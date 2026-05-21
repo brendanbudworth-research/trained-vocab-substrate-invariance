@@ -1,0 +1,352 @@
+[logging] tee'ing all output to /Users/brendan.budworth/dev/thesis/experiments/outputs/22b_20260520_083957.log
+Script 22b - full anchor x layer sweep
+  Models: OLMo 2 7B, Gemma 2 9B
+  NEUT anchors: ['operator-after', 'sentence-final']
+  FUNC anchors: ['operator-after', 'first-arg', 'close-paren', 'sentence-final']
+  Focus layers: OLMo 2 [4, 7, 10, 16, 24]; Gemma 2 [2, 4, 8, 16, 17]
+  Total cells per model: 5 layers x (2x4 N->F + 4x2 F->N) = 80
+  Grand total: 160 cells
+
+  Verdict thresholds:
+    M2-arity PASS:  >= 0.65 (0.05 above lucky-default floor)
+    M4b PASS:       >= 0.65    (~25% above by-arity-random baseline)
+    M4c distributed: < 0.7    (above = single-canonical catchment)
+
+========================================================================================================================================================================================================
+LOADING SCRIPT-21 CACHES
+========================================================================================================================================================================================================
+  loaded 21_OLMo_2_7B_NEUTRAL: canon(2, 250, 33, 4096), inv(2, 250, 33, 4096)
+  loaded 21_OLMo_2_7B_FUNC-PFX: canon(4, 250, 33, 4096), inv(4, 250, 33, 4096)
+  loaded 21_Gemma_2_9B_NEUTRAL: canon(2, 250, 43, 3584), inv(2, 250, 43, 3584)
+  loaded 21_Gemma_2_9B_FUNC-PFX: canon(4, 250, 43, 3584), inv(4, 250, 43, 3584)
+
+========================================================================================================================================================================================================
+RUNNING SWEEP
+========================================================================================================================================================================================================
+
+  OLMo 2 7B: 80 cells ... done in 47.6s
+  Gemma 2 9B: 80 cells ... done in 74.7s
+
+
+########  OLMo 2 7B - all 80 cells  ########
+
+========================================================================================================================================================================================================
+FULL SWEEP - all cells, all metrics
+========================================================================================================================================================================================================
+
+  cell                                                    | M1tr  | M1te  | M2cano  | M2arty  | gap    | M3°c  | M3°p  | M4a    | M4b    | M4c   | pwmin | verdict        | per-word
+  ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+  OLMo 2 7B   N->F opera->opera L4                        | 0.99  | 1.00  | 1.000   | 1.000   | +0.000 | 74.1° | 71.4° |  0.0% | 60.0% | 1.00  | 1.00  | LUCKY-NEG *LUCKY* | bliq=implies(100%/0%U) dren=implies(100%/0%U) vusp=implies(100%/0%U) molex=implies(100%/0%U) perph=implies(100%/0%U)
+  OLMo 2 7B   N->F opera->first L4                        | 0.99  | 1.00  | 0.916   | 0.916   | +0.000 | 74.7° | 72.1° | 13.6% | 58.4% | 0.76  | 0.62  | M2A-ONLY       | bliq=implies(100%/0%U) dren=implies(62%/38%U) vusp=implies(100%/0%U) molex=implies(100%/0%U) perph=implies(70%/30%U)
+  OLMo 2 7B   N->F opera->close L4                        | 0.99  | 1.00  | 0.400   | 0.800   | +0.400 | 86.3° | 85.5° |  0.0% | 60.0% | 1.00  | 1.00  | LUCKY-NEG *LUCKY* | bliq=implies(100%/0%U) dren=implies(100%/0%U) vusp=implies(100%/0%U) molex=implies(100%/0%U) perph=implies(100%/0%U)
+  OLMo 2 7B   N->F opera->sente L4                        | 0.99  | 1.00  | 0.200   | 0.600   | +0.400 | 86.6° | 85.7° |  0.0% | 60.0% | 1.00  | 1.00  | LUCKY-NEG *LUCKY* | bliq=implies(100%/0%U) dren=implies(100%/0%U) vusp=implies(100%/0%U) molex=implies(100%/0%U) perph=implies(100%/0%U)
+  OLMo 2 7B   N->F sente->opera L4                        | 0.96  | 1.00  | 0.800   | 0.800   | +0.000 | 83.6° | 81.7° | 100.0% | 40.0% | 1.00  | 1.00  | LUCKY-NEG *LUCKY* | bliq=not(100%/100%U) dren=not(100%/100%U) vusp=not(100%/100%U) molex=not(100%/100%U) perph=not(100%/100%U)
+  OLMo 2 7B   N->F sente->first L4                        | 0.96  | 1.00  | 0.688   | 0.768   | +0.080 | 80.9° | 79.4° | 64.4% | 45.2% | 0.54  | 0.52  | M2A-ONLY       | bliq=not(74%/74%U) dren=not(52%/52%U) vusp=not(72%/72%U) molex=not(72%/72%U) perph=not(52%/52%U)
+  OLMo 2 7B   N->F sente->close L4                        | 0.96  | 1.00  | 0.600   | 0.800   | +0.200 | 86.7° | 85.7° | 85.2% | 54.8% | 0.75  | 0.64  | M2A-ONLY       | bliq=not(90%/90%U) dren=not(100%/100%U) vusp=not(100%/100%U) molex=implies(64%/36%U) perph=not(100%/100%U)
+  OLMo 2 7B   N->F sente->sente L4                        | 0.96  | 1.00  | 0.596   | 0.868   | +0.272 | 73.6° | 73.0° | 19.6% | 61.2% | 0.65  | 0.62  | M2A-ONLY       | bliq=implies(88%/12%U) dren=implies(72%/28%U) vusp=implies(62%/38%U) molex=implies(90%/6%U) perph=implies(86%/14%U)
+  OLMo 2 7B   F->N opera->opera L4                        | 1.00  | 0.99  | 0.264   | 0.668   | +0.404 | 74.1° | 71.4° |  0.0% | 60.0% | 1.00  | 1.00  | LUCKY-NEG *LUCKY* | bliq=implies(100%/0%U) dren=implies(100%/0%U) vusp=implies(100%/0%U) molex=implies(100%/0%U) perph=implies(100%/0%U)
+  OLMo 2 7B   F->N opera->sente L4                        | 1.00  | 0.96  | 0.200   | 0.600   | +0.400 | 83.6° | 81.7° |  0.0% | 60.0% | 1.00  | 1.00  | LUCKY-NEG *LUCKY* | bliq=implies(100%/0%U) dren=implies(100%/0%U) vusp=implies(100%/0%U) molex=implies(100%/0%U) perph=implies(100%/0%U)
+  OLMo 2 7B   F->N first->opera L4                        | 1.00  | 0.99  | 0.600   | 0.952   | +0.352 | 74.7° | 72.1° | 17.6% | 57.6% | 0.71  | 0.78  | M2A-ONLY       | bliq=or(78%/22%U) dren=or(88%/12%U) vusp=or(78%/22%U) molex=or(84%/16%U) perph=or(84%/16%U)
+  OLMo 2 7B   F->N first->sente L4                        | 1.00  | 0.96  | 0.344   | 0.668   | +0.324 | 80.9° | 79.4° | 49.2% | 51.6% | 0.50  | 0.50  | M2A-ONLY       | bliq=necessarily(52%/52%U) dren=or(60%/40%U) vusp=necessarily(52%/52%U) molex=necessarily(52%/52%U) perph=or(50%/50%U)
+  OLMo 2 7B   F->N close->opera L4                        | 1.00  | 0.99  | 0.376   | 0.496   | +0.120 | 86.3° | 85.5° |  2.4% | 60.8% | 0.95  | 0.94  | FAIL           | bliq=implies(100%/0%U) dren=implies(96%/4%U) vusp=implies(98%/2%U) molex=implies(100%/0%U) perph=implies(94%/6%U)
+  OLMo 2 7B   F->N close->sente L4                        | 1.00  | 0.96  | 0.328   | 0.492   | +0.164 | 86.7° | 85.7° | 19.2% | 56.8% | 0.69  | 0.72  | FAIL           | bliq=implies(80%/20%U) dren=implies(72%/28%U) vusp=implies(76%/24%U) molex=implies(92%/8%U) perph=implies(84%/16%U)
+  OLMo 2 7B   F->N sente->opera L4                        | 1.00  | 0.99  | 0.548   | 0.640   | +0.092 | 86.6° | 85.7° | 86.8% | 42.0% | 0.74  | 0.82  | FAIL           | bliq=not(88%/88%U) dren=not(84%/86%U) vusp=not(86%/86%U) molex=not(88%/88%U) perph=not(82%/86%U)
+  OLMo 2 7B   F->N sente->sente L4                        | 1.00  | 0.96  | 0.392   | 0.460   | +0.068 | 73.6° | 73.0° | 93.2% | 42.0% | 0.70  | 0.78  | FAIL           | bliq=not(84%/94%U) dren=not(80%/92%U) vusp=not(88%/96%U) molex=not(78%/92%U) perph=not(82%/92%U)
+  OLMo 2 7B   N->F opera->opera L7                        | 1.00  | 1.00  | 1.000   | 1.000   | +0.000 | 75.6° | 74.9° | 20.0% | 80.0% | 0.68  | 1.00  | LUCKY-NEG *LUCKY* | bliq=and(100%/0%U) dren=and(100%/0%U) vusp=and(100%/0%U) molex=and(100%/0%U) perph=necessarily(100%/100%U)
+  OLMo 2 7B   N->F opera->first L7                        | 1.00  | 1.00  | 0.804   | 0.848   | +0.044 | 78.2° | 76.5° | 38.0% | 46.8% | 0.30  | 0.44  | M2A-ONLY       | bliq=and(46%/44%U) dren=not(62%/62%U) vusp=implies(44%/30%U) molex=implies(78%/22%U) perph=implies(54%/32%U)
+  OLMo 2 7B   N->F opera->close L7                        | 1.00  | 1.00  | 0.800   | 1.000   | +0.200 | 84.3° | 83.2° | 96.0% | 44.0% | 0.92  | 0.86  | M2A-ONLY       | bliq=necessarily(94%/94%U) dren=necessarily(86%/86%U) vusp=necessarily(100%/100%U) molex=necessarily(100%/100%U) perph=necessarily(100%/100%U)
+  OLMo 2 7B   N->F opera->sente L7                        | 1.00  | 1.00  | 0.200   | 0.400   | +0.200 | 86.0° | 84.9° | 100.0% | 40.0% | 1.00  | 1.00  | LUCKY-NEG *LUCKY* | bliq=necessarily(100%/100%U) dren=necessarily(100%/100%U) vusp=necessarily(100%/100%U) molex=necessarily(100%/100%U) perph=necessarily(100%/100%U)
+  OLMo 2 7B   N->F sente->opera L7                        | 0.98  | 1.00  | 1.000   | 1.000   | +0.000 | 83.3° | 83.1° | 80.0% | 20.0% | 0.68  | 1.00  | LUCKY-NEG *LUCKY* | bliq=not(100%/100%U) dren=not(100%/100%U) vusp=not(100%/100%U) molex=not(100%/100%U) perph=and(100%/0%U)
+  OLMo 2 7B   N->F sente->first L7                        | 0.98  | 1.00  | 0.596   | 0.728   | +0.132 | 82.2° | 82.2° | 80.0% | 26.4% | 0.41  | 0.52  | M2A-ONLY       | bliq=not(84%/84%U) dren=not(100%/100%U) vusp=and(70%/30%U) molex=not(52%/100%U) perph=necessarily(52%/86%U)
+  OLMo 2 7B   N->F sente->close L7                        | 0.98  | 1.00  | 0.732   | 0.988   | +0.256 | 82.8° | 82.9° | 91.6% | 48.4% | 0.85  | 0.58  | M2A-ONLY       | bliq=not(58%/58%U) dren=not(100%/100%U) vusp=not(100%/100%U) molex=not(100%/100%U) perph=not(100%/100%U)
+  OLMo 2 7B   N->F sente->sente L7                        | 0.98  | 1.00  | 0.704   | 0.904   | +0.200 | 76.4° | 75.9° | 55.6% | 50.8% | 0.29  | 0.40  | M2A-ONLY       | bliq=and(50%/38%U) dren=not(40%/52%U) vusp=necessarily(44%/64%U) molex=necessarily(44%/72%U) perph=and(40%/52%U)
+  OLMo 2 7B   F->N opera->opera L7                        | 1.00  | 1.00  | 0.212   | 0.612   | +0.400 | 75.6° | 74.9° |  0.0% | 60.0% | 1.00  | 1.00  | LUCKY-NEG *LUCKY* | bliq=implies(100%/0%U) dren=implies(100%/0%U) vusp=implies(100%/0%U) molex=implies(100%/0%U) perph=implies(100%/0%U)
+  OLMo 2 7B   F->N opera->sente L7                        | 1.00  | 0.98  | 0.200   | 0.600   | +0.400 | 83.3° | 83.1° |  0.0% | 60.0% | 1.00  | 1.00  | LUCKY-NEG *LUCKY* | bliq=implies(100%/0%U) dren=implies(100%/0%U) vusp=implies(100%/0%U) molex=implies(100%/0%U) perph=implies(100%/0%U)
+  OLMo 2 7B   F->N first->opera L7                        | 1.00  | 1.00  | 0.980   | 0.984   | +0.004 | 78.2° | 76.5° | 55.2% | 65.6% | 0.35  | 0.36  | PASS-arity     | bliq=implies(58%/42%U) dren=implies(54%/44%U) vusp=necessarily(36%/70%U) molex=implies(60%/38%U) perph=necessarily(66%/82%U)
+  OLMo 2 7B   F->N first->sente L7                        | 1.00  | 0.98  | 0.500   | 0.708   | +0.208 | 82.2° | 82.2° | 69.6% | 43.2% | 0.36  | 0.38  | M2A-ONLY       | bliq=not(56%/76%U) dren=not(50%/78%U) vusp=not(44%/70%U) molex=not(42%/62%U) perph=implies(38%/62%U)
+  OLMo 2 7B   F->N close->opera L7                        | 1.00  | 1.00  | 0.408   | 0.508   | +0.100 | 84.3° | 83.2° | 99.2% | 40.0% | 0.98  | 0.98  | LUCKY-NEG *LUCKY* | bliq=not(100%/100%U) dren=not(100%/100%U) vusp=not(100%/100%U) molex=not(98%/98%U) perph=not(98%/98%U)
+  OLMo 2 7B   F->N close->sente L7                        | 1.00  | 0.98  | 0.300   | 0.484   | +0.184 | 82.8° | 82.9° | 94.8% | 40.4% | 0.90  | 0.92  | FAIL           | bliq=not(96%/96%U) dren=not(94%/94%U) vusp=not(92%/92%U) molex=not(96%/96%U) perph=not(96%/96%U)
+  OLMo 2 7B   F->N sente->opera L7                        | 1.00  | 1.00  | 0.388   | 0.448   | +0.060 | 86.0° | 84.9° | 85.6% | 32.8% | 0.66  | 0.66  | FAIL           | bliq=not(90%/96%U) dren=not(82%/90%U) vusp=not(72%/76%U) molex=not(88%/96%U) perph=not(66%/70%U)
+  OLMo 2 7B   F->N sente->sente L7                        | 1.00  | 0.98  | 0.500   | 0.596   | +0.096 | 76.4° | 75.9° | 71.6% | 41.2% | 0.53  | 0.52  | FAIL           | bliq=not(72%/74%U) dren=not(66%/70%U) vusp=not(68%/68%U) molex=not(76%/82%U) perph=not(52%/64%U)
+  OLMo 2 7B   N->F opera->opera L10                       | 1.00  | 1.00  | 0.800   | 0.800   | +0.000 | 71.3° | 74.4° |  0.0% | 60.0% | 1.00  | 1.00  | LUCKY-NEG *LUCKY* | bliq=implies(100%/0%U) dren=implies(100%/0%U) vusp=implies(100%/0%U) molex=implies(100%/0%U) perph=implies(100%/0%U)
+  OLMo 2 7B   N->F opera->first L10                       | 1.00  | 1.00  | 0.800   | 0.800   | +0.000 | 75.6° | 78.4° | 10.8% | 49.2% | 0.66  | 0.46  | M2A-ONLY       | bliq=implies(100%/0%U) dren=implies(46%/44%U) vusp=implies(100%/0%U) molex=implies(70%/10%U) perph=implies(86%/0%U)
+  OLMo 2 7B   N->F opera->close L10                       | 1.00  | 1.00  | 0.924   | 0.924   | +0.000 | 81.7° | 83.3° | 100.0% | 40.0% | 1.00  | 1.00  | LUCKY-NEG *LUCKY* | bliq=necessarily(100%/100%U) dren=necessarily(100%/100%U) vusp=necessarily(100%/100%U) molex=necessarily(100%/100%U) perph=necessarily(100%/100%U)
+  OLMo 2 7B   N->F opera->sente L10                       | 1.00  | 1.00  | 0.348   | 0.624   | +0.276 | 81.6° | 82.3° | 83.2% | 40.0% | 0.72  | 0.78  | FAIL           | bliq=necessarily(86%/86%U) dren=necessarily(90%/90%U) vusp=necessarily(78%/78%U) molex=necessarily(82%/82%U) perph=necessarily(80%/80%U)
+  OLMo 2 7B   N->F sente->opera L10                       | 0.95  | 1.00  | 1.000   | 1.000   | +0.000 | 81.2° | 80.6° | 20.0% | 80.0% | 0.68  | 1.00  | LUCKY-NEG *LUCKY* | bliq=and(100%/0%U) dren=and(100%/0%U) vusp=necessarily(100%/100%U) molex=and(100%/0%U) perph=and(100%/0%U)
+  OLMo 2 7B   N->F sente->first L10                       | 0.95  | 1.00  | 0.552   | 0.796   | +0.244 | 79.6° | 81.5° | 20.8% | 60.8% | 0.60  | 0.58  | M2A-ONLY       | bliq=and(80%/20%U) dren=and(80%/20%U) vusp=and(58%/42%U) molex=and(70%/10%U) perph=and(88%/12%U)
+  OLMo 2 7B   N->F sente->close L10                       | 0.95  | 1.00  | 0.616   | 1.000   | +0.384 | 80.6° | 81.1° | 30.0% | 90.0% | 0.57  | 0.50  | PASS-arity     | bliq=and(100%/0%U) dren=and(100%/0%U) vusp=necessarily(100%/100%U) molex=and(100%/0%U) perph=and(50%/50%U)
+  OLMo 2 7B   N->F sente->sente L10                       | 0.95  | 1.00  | 0.688   | 0.828   | +0.140 | 74.1° | 73.1° | 40.0% | 55.2% | 0.28  | 0.34  | M2A-ONLY       | bliq=and(48%/30%U) dren=and(42%/42%U) vusp=and(36%/50%U) molex=and(34%/40%U) perph=and(52%/38%U)
+  OLMo 2 7B   F->N opera->opera L10                       | 1.00  | 1.00  | 0.688   | 0.840   | +0.152 | 71.3° | 74.4° | 17.2% | 48.4% | 0.42  | 0.44  | M2A-ONLY       | bliq=implies(80%/20%U) dren=implies(68%/32%U) vusp=or(44%/14%U) molex=implies(80%/20%U) perph=or(84%/0%U)
+  OLMo 2 7B   F->N opera->sente L10                       | 1.00  | 0.95  | 0.220   | 0.600   | +0.380 | 81.2° | 80.6° |  0.0% | 60.0% | 0.98  | 0.98  | LUCKY-NEG *LUCKY* | bliq=implies(100%/0%U) dren=implies(100%/0%U) vusp=implies(98%/0%U) molex=implies(100%/0%U) perph=implies(98%/0%U)
+  OLMo 2 7B   F->N first->opera L10                       | 1.00  | 1.00  | 0.660   | 0.888   | +0.228 | 75.6° | 78.4° |  8.4% | 54.8% | 0.76  | 0.74  | M2A-ONLY       | bliq=implies(96%/4%U) dren=implies(74%/22%U) vusp=implies(96%/4%U) molex=implies(92%/8%U) perph=implies(74%/4%U)
+  OLMo 2 7B   F->N first->sente L10                       | 1.00  | 0.95  | 0.360   | 0.664   | +0.304 | 79.6° | 81.5° | 16.0% | 54.4% | 0.72  | 0.78  | M2A-ONLY       | bliq=implies(78%/22%U) dren=implies(80%/20%U) vusp=implies(88%/12%U) molex=implies(88%/12%U) perph=implies(84%/14%U)
+  OLMo 2 7B   F->N close->opera L10                       | 1.00  | 1.00  | 0.396   | 0.500   | +0.104 | 81.7° | 83.3° | 100.0% | 40.0% | 0.95  | 0.94  | FAIL           | bliq=not(98%/100%U) dren=not(100%/100%U) vusp=not(98%/100%U) molex=not(98%/100%U) perph=not(94%/100%U)
+  OLMo 2 7B   F->N close->sente L10                       | 1.00  | 0.95  | 0.332   | 0.544   | +0.212 | 80.6° | 81.1° | 96.0% | 40.8% | 0.92  | 0.94  | FAIL           | bliq=not(94%/94%U) dren=not(96%/96%U) vusp=not(96%/96%U) molex=not(96%/98%U) perph=not(96%/96%U)
+  OLMo 2 7B   F->N sente->opera L10                       | 1.00  | 1.00  | 0.416   | 0.648   | +0.232 | 81.6° | 82.3° | 62.8% | 35.6% | 0.43  | 0.50  | FAIL           | bliq=not(72%/80%U) dren=not(92%/94%U) vusp=not(82%/86%U) molex=and(50%/44%U) perph=and(82%/10%U)
+  OLMo 2 7B   F->N sente->sente L10                       | 1.00  | 0.95  | 0.552   | 0.724   | +0.172 | 74.1° | 73.1° | 68.4% | 42.8% | 0.43  | 0.52  | M2A-ONLY       | bliq=not(60%/66%U) dren=not(72%/76%U) vusp=not(64%/68%U) molex=not(52%/72%U) perph=not(56%/60%U)
+  OLMo 2 7B   N->F opera->opera L16                       | 0.99  | 1.00  | 0.600   | 0.800   | +0.200 | 74.8° | 75.9° |  0.0% | 60.0% | 0.68  | 1.00  | LUCKY-NEG *LUCKY* | bliq=implies(100%/0%U) dren=implies(100%/0%U) vusp=implies(100%/0%U) molex=implies(100%/0%U) perph=or(100%/0%U)
+  OLMo 2 7B   N->F opera->first L16                       | 0.99  | 1.00  | 0.536   | 0.736   | +0.200 | 82.6° | 83.1° |  0.0% | 60.0% | 0.51  | 0.52  | M2A-ONLY       | bliq=implies(78%/0%U) dren=or(76%/0%U) vusp=or(54%/0%U) molex=implies(52%/0%U) perph=or(78%/0%U)
+  OLMo 2 7B   N->F opera->close L16                       | 0.99  | 1.00  | 0.812   | 1.000   | +0.188 | 81.7° | 82.4° | 100.0% | 40.0% | 1.00  | 1.00  | LUCKY-NEG *LUCKY* | bliq=necessarily(100%/100%U) dren=necessarily(100%/100%U) vusp=necessarily(100%/100%U) molex=necessarily(100%/100%U) perph=necessarily(100%/100%U)
+  OLMo 2 7B   N->F opera->sente L16                       | 0.99  | 0.99  | 0.424   | 0.568   | +0.144 | 79.8° | 81.4° | 54.8% | 51.6% | 0.29  | 0.32  | FAIL           | bliq=implies(32%/52%U) dren=necessarily(40%/54%U) vusp=implies(40%/52%U) molex=implies(42%/52%U) perph=not(34%/64%U)
+  OLMo 2 7B   N->F sente->opera L16                       | 0.88  | 1.00  | 0.800   | 1.000   | +0.200 | 81.6° | 79.4° |  0.0% | 60.0% | 0.52  | 1.00  | LUCKY-NEG *LUCKY* | bliq=and(100%/0%U) dren=or(100%/0%U) vusp=or(100%/0%U) molex=and(100%/0%U) perph=or(100%/0%U)
+  OLMo 2 7B   N->F sente->first L16                       | 0.88  | 1.00  | 0.724   | 0.936   | +0.212 | 84.1° | 82.7° | 25.6% | 64.8% | 0.58  | 0.52  | M2A-ONLY       | bliq=or(100%/0%U) dren=necessarily(52%/52%U) vusp=necessarily(58%/58%U) molex=or(88%/0%U) perph=or(82%/18%U)
+  OLMo 2 7B   N->F sente->close L16                       | 0.88  | 1.00  | 0.768   | 1.000   | +0.232 | 79.8° | 79.3° | 11.6% | 71.6% | 0.79  | 0.58  | ARITY-AXIS-ONLY | bliq=or(100%/0%U) dren=or(100%/0%U) vusp=necessarily(58%/58%U) molex=or(100%/0%U) perph=or(100%/0%U)
+  OLMo 2 7B   N->F sente->sente L16                       | 0.88  | 0.99  | 0.528   | 0.792   | +0.264 | 74.0° | 73.7° |  3.6% | 63.6% | 0.63  | 0.68  | M2A-ONLY       | bliq=and(90%/0%U) dren=and(78%/0%U) vusp=and(80%/6%U) molex=and(76%/0%U) perph=and(68%/12%U)
+  OLMo 2 7B   F->N opera->opera L16                       | 1.00  | 0.99  | 0.620   | 0.872   | +0.252 | 74.8° | 75.9° | 14.8% | 46.8% | 0.40  | 0.48  | M2A-ONLY       | bliq=implies(76%/12%U) dren=implies(54%/34%U) vusp=or(48%/4%U) molex=implies(74%/24%U) perph=or(82%/0%U)
+  OLMo 2 7B   F->N opera->sente L16                       | 1.00  | 0.88  | 0.256   | 0.636   | +0.380 | 81.6° | 79.4° |  1.2% | 60.4% | 0.96  | 0.96  | LUCKY-NEG *LUCKY* | bliq=implies(98%/2%U) dren=implies(100%/0%U) vusp=implies(96%/2%U) molex=implies(100%/0%U) perph=implies(96%/2%U)
+  OLMo 2 7B   F->N first->opera L16                       | 1.00  | 0.99  | 0.336   | 0.716   | +0.380 | 82.6° | 83.1° |  8.4% | 56.4% | 0.84  | 0.88  | M2A-ONLY       | bliq=implies(94%/6%U) dren=implies(88%/12%U) vusp=implies(92%/8%U) molex=implies(88%/12%U) perph=implies(96%/4%U)
+  OLMo 2 7B   F->N first->sente L16                       | 1.00  | 0.88  | 0.308   | 0.692   | +0.384 | 84.1° | 82.7° |  6.4% | 59.2% | 0.88  | 0.92  | M2A-ONLY       | bliq=implies(92%/8%U) dren=implies(96%/4%U) vusp=implies(92%/8%U) molex=implies(94%/6%U) perph=implies(94%/6%U)
+  OLMo 2 7B   F->N close->opera L16                       | 1.00  | 0.99  | 0.280   | 0.444   | +0.164 | 81.7° | 82.4° | 95.6% | 39.6% | 0.91  | 0.92  | FAIL           | bliq=not(96%/96%U) dren=not(100%/100%U) vusp=not(94%/94%U) molex=not(94%/94%U) perph=not(92%/94%U)
+  OLMo 2 7B   F->N close->sente L16                       | 1.00  | 0.88  | 0.268   | 0.428   | +0.160 | 79.8° | 79.3° | 98.8% | 39.6% | 0.97  | 0.98  | LUCKY-NEG *LUCKY* | bliq=not(98%/98%U) dren=not(100%/100%U) vusp=not(98%/98%U) molex=not(98%/100%U) perph=not(98%/98%U)
+  OLMo 2 7B   F->N sente->opera L16                       | 0.99  | 0.99  | 0.352   | 0.524   | +0.172 | 79.8° | 81.4° | 54.4% | 39.2% | 0.42  | 0.36  | FAIL           | bliq=or(48%/50%U) dren=not(70%/72%U) vusp=or(50%/48%U) molex=not(36%/66%U) perph=or(62%/36%U)
+  OLMo 2 7B   F->N sente->sente L16                       | 0.99  | 0.88  | 0.348   | 0.508   | +0.160 | 74.0° | 73.7° | 90.8% | 38.8% | 0.44  | 0.52  | FAIL           | bliq=not(58%/88%U) dren=not(74%/96%U) vusp=not(60%/88%U) molex=necessarily(62%/96%U) perph=not(52%/86%U)
+  OLMo 2 7B   N->F opera->opera L24                       | 0.94  | 1.00  | 1.000   | 1.000   | +0.000 | 74.9° | 72.2° |  0.0% | 60.0% | 0.68  | 1.00  | LUCKY-NEG *LUCKY* | bliq=and(100%/0%U) dren=or(100%/0%U) vusp=or(100%/0%U) molex=or(100%/0%U) perph=or(100%/0%U)
+  OLMo 2 7B   N->F opera->first L24                       | 0.94  | 1.00  | 0.740   | 0.908   | +0.168 | 80.6° | 78.9° | 24.0% | 58.4% | 0.40  | 0.36  | M2A-ONLY       | bliq=implies(66%/24%U) dren=implies(62%/20%U) vusp=necessarily(36%/36%U) molex=implies(64%/20%U) perph=implies(54%/20%U)
+  OLMo 2 7B   N->F opera->close L24                       | 0.94  | 1.00  | 0.864   | 0.980   | +0.116 | 78.9° | 79.5° | 20.4% | 79.6% | 0.68  | 0.98  | LUCKY-NEG *LUCKY* | bliq=and(100%/0%U) dren=and(100%/0%U) vusp=necessarily(100%/100%U) molex=and(98%/2%U) perph=and(100%/0%U)
+  OLMo 2 7B   N->F opera->sente L24                       | 0.94  | 1.00  | 0.704   | 0.852   | +0.148 | 80.8° | 82.5° | 18.0% | 58.0% | 0.53  | 0.60  | M2A-ONLY       | bliq=and(60%/22%U) dren=and(76%/14%U) vusp=and(80%/12%U) molex=and(64%/14%U) perph=and(66%/28%U)
+  OLMo 2 7B   N->F sente->opera L24                       | 0.82  | 1.00  | 1.000   | 1.000   | +0.000 | 79.9° | 77.7° |  0.0% | 60.0% | 0.68  | 1.00  | LUCKY-NEG *LUCKY* | bliq=and(100%/0%U) dren=or(100%/0%U) vusp=and(100%/0%U) molex=and(100%/0%U) perph=and(100%/0%U)
+  OLMo 2 7B   N->F sente->first L24                       | 0.82  | 1.00  | 0.712   | 0.856   | +0.144 | 82.5° | 81.7° | 48.0% | 45.6% | 0.39  | 0.44  | M2A-ONLY       | bliq=or(82%/18%U) dren=necessarily(80%/80%U) vusp=or(44%/22%U) molex=necessarily(58%/58%U) perph=necessarily(62%/62%U)
+  OLMo 2 7B   N->F sente->close L24                       | 0.82  | 1.00  | 0.856   | 1.000   | +0.144 | 79.9° | 78.6° |  0.0% | 60.0% | 0.84  | 0.68  | M2A-ONLY       | bliq=or(88%/0%U) dren=or(100%/0%U) vusp=or(100%/0%U) molex=or(68%/0%U) perph=or(100%/0%U)
+  OLMo 2 7B   N->F sente->sente L24                       | 0.82  | 1.00  | 0.972   | 1.000   | +0.028 | 66.4° | 67.4° | 27.2% | 60.0% | 0.41  | 0.42  | M2A-ONLY       | bliq=and(70%/20%U) dren=and(64%/24%U) vusp=and(64%/32%U) molex=and(44%/24%U) perph=and(42%/36%U)
+  OLMo 2 7B   F->N opera->opera L24                       | 1.00  | 0.94  | 0.640   | 0.880   | +0.240 | 74.9° | 72.2° | 14.0% | 53.2% | 0.65  | 0.70  | M2A-ONLY       | bliq=implies(84%/12%U) dren=implies(70%/24%U) vusp=implies(76%/10%U) molex=implies(82%/16%U) perph=implies(86%/8%U)
+  OLMo 2 7B   F->N opera->sente L24                       | 1.00  | 0.82  | 0.284   | 0.644   | +0.360 | 79.9° | 77.7° |  1.6% | 59.2% | 0.97  | 0.94  | FAIL           | bliq=implies(100%/0%U) dren=implies(100%/0%U) vusp=implies(100%/0%U) molex=implies(94%/6%U) perph=implies(98%/2%U)
+  OLMo 2 7B   F->N first->opera L24                       | 1.00  | 0.94  | 0.440   | 0.740   | +0.300 | 80.6° | 78.9° | 41.2% | 47.6% | 0.35  | 0.40  | M2A-ONLY       | bliq=implies(40%/42%U) dren=implies(44%/38%U) vusp=implies(44%/36%U) molex=necessarily(50%/54%U) perph=implies(48%/36%U)
+  OLMo 2 7B   F->N first->sente L24                       | 1.00  | 0.82  | 0.400   | 0.688   | +0.288 | 82.5° | 81.7° | 31.2% | 52.8% | 0.43  | 0.48  | M2A-ONLY       | bliq=implies(70%/18%U) dren=implies(66%/26%U) vusp=implies(48%/36%U) molex=necessarily(52%/52%U) perph=implies(66%/24%U)
+  OLMo 2 7B   F->N close->opera L24                       | 1.00  | 0.94  | 0.452   | 0.568   | +0.116 | 78.9° | 79.5° | 51.2% | 42.4% | 0.28  | 0.38  | FAIL           | bliq=or(38%/42%U) dren=not(62%/74%U) vusp=or(50%/40%U) molex=necessarily(40%/56%U) perph=or(46%/44%U)
+  OLMo 2 7B   F->N close->sente L24                       | 1.00  | 0.82  | 0.488   | 0.604   | +0.116 | 79.9° | 78.6° | 74.4% | 44.0% | 0.53  | 0.52  | FAIL           | bliq=not(72%/72%U) dren=not(76%/76%U) vusp=not(80%/80%U) molex=not(52%/78%U) perph=not(66%/66%U)
+  OLMo 2 7B   F->N sente->opera L24                       | 1.00  | 0.94  | 0.408   | 0.464   | +0.056 | 80.8° | 82.5° | 65.2% | 34.0% | 0.41  | 0.48  | FAIL           | bliq=not(70%/82%U) dren=not(68%/78%U) vusp=or(58%/40%U) molex=not(48%/68%U) perph=not(48%/58%U)
+  OLMo 2 7B   F->N sente->sente L24                       | 1.00  | 0.82  | 0.520   | 0.564   | +0.044 | 66.4° | 67.4° | 90.8% | 37.2% | 0.75  | 0.78  | FAIL           | bliq=not(94%/94%U) dren=not(94%/96%U) vusp=not(80%/82%U) molex=not(78%/94%U) perph=not(86%/88%U)
+
+
+########  Gemma 2 9B - all 80 cells  ########
+
+========================================================================================================================================================================================================
+FULL SWEEP - all cells, all metrics
+========================================================================================================================================================================================================
+
+  cell                                                    | M1tr  | M1te  | M2cano  | M2arty  | gap    | M3°c  | M3°p  | M4a    | M4b    | M4c   | pwmin | verdict        | per-word
+  ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+  Gemma 2 9B  N->F opera->opera L2                        | 0.97  | 1.00  | 1.000   | 1.000   | +0.000 | 50.8° | 45.9° | 40.0% | 60.0% | 0.52  | 1.00  | LUCKY-NEG *LUCKY* | bliq=not(100%/100%U) dren=implies(100%/0%U) vusp=implies(100%/0%U) molex=implies(100%/0%U) perph=not(100%/100%U)
+  Gemma 2 9B  N->F opera->first L2                        | 0.97  | 1.00  | 0.724   | 0.748   | +0.024 | 63.8° | 59.1° |  0.0% | 60.0% | 0.55  | 0.56  | M2A-ONLY       | bliq=implies(90%/0%U) dren=implies(58%/0%U) vusp=implies(70%/0%U) molex=implies(74%/0%U) perph=implies(56%/0%U)
+  Gemma 2 9B  N->F opera->close L2                        | 0.97  | 1.00  | 0.632   | 0.852   | +0.220 | 76.5° | 76.6° |  0.4% | 59.6% | 0.50  | 0.58  | M2A-ONLY       | bliq=implies(58%/0%U) dren=or(68%/0%U) vusp=implies(70%/0%U) molex=or(76%/2%U) perph=implies(74%/0%U)
+  Gemma 2 9B  N->F opera->sente L2                        | 0.97  | 1.00  | 0.252   | 0.652   | +0.400 | 79.5° | 75.4° |  7.6% | 64.4% | 0.86  | 0.70  | M2A-ONLY       | bliq=implies(100%/0%U) dren=implies(94%/6%U) vusp=implies(70%/30%U) molex=implies(98%/2%U) perph=implies(100%/0%U)
+  Gemma 2 9B  N->F sente->opera L2                        | 0.99  | 1.00  | 0.800   | 1.000   | +0.200 | 62.3° | 69.7° | 100.0% | 40.0% | 1.00  | 1.00  | LUCKY-NEG *LUCKY* | bliq=necessarily(100%/100%U) dren=necessarily(100%/100%U) vusp=necessarily(100%/100%U) molex=necessarily(100%/100%U) perph=necessarily(100%/100%U)
+  Gemma 2 9B  N->F sente->first L2                        | 0.99  | 1.00  | 0.636   | 0.980   | +0.344 | 60.2° | 59.6° | 17.2% | 62.0% | 0.38  | 0.44  | M2A-ONLY       | bliq=implies(72%/16%U) dren=and(90%/10%U) vusp=and(44%/34%U) molex=and(66%/12%U) perph=implies(54%/14%U)
+  Gemma 2 9B  N->F sente->close L2                        | 0.99  | 1.00  | 1.000   | 1.000   | +0.000 | 74.3° | 78.4° | 74.0% | 43.6% | 0.44  | 0.46  | M2A-ONLY       | bliq=necessarily(56%/70%U) dren=necessarily(80%/80%U) vusp=necessarily(56%/80%U) molex=necessarily(74%/76%U) perph=necessarily(46%/64%U)
+  Gemma 2 9B  N->F sente->sente L2                        | 0.99  | 1.00  | 0.420   | 0.736   | +0.316 | 61.4° | 62.6° | 40.8% | 52.0% | 0.52  | 0.50  | M2A-ONLY       | bliq=implies(64%/36%U) dren=implies(50%/50%U) vusp=necessarily(52%/52%U) molex=implies(64%/36%U) perph=implies(70%/30%U)
+  Gemma 2 9B  F->N opera->opera L2                        | 1.00  | 0.97  | 0.888   | 0.932   | +0.044 | 50.8° | 45.9° | 42.0% | 46.0% | 0.42  | 0.52  | M2A-ONLY       | bliq=not(76%/90%U) dren=implies(76%/24%U) vusp=implies(76%/24%U) molex=implies(72%/26%U) perph=implies(52%/46%U)
+  Gemma 2 9B  F->N opera->sente L2                        | 1.00  | 0.99  | 0.252   | 0.632   | +0.380 | 62.3° | 69.7° |  6.4% | 58.4% | 0.88  | 0.92  | FAIL           | bliq=implies(92%/8%U) dren=implies(94%/6%U) vusp=implies(94%/6%U) molex=implies(94%/6%U) perph=implies(94%/6%U)
+  Gemma 2 9B  F->N first->opera L2                        | 1.00  | 0.97  | 0.740   | 0.932   | +0.192 | 63.8° | 59.1° | 24.4% | 53.2% | 0.46  | 0.48  | M2A-ONLY       | bliq=or(70%/26%U) dren=implies(48%/28%U) vusp=or(68%/26%U) molex=or(74%/24%U) perph=or(82%/18%U)
+  Gemma 2 9B  F->N first->sente L2                        | 1.00  | 0.99  | 0.576   | 0.800   | +0.224 | 60.2° | 59.6° | 38.0% | 50.0% | 0.42  | 0.44  | M2A-ONLY       | bliq=or(60%/34%U) dren=necessarily(44%/44%U) vusp=or(60%/38%U) molex=or(54%/42%U) perph=or(58%/32%U)
+  Gemma 2 9B  F->N close->opera L2                        | 1.00  | 0.97  | 0.544   | 0.736   | +0.192 | 76.5° | 76.6° | 15.6% | 50.8% | 0.39  | 0.54  | M2A-ONLY       | bliq=implies(68%/6%U) dren=implies(54%/38%U) vusp=implies(64%/6%U) molex=implies(54%/18%U) perph=or(56%/10%U)
+  Gemma 2 9B  F->N close->sente L2                        | 1.00  | 0.99  | 0.332   | 0.516   | +0.184 | 74.3° | 78.4° | 82.0% | 42.0% | 0.66  | 0.76  | FAIL           | bliq=necessarily(76%/78%U) dren=necessarily(90%/92%U) vusp=necessarily(76%/80%U) molex=necessarily(78%/80%U) perph=necessarily(78%/80%U)
+  Gemma 2 9B  F->N sente->opera L2                        | 1.00  | 0.97  | 0.544   | 0.576   | +0.032 | 79.5° | 75.4° | 86.8% | 43.6% | 0.61  | 0.46  | FAIL           | bliq=not(88%/88%U) dren=not(46%/82%U) vusp=not(86%/90%U) molex=not(84%/88%U) perph=not(80%/86%U)
+  Gemma 2 9B  F->N sente->sente L2                        | 1.00  | 0.99  | 0.416   | 0.600   | +0.184 | 61.4° | 62.6° | 64.8% | 46.4% | 0.31  | 0.32  | FAIL           | bliq=not(46%/76%U) dren=necessarily(50%/58%U) vusp=not(38%/70%U) molex=or(32%/62%U) perph=or(38%/58%U)
+  Gemma 2 9B  N->F opera->opera L4                        | 0.99  | 1.00  | 1.000   | 1.000   | +0.000 | 56.5° | 54.3° | 80.0% | 60.0% | 0.68  | 1.00  | LUCKY-NEG *LUCKY* | bliq=necessarily(100%/100%U) dren=and(100%/0%U) vusp=necessarily(100%/100%U) molex=necessarily(100%/100%U) perph=necessarily(100%/100%U)
+  Gemma 2 9B  N->F opera->first L4                        | 0.99  | 1.00  | 0.972   | 0.972   | +0.000 | 62.9° | 60.6° | 19.2% | 62.4% | 0.27  | 0.46  | M2A-ONLY       | bliq=implies(46%/20%U) dren=and(62%/0%U) vusp=implies(72%/8%U) molex=or(56%/22%U) perph=necessarily(46%/46%U)
+  Gemma 2 9B  N->F opera->close L4                        | 0.99  | 1.00  | 0.456   | 0.584   | +0.128 | 87.2° | 86.4° | 60.8% | 35.2% | 0.52  | 0.56  | FAIL           | bliq=necessarily(56%/56%U) dren=necessarily(80%/80%U) vusp=implies(70%/30%U) molex=necessarily(78%/78%U) perph=necessarily(60%/60%U)
+  Gemma 2 9B  N->F opera->sente L4                        | 0.99  | 0.99  | 0.236   | 0.468   | +0.232 | 81.5° | 77.3° | 96.0% | 43.2% | 0.92  | 0.90  | FAIL           | bliq=necessarily(90%/90%U) dren=necessarily(100%/100%U) vusp=necessarily(100%/100%U) molex=necessarily(92%/92%U) perph=necessarily(98%/98%U)
+  Gemma 2 9B  N->F sente->opera L4                        | 1.00  | 1.00  | 1.000   | 1.000   | +0.000 | 76.4° | 79.0° | 57.6% | 72.8% | 0.51  | 0.76  | PASS-arity     | bliq=and(88%/12%U) dren=necessarily(100%/100%U) vusp=necessarily(76%/76%U) molex=and(100%/0%U) perph=necessarily(100%/100%U)
+  Gemma 2 9B  N->F sente->first L4                        | 1.00  | 1.00  | 1.000   | 1.000   | +0.000 | 69.2° | 67.9° | 29.2% | 48.4% | 0.36  | 0.38  | M2A-ONLY       | bliq=implies(38%/34%U) dren=and(46%/34%U) vusp=and(88%/12%U) molex=and(54%/34%U) perph=and(50%/32%U)
+  Gemma 2 9B  N->F sente->close L4                        | 1.00  | 1.00  | 0.600   | 0.600   | +0.000 | 84.3° | 84.4° | 100.0% | 40.0% | 0.92  | 0.86  | FAIL           | bliq=not(100%/100%U) dren=not(100%/100%U) vusp=not(92%/100%U) molex=not(100%/100%U) perph=not(86%/100%U)
+  Gemma 2 9B  N->F sente->sente L4                        | 1.00  | 0.99  | 0.516   | 0.840   | +0.324 | 61.4° | 59.3° | 12.8% | 61.6% | 0.71  | 0.68  | M2A-ONLY       | bliq=implies(100%/0%U) dren=implies(68%/26%U) vusp=implies(74%/22%U) molex=implies(96%/2%U) perph=implies(78%/14%U)
+  Gemma 2 9B  F->N opera->opera L4                        | 1.00  | 0.99  | 0.956   | 0.980   | +0.024 | 56.5° | 54.3° | 24.0% | 61.6% | 0.61  | 0.50  | M2A-ONLY       | bliq=implies(84%/14%U) dren=implies(68%/28%U) vusp=implies(84%/14%U) molex=implies(84%/14%U) perph=implies(50%/50%U)
+  Gemma 2 9B  F->N opera->sente L4                        | 1.00  | 1.00  | 0.252   | 0.620   | +0.368 | 76.4° | 79.0° |  5.2% | 59.6% | 0.90  | 0.92  | FAIL           | bliq=implies(96%/4%U) dren=implies(94%/6%U) vusp=implies(96%/4%U) molex=implies(96%/4%U) perph=implies(92%/8%U)
+  Gemma 2 9B  F->N first->opera L4                        | 1.00  | 0.99  | 0.984   | 0.992   | +0.008 | 62.9° | 60.6° | 69.2% | 49.2% | 0.45  | 0.44  | M2A-ONLY       | bliq=not(92%/96%U) dren=implies(44%/46%U) vusp=not(58%/64%U) molex=not(52%/58%U) perph=not(70%/82%U)
+  Gemma 2 9B  F->N first->sente L4                        | 1.00  | 1.00  | 0.424   | 0.720   | +0.296 | 69.2° | 67.9° | 31.2% | 52.8% | 0.56  | 0.58  | M2A-ONLY       | bliq=implies(58%/42%U) dren=implies(76%/24%U) vusp=implies(70%/30%U) molex=implies(70%/30%U) perph=implies(70%/30%U)
+  Gemma 2 9B  F->N close->opera L4                        | 1.00  | 0.99  | 0.504   | 0.584   | +0.080 | 87.2° | 86.4° | 17.2% | 55.6% | 0.70  | 0.58  | FAIL           | bliq=implies(94%/4%U) dren=implies(58%/42%U) vusp=implies(90%/8%U) molex=implies(90%/8%U) perph=implies(76%/24%U)
+  Gemma 2 9B  F->N close->sente L4                        | 1.00  | 1.00  | 0.468   | 0.592   | +0.124 | 84.3° | 84.4° | 44.0% | 51.2% | 0.44  | 0.48  | FAIL           | bliq=implies(54%/34%U) dren=necessarily(52%/52%U) vusp=implies(56%/40%U) molex=implies(50%/46%U) perph=necessarily(48%/48%U)
+  Gemma 2 9B  F->N sente->opera L4                        | 0.99  | 0.99  | 0.828   | 0.888   | +0.060 | 81.5° | 77.3° | 79.2% | 46.4% | 0.42  | 0.42  | M2A-ONLY       | bliq=not(92%/92%U) dren=and(42%/58%U) vusp=not(78%/90%U) molex=not(80%/82%U) perph=necessarily(46%/74%U)
+  Gemma 2 9B  F->N sente->sente L4                        | 0.99  | 1.00  | 0.656   | 0.712   | +0.056 | 61.4° | 59.3° | 70.8% | 49.2% | 0.42  | 0.32  | M2A-ONLY       | bliq=not(74%/78%U) dren=necessarily(32%/62%U) vusp=not(72%/80%U) molex=not(58%/64%U) perph=not(62%/70%U)
+  Gemma 2 9B  N->F opera->opera L8                        | 0.99  | 1.00  | 1.000   | 1.000   | +0.000 | 68.0° | 66.8° | 100.0% | 40.0% | 1.00  | 1.00  | LUCKY-NEG *LUCKY* | bliq=necessarily(100%/100%U) dren=necessarily(100%/100%U) vusp=necessarily(100%/100%U) molex=necessarily(100%/100%U) perph=necessarily(100%/100%U)
+  Gemma 2 9B  N->F opera->first L8                        | 0.99  | 1.00  | 0.872   | 0.928   | +0.056 | 73.8° | 72.0° | 67.6% | 46.8% | 0.56  | 0.52  | M2A-ONLY       | bliq=necessarily(78%/78%U) dren=necessarily(52%/52%U) vusp=necessarily(80%/80%U) molex=necessarily(72%/72%U) perph=necessarily(56%/56%U)
+  Gemma 2 9B  N->F opera->close L8                        | 0.99  | 1.00  | 0.600   | 0.600   | +0.000 | 86.6° | 83.1° | 100.0% | 40.0% | 1.00  | 1.00  | LUCKY-NEG *LUCKY* | bliq=necessarily(100%/100%U) dren=necessarily(100%/100%U) vusp=necessarily(100%/100%U) molex=necessarily(100%/100%U) perph=necessarily(100%/100%U)
+  Gemma 2 9B  N->F opera->sente L8                        | 0.99  | 1.00  | 0.200   | 0.400   | +0.200 | 75.9° | 76.0° | 100.0% | 40.0% | 1.00  | 1.00  | LUCKY-NEG *LUCKY* | bliq=necessarily(100%/100%U) dren=necessarily(100%/100%U) vusp=necessarily(100%/100%U) molex=necessarily(100%/100%U) perph=necessarily(100%/100%U)
+  Gemma 2 9B  N->F sente->opera L8                        | 0.99  | 1.00  | 1.000   | 1.000   | +0.000 | 80.0° | 79.0° | 40.0% | 60.0% | 0.52  | 1.00  | LUCKY-NEG *LUCKY* | bliq=necessarily(100%/100%U) dren=and(100%/0%U) vusp=necessarily(100%/100%U) molex=and(100%/0%U) perph=and(100%/0%U)
+  Gemma 2 9B  N->F sente->first L8                        | 0.99  | 1.00  | 1.000   | 1.000   | +0.000 | 78.8° | 76.8° | 36.8% | 73.6% | 0.51  | 0.66  | PASS-arity     | bliq=and(66%/34%U) dren=and(76%/24%U) vusp=necessarily(92%/92%U) molex=and(88%/0%U) perph=and(66%/34%U)
+  Gemma 2 9B  N->F sente->close L8                        | 0.99  | 1.00  | 0.892   | 0.900   | +0.008 | 85.9° | 83.2° | 92.4% | 38.8% | 0.70  | 0.70  | M2A-ONLY       | bliq=necessarily(86%/100%U) dren=necessarily(70%/84%U) vusp=necessarily(92%/92%U) molex=necessarily(80%/100%U) perph=necessarily(86%/86%U)
+  Gemma 2 9B  N->F sente->sente L8                        | 0.99  | 1.00  | 0.608   | 0.784   | +0.176 | 66.6° | 65.7° | 64.4% | 48.4% | 0.54  | 0.58  | M2A-ONLY       | bliq=necessarily(62%/62%U) dren=necessarily(66%/66%U) vusp=necessarily(74%/74%U) molex=necessarily(62%/62%U) perph=necessarily(58%/58%U)
+  Gemma 2 9B  F->N opera->opera L8                        | 1.00  | 0.99  | 0.860   | 0.912   | +0.052 | 68.0° | 66.8° | 25.6% | 56.8% | 0.32  | 0.36  | M2A-ONLY       | bliq=and(38%/24%U) dren=and(64%/28%U) vusp=implies(40%/26%U) molex=implies(44%/20%U) perph=and(36%/30%U)
+  Gemma 2 9B  F->N opera->sente L8                        | 1.00  | 0.99  | 0.528   | 0.732   | +0.204 | 80.0° | 79.0° | 12.4% | 58.0% | 0.58  | 0.68  | M2A-ONLY       | bliq=implies(76%/12%U) dren=implies(68%/12%U) vusp=implies(76%/12%U) molex=implies(76%/12%U) perph=implies(74%/14%U)
+  Gemma 2 9B  F->N first->opera L8                        | 1.00  | 0.99  | 0.772   | 0.860   | +0.088 | 73.8° | 72.0° |  1.6% | 60.8% | 0.97  | 0.94  | M2A-ONLY       | bliq=implies(100%/0%U) dren=implies(98%/2%U) vusp=implies(100%/0%U) molex=implies(100%/0%U) perph=implies(94%/6%U)
+  Gemma 2 9B  F->N first->sente L8                        | 1.00  | 0.99  | 0.200   | 0.600   | +0.400 | 78.8° | 76.8° |  0.0% | 60.0% | 1.00  | 1.00  | LUCKY-NEG *LUCKY* | bliq=implies(100%/0%U) dren=implies(100%/0%U) vusp=implies(100%/0%U) molex=implies(100%/0%U) perph=implies(100%/0%U)
+  Gemma 2 9B  F->N close->opera L8                        | 1.00  | 0.99  | 0.700   | 0.776   | +0.076 | 86.6° | 83.1° |  0.0% | 60.0% | 0.76  | 0.64  | M2A-ONLY       | bliq=implies(64%/0%U) dren=implies(100%/0%U) vusp=implies(96%/0%U) molex=implies(72%/0%U) perph=implies(98%/0%U)
+  Gemma 2 9B  F->N close->sente L8                        | 1.00  | 0.99  | 0.332   | 0.600   | +0.268 | 85.9° | 83.2° |  0.0% | 60.0% | 0.56  | 0.66  | FAIL           | bliq=implies(66%/0%U) dren=implies(72%/0%U) vusp=implies(68%/0%U) molex=implies(66%/0%U) perph=implies(66%/0%U)
+  Gemma 2 9B  F->N sente->opera L8                        | 1.00  | 0.99  | 0.772   | 0.872   | +0.100 | 75.9° | 76.0° | 89.6% | 42.4% | 0.63  | 0.76  | M2A-ONLY       | bliq=necessarily(80%/92%U) dren=necessarily(78%/88%U) vusp=necessarily(82%/92%U) molex=necessarily(76%/88%U) perph=necessarily(76%/88%U)
+  Gemma 2 9B  F->N sente->sente L8                        | 1.00  | 0.99  | 0.816   | 0.912   | +0.096 | 66.6° | 65.7° | 28.4% | 54.8% | 0.43  | 0.56  | M2A-ONLY       | bliq=and(58%/30%U) dren=and(66%/28%U) vusp=and(56%/32%U) molex=and(58%/26%U) perph=and(64%/26%U)
+  Gemma 2 9B  N->F opera->opera L16                       | 1.00  | 1.00  | 0.800   | 0.800   | +0.000 | 63.9° | 70.4° |  0.0% | 60.0% | 1.00  | 1.00  | LUCKY-NEG *LUCKY* | bliq=implies(100%/0%U) dren=implies(100%/0%U) vusp=implies(100%/0%U) molex=implies(100%/0%U) perph=implies(100%/0%U)
+  Gemma 2 9B  N->F opera->first L16                       | 1.00  | 1.00  | 0.688   | 0.828   | +0.140 | 83.1° | 81.5° | 47.6% | 60.4% | 0.32  | 0.36  | M2A-ONLY       | bliq=necessarily(44%/44%U) dren=necessarily(44%/44%U) vusp=or(44%/48%U) molex=or(36%/30%U) perph=necessarily(72%/72%U)
+  Gemma 2 9B  N->F opera->close L16                       | 1.00  | 1.00  | 0.800   | 0.800   | +0.000 | 83.6° | 81.3° | 100.0% | 40.0% | 1.00  | 1.00  | LUCKY-NEG *LUCKY* | bliq=necessarily(100%/100%U) dren=necessarily(100%/100%U) vusp=necessarily(100%/100%U) molex=necessarily(100%/100%U) perph=necessarily(100%/100%U)
+  Gemma 2 9B  N->F opera->sente L16                       | 1.00  | 1.00  | 0.220   | 0.444   | +0.224 | 82.8° | 78.8° | 90.0% | 41.2% | 0.82  | 0.86  | FAIL           | bliq=necessarily(92%/92%U) dren=necessarily(90%/90%U) vusp=necessarily(86%/86%U) molex=necessarily(90%/90%U) perph=necessarily(92%/92%U)
+  Gemma 2 9B  N->F sente->opera L16                       | 0.95  | 1.00  | 1.000   | 1.000   | +0.000 | 76.3° | 77.4° | 100.0% | 40.0% | 0.52  | 1.00  | LUCKY-NEG *LUCKY* | bliq=not(100%/100%U) dren=not(100%/100%U) vusp=not(100%/100%U) molex=necessarily(100%/100%U) perph=necessarily(100%/100%U)
+  Gemma 2 9B  N->F sente->first L16                       | 0.95  | 1.00  | 0.580   | 0.740   | +0.160 | 83.5° | 82.7° | 57.2% | 42.0% | 0.29  | 0.38  | M2A-ONLY       | bliq=not(74%/74%U) dren=and(54%/46%U) vusp=not(38%/58%U) molex=necessarily(58%/68%U) perph=and(60%/40%U)
+  Gemma 2 9B  N->F sente->close L16                       | 0.95  | 1.00  | 0.804   | 0.944   | +0.140 | 84.8° | 81.5° | 49.6% | 49.6% | 0.47  | 0.54  | M2A-ONLY       | bliq=and(58%/42%U) dren=and(80%/20%U) vusp=and(56%/44%U) molex=necessarily(88%/88%U) perph=necessarily(54%/54%U)
+  Gemma 2 9B  N->F sente->sente L16                       | 0.95  | 1.00  | 0.420   | 0.664   | +0.244 | 78.0° | 74.1° | 96.0% | 36.8% | 0.92  | 0.82  | M2A-ONLY       | bliq=necessarily(100%/100%U) dren=necessarily(98%/98%U) vusp=necessarily(100%/100%U) molex=necessarily(100%/100%U) perph=necessarily(82%/82%U)
+  Gemma 2 9B  F->N opera->opera L16                       | 1.00  | 1.00  | 0.724   | 0.876   | +0.152 | 63.9° | 70.4° | 99.2% | 40.0% | 0.89  | 0.92  | M2A-ONLY       | bliq=not(96%/100%U) dren=not(94%/98%U) vusp=not(96%/100%U) molex=not(92%/100%U) perph=not(94%/98%U)
+  Gemma 2 9B  F->N opera->sente L16                       | 1.00  | 0.95  | 0.348   | 0.456   | +0.108 | 76.3° | 77.4° | 98.4% | 40.8% | 0.86  | 0.90  | FAIL           | bliq=not(92%/98%U) dren=not(90%/98%U) vusp=not(94%/100%U) molex=not(92%/98%U) perph=not(94%/98%U)
+  Gemma 2 9B  F->N first->opera L16                       | 1.00  | 1.00  | 0.452   | 0.696   | +0.244 | 83.1° | 81.5° | 60.4% | 46.0% | 0.49  | 0.54  | M2A-ONLY       | bliq=not(60%/60%U) dren=not(88%/88%U) vusp=implies(54%/38%U) molex=implies(60%/38%U) perph=not(78%/78%U)
+  Gemma 2 9B  F->N first->sente L16                       | 1.00  | 0.95  | 0.320   | 0.564   | +0.244 | 83.5° | 82.7° | 62.4% | 45.6% | 0.53  | 0.56  | FAIL           | bliq=not(62%/62%U) dren=not(74%/74%U) vusp=not(64%/64%U) molex=not(56%/56%U) perph=not(56%/56%U)
+  Gemma 2 9B  F->N close->opera L16                       | 1.00  | 1.00  | 0.628   | 0.712   | +0.084 | 83.6° | 81.3° | 73.2% | 49.2% | 0.48  | 0.54  | M2A-ONLY       | bliq=not(58%/64%U) dren=not(78%/84%U) vusp=not(68%/76%U) molex=not(54%/62%U) perph=not(74%/80%U)
+  Gemma 2 9B  F->N close->sente L16                       | 1.00  | 0.95  | 0.504   | 0.640   | +0.136 | 84.8° | 81.5° | 40.0% | 56.0% | 0.32  | 0.36  | FAIL           | bliq=implies(46%/40%U) dren=implies(50%/34%U) vusp=implies(44%/42%U) molex=implies(54%/36%U) perph=not(36%/48%U)
+  Gemma 2 9B  F->N sente->opera L16                       | 1.00  | 1.00  | 0.568   | 0.844   | +0.276 | 82.8° | 78.8° | 78.4% | 30.4% | 0.57  | 0.44  | M2A-ONLY       | bliq=not(80%/84%U) dren=not(90%/92%U) vusp=and(44%/40%U) molex=not(86%/94%U) perph=not(80%/82%U)
+  Gemma 2 9B  F->N sente->sente L16                       | 1.00  | 0.95  | 0.500   | 0.756   | +0.256 | 78.0° | 74.1° | 65.6% | 44.0% | 0.39  | 0.50  | M2A-ONLY       | bliq=not(56%/66%U) dren=not(66%/72%U) vusp=not(50%/58%U) molex=not(50%/66%U) perph=not(60%/66%U)
+  Gemma 2 9B  N->F opera->opera L17                       | 1.00  | 1.00  | 0.800   | 0.800   | +0.000 | 67.0° | 70.6° |  0.0% | 60.0% | 1.00  | 1.00  | LUCKY-NEG *LUCKY* | bliq=implies(100%/0%U) dren=implies(100%/0%U) vusp=implies(100%/0%U) molex=implies(100%/0%U) perph=implies(100%/0%U)
+  Gemma 2 9B  N->F opera->first L17                       | 1.00  | 1.00  | 0.596   | 0.748   | +0.152 | 84.8° | 83.1° | 33.6% | 46.4% | 0.37  | 0.38  | M2A-ONLY       | bliq=necessarily(44%/44%U) dren=or(46%/44%U) vusp=or(70%/12%U) molex=or(58%/30%U) perph=necessarily(38%/38%U)
+  Gemma 2 9B  N->F opera->close L17                       | 1.00  | 1.00  | 0.800   | 0.800   | +0.000 | 83.5° | 81.4° | 100.0% | 40.0% | 1.00  | 1.00  | LUCKY-NEG *LUCKY* | bliq=necessarily(100%/100%U) dren=necessarily(100%/100%U) vusp=necessarily(100%/100%U) molex=necessarily(100%/100%U) perph=necessarily(100%/100%U)
+  Gemma 2 9B  N->F opera->sente L17                       | 1.00  | 1.00  | 0.236   | 0.496   | +0.260 | 83.6° | 80.4° | 82.0% | 42.0% | 0.70  | 0.80  | FAIL           | bliq=necessarily(84%/84%U) dren=necessarily(86%/86%U) vusp=necessarily(80%/80%U) molex=necessarily(80%/80%U) perph=necessarily(80%/80%U)
+  Gemma 2 9B  N->F sente->opera L17                       | 0.94  | 1.00  | 1.000   | 1.000   | +0.000 | 78.0° | 77.3° | 60.0% | 80.0% | 0.52  | 1.00  | LUCKY-NEG *LUCKY* | bliq=and(100%/0%U) dren=and(100%/0%U) vusp=necessarily(100%/100%U) molex=necessarily(100%/100%U) perph=necessarily(100%/100%U)
+  Gemma 2 9B  N->F sente->first L17                       | 0.94  | 1.00  | 0.588   | 0.756   | +0.168 | 84.0° | 84.3° | 66.0% | 31.6% | 0.50  | 0.50  | M2A-ONLY       | bliq=necessarily(90%/90%U) dren=necessarily(72%/72%U) vusp=necessarily(76%/76%U) molex=necessarily(74%/74%U) perph=or(50%/18%U)
+  Gemma 2 9B  N->F sente->close L17                       | 0.94  | 1.00  | 0.888   | 0.888   | +0.000 | 84.2° | 81.8° | 93.2% | 46.8% | 0.87  | 0.80  | M2A-ONLY       | bliq=necessarily(88%/88%U) dren=necessarily(80%/80%U) vusp=necessarily(100%/100%U) molex=necessarily(98%/98%U) perph=necessarily(100%/100%U)
+  Gemma 2 9B  N->F sente->sente L17                       | 0.94  | 1.00  | 0.472   | 0.696   | +0.224 | 79.5° | 74.3° | 96.8% | 37.6% | 0.92  | 0.82  | M2A-ONLY       | bliq=necessarily(100%/100%U) dren=necessarily(98%/98%U) vusp=necessarily(100%/100%U) molex=necessarily(100%/100%U) perph=necessarily(82%/86%U)
+  Gemma 2 9B  F->N opera->opera L17                       | 1.00  | 1.00  | 0.640   | 0.860   | +0.220 | 67.0° | 70.6° | 99.2% | 40.0% | 0.98  | 0.96  | LUCKY-NEG *LUCKY* | bliq=not(100%/100%U) dren=not(96%/98%U) vusp=not(100%/100%U) molex=not(100%/100%U) perph=not(98%/98%U)
+  Gemma 2 9B  F->N opera->sente L17                       | 1.00  | 0.94  | 0.252   | 0.432   | +0.180 | 78.0° | 77.3° | 98.8% | 40.4% | 0.98  | 0.98  | LUCKY-NEG *LUCKY* | bliq=not(98%/98%U) dren=not(98%/98%U) vusp=not(100%/100%U) molex=not(100%/100%U) perph=not(98%/98%U)
+  Gemma 2 9B  F->N first->opera L17                       | 1.00  | 1.00  | 0.436   | 0.640   | +0.204 | 84.8° | 83.1° | 93.6% | 39.2% | 0.88  | 0.90  | FAIL           | bliq=not(96%/96%U) dren=not(100%/100%U) vusp=not(92%/92%U) molex=not(90%/90%U) perph=not(90%/90%U)
+  Gemma 2 9B  F->N first->sente L17                       | 1.00  | 0.94  | 0.284   | 0.484   | +0.200 | 84.0° | 84.3° | 91.2% | 41.6% | 0.84  | 0.88  | FAIL           | bliq=not(88%/88%U) dren=not(96%/96%U) vusp=not(90%/90%U) molex=not(90%/90%U) perph=not(92%/92%U)
+  Gemma 2 9B  F->N close->opera L17                       | 1.00  | 1.00  | 0.668   | 0.756   | +0.088 | 83.5° | 81.4° | 81.2% | 41.2% | 0.48  | 0.64  | M2A-ONLY       | bliq=not(66%/82%U) dren=not(72%/90%U) vusp=not(64%/76%U) molex=not(64%/78%U) perph=not(64%/80%U)
+  Gemma 2 9B  F->N close->sente L17                       | 1.00  | 0.94  | 0.440   | 0.532   | +0.092 | 84.2° | 81.8° | 82.4% | 42.4% | 0.37  | 0.44  | FAIL           | bliq=necessarily(50%/80%U) dren=necessarily(54%/84%U) vusp=necessarily(48%/84%U) molex=necessarily(50%/86%U) perph=necessarily(44%/78%U)
+  Gemma 2 9B  F->N sente->opera L17                       | 1.00  | 1.00  | 0.532   | 0.724   | +0.192 | 83.6° | 80.4° | 87.6% | 33.2% | 0.69  | 0.60  | M2A-ONLY       | bliq=not(88%/94%U) dren=not(94%/96%U) vusp=not(60%/64%U) molex=not(86%/96%U) perph=not(84%/88%U)
+  Gemma 2 9B  F->N sente->sente L17                       | 1.00  | 0.94  | 0.476   | 0.676   | +0.200 | 79.5° | 74.3° | 69.6% | 42.4% | 0.44  | 0.46  | M2A-ONLY       | bliq=not(60%/70%U) dren=not(70%/76%U) vusp=not(46%/56%U) molex=not(62%/72%U) perph=not(66%/74%U)
+
+========================================================================================================================================================================================================
+TOP-12 CELLS BY ARITY-RESPECTING TRANSFER (M2-arity desc, M4b desc, M4c asc)
+========================================================================================================================================================================================================
+
+  Composite key: (M2-arity, M4b, -M4c). Lucky-default cells
+  excluded since their high M4b is the predict-all-binary trap.
+
+  rank | cell                                                    | M2cano  | M2arty  | gap    | M4a    | M4b    | M4c   | pwmin | verdict        | per-word
+  ---------------------------------------------------------------------------------------------------------------------------------------------------------
+   1.  | OLMo 2 7B   N->F sente->close L10                       | 0.616   | 1.000   | +0.384 | 30.0% | 90.0% | 0.57  | 0.50  | PASS-arity     | bliq=and(100%/0%U) dren=and(100%/0%U) vusp=necessarily(100%/100%U) molex=and(100%/0%U) perph=and(50%/50%U)
+   2.  | Gemma 2 9B  N->F sente->first L8                        | 1.000   | 1.000   | +0.000 | 36.8% | 73.6% | 0.51  | 0.66  | PASS-arity     | bliq=and(66%/34%U) dren=and(76%/24%U) vusp=necessarily(92%/92%U) molex=and(88%/0%U) perph=and(66%/34%U)
+   3.  | Gemma 2 9B  N->F sente->opera L4                        | 1.000   | 1.000   | +0.000 | 57.6% | 72.8% | 0.51  | 0.76  | PASS-arity     | bliq=and(88%/12%U) dren=necessarily(100%/100%U) vusp=necessarily(76%/76%U) molex=and(100%/0%U) perph=necessarily(100%/100%U)
+   4.  | OLMo 2 7B   N->F sente->close L16                       | 0.768   | 1.000   | +0.232 | 11.6% | 71.6% | 0.79  | 0.58  | ARITY-AXIS-ONLY | bliq=or(100%/0%U) dren=or(100%/0%U) vusp=necessarily(58%/58%U) molex=or(100%/0%U) perph=or(100%/0%U)
+   5.  | OLMo 2 7B   N->F sente->sente L24                       | 0.972   | 1.000   | +0.028 | 27.2% | 60.0% | 0.41  | 0.42  | M2A-ONLY       | bliq=and(70%/20%U) dren=and(64%/24%U) vusp=and(64%/32%U) molex=and(44%/24%U) perph=and(42%/36%U)
+   6.  | OLMo 2 7B   N->F sente->close L24                       | 0.856   | 1.000   | +0.144 |  0.0% | 60.0% | 0.84  | 0.68  | M2A-ONLY       | bliq=or(88%/0%U) dren=or(100%/0%U) vusp=or(100%/0%U) molex=or(68%/0%U) perph=or(100%/0%U)
+   7.  | Gemma 2 9B  N->F sente->first L4                        | 1.000   | 1.000   | +0.000 | 29.2% | 48.4% | 0.36  | 0.38  | M2A-ONLY       | bliq=implies(38%/34%U) dren=and(46%/34%U) vusp=and(88%/12%U) molex=and(54%/34%U) perph=and(50%/32%U)
+   8.  | OLMo 2 7B   N->F opera->close L7                        | 0.800   | 1.000   | +0.200 | 96.0% | 44.0% | 0.92  | 0.86  | M2A-ONLY       | bliq=necessarily(94%/94%U) dren=necessarily(86%/86%U) vusp=necessarily(100%/100%U) molex=necessarily(100%/100%U) perph=necessarily(100%/100%U)
+   9.  | Gemma 2 9B  N->F sente->close L2                        | 1.000   | 1.000   | +0.000 | 74.0% | 43.6% | 0.44  | 0.46  | M2A-ONLY       | bliq=necessarily(56%/70%U) dren=necessarily(80%/80%U) vusp=necessarily(56%/80%U) molex=necessarily(74%/76%U) perph=necessarily(46%/64%U)
+  10.  | Gemma 2 9B  F->N first->opera L4                        | 0.984   | 0.992   | +0.008 | 69.2% | 49.2% | 0.45  | 0.44  | M2A-ONLY       | bliq=not(92%/96%U) dren=implies(44%/46%U) vusp=not(58%/64%U) molex=not(52%/58%U) perph=not(70%/82%U)
+  11.  | OLMo 2 7B   N->F sente->close L7                        | 0.732   | 0.988   | +0.256 | 91.6% | 48.4% | 0.85  | 0.58  | M2A-ONLY       | bliq=not(58%/58%U) dren=not(100%/100%U) vusp=not(100%/100%U) molex=not(100%/100%U) perph=not(100%/100%U)
+  12.  | OLMo 2 7B   F->N first->opera L7                        | 0.980   | 0.984   | +0.004 | 55.2% | 65.6% | 0.35  | 0.36  | PASS-arity     | bliq=implies(58%/42%U) dren=implies(54%/44%U) vusp=necessarily(36%/70%U) molex=implies(60%/38%U) perph=necessarily(66%/82%U)
+
+========================================================================================================================================================================================================
+M2-CANONICAL vs M2-ARITY DISSOCIATION SUMMARY
+========================================================================================================================================================================================================
+
+  Large positive gap (M2-arity - M2-canonical) = arity axis transfers
+  but canonical-identity does not. This is the §3.7.10 finding.
+
+  Top 10 cells by absolute dissociation gap:
+
+  cell                                                    | M2cano  | M2arty  | gap    | verdict        | mechanism
+  -----------------------------------------------------------------------------------------------------------------
+  OLMo 2 7B   F->N opera->opera L4                        | 0.264   | 0.668   | +0.404 | LUCKY-NEG*     | lucky-default (predict-all-1-binary; gap is chance-by-arity, not real)
+  OLMo 2 7B   N->F opera->close L4                        | 0.400   | 0.800   | +0.400 | LUCKY-NEG*     | lucky-default (predict-all-1-binary; gap is chance-by-arity, not real)
+  OLMo 2 7B   F->N opera->opera L7                        | 0.212   | 0.612   | +0.400 | LUCKY-NEG*     | lucky-default (predict-all-1-binary; gap is chance-by-arity, not real)
+  Gemma 2 9B  N->F opera->sente L2                        | 0.252   | 0.652   | +0.400 | M2A-ONLY       | arity-axis transfers; canonical-identity within-arity confusion
+  OLMo 2 7B   N->F opera->sente L4                        | 0.200   | 0.600   | +0.400 | LUCKY-NEG*     | lucky-default (predict-all-1-binary; gap is chance-by-arity, not real)
+  OLMo 2 7B   F->N opera->sente L4                        | 0.200   | 0.600   | +0.400 | LUCKY-NEG*     | lucky-default (predict-all-1-binary; gap is chance-by-arity, not real)
+  OLMo 2 7B   F->N opera->sente L7                        | 0.200   | 0.600   | +0.400 | LUCKY-NEG*     | lucky-default (predict-all-1-binary; gap is chance-by-arity, not real)
+  Gemma 2 9B  F->N first->sente L8                        | 0.200   | 0.600   | +0.400 | LUCKY-NEG*     | lucky-default (predict-all-1-binary; gap is chance-by-arity, not real)
+  OLMo 2 7B   N->F sente->close L10                       | 0.616   | 1.000   | +0.384 | PASS-arity     | arity-axis transfers; canonical-identity within-arity confusion
+  OLMo 2 7B   F->N first->sente L16                       | 0.308   | 0.692   | +0.384 | M2A-ONLY       | arity-axis transfers; canonical-identity within-arity confusion
+
+========================================================================================================================================================================================================
+§3.7.9 CELL VS ALL ALTERNATIVES
+========================================================================================================================================================================================================
+
+  Target cell (script-22a primary candidate, §3.7.9):
+    OLMo 2 7B   N->F sente->close L10                      
+    M2-canonical: 0.616
+    M2-arity:     1.000
+    gap:          +0.384
+    M4a / b / c:  30.0% / 90.0% / 0.57
+    M3 cent / prob: 80.6° / 81.1°
+    per-word:     bliq=and(100%/0%U) dren=and(100%/0%U) vusp=necessarily(100%/100%U) molex=and(100%/0%U) perph=and(50%/50%U)
+    verdict:      PASS-arity
+
+  No challengers found. The §3.7.9 cell is the UNIQUE strongest
+  arity-respecting transfer cell in the OLMo 2 + Gemma 2 x 5 layers
+  x 16 anchor pairings = 160-cell battery.
+
+========================================================================================================================================================================================================
+PER-(LAYER, DIRECTION) VERDICT GRID
+========================================================================================================================================================================================================
+
+  -- OLMo 2 7B per-layer arity-respecting transfer grid --
+
+  Rows: (train anchor, test anchor) pairs. Cols: layers.
+  Each entry shows verdict / M2-arity / M4b.
+
+  Direction N->F:
+    pair                 | L 4         | L 7         | L10         | L16         | L24        
+    ------------------------------------------------------------------------------------------
+    opera ->opera      | LUCK 1.00* | LUCK 1.00* | LUCK 0.80* | LUCK 0.80* | LUCK 1.00* | 
+    opera ->first      | M2A- 0.92  | M2A- 0.85  | M2A- 0.80  | M2A- 0.74  | M2A- 0.91  | 
+    opera ->close      | LUCK 0.80* | M2A- 1.00  | LUCK 0.92* | LUCK 1.00* | LUCK 0.98* | 
+    opera ->sente      | LUCK 0.60* | LUCK 0.40* | FAIL 0.62  | FAIL 0.57  | M2A- 0.85  | 
+    sente ->opera      | LUCK 0.80* | LUCK 1.00* | LUCK 1.00* | LUCK 1.00* | LUCK 1.00* | 
+    sente ->first      | M2A- 0.77  | M2A- 0.73  | M2A- 0.80  | M2A- 0.94  | M2A- 0.86  | 
+    sente ->close      | M2A- 0.80  | M2A- 0.99  | PASS 1.00  | ARIT 1.00  | M2A- 1.00  | 
+    sente ->sente      | M2A- 0.87  | M2A- 0.90  | M2A- 0.83  | M2A- 0.79  | M2A- 1.00  | 
+
+  Direction F->N:
+    pair                 | L 4         | L 7         | L10         | L16         | L24        
+    ------------------------------------------------------------------------------------------
+    opera ->opera      | LUCK 0.67* | LUCK 0.61* | M2A- 0.84  | M2A- 0.87  | M2A- 0.88  | 
+    opera ->sente      | LUCK 0.60* | LUCK 0.60* | LUCK 0.60* | LUCK 0.64* | FAIL 0.64  | 
+    first ->opera      | M2A- 0.95  | PASS 0.98  | M2A- 0.89  | M2A- 0.72  | M2A- 0.74  | 
+    first ->sente      | M2A- 0.67  | M2A- 0.71  | M2A- 0.66  | M2A- 0.69  | M2A- 0.69  | 
+    close ->opera      | FAIL 0.50  | LUCK 0.51* | FAIL 0.50  | FAIL 0.44  | FAIL 0.57  | 
+    close ->sente      | FAIL 0.49  | FAIL 0.48  | FAIL 0.54  | LUCK 0.43* | FAIL 0.60  | 
+    sente ->opera      | FAIL 0.64  | FAIL 0.45  | FAIL 0.65  | FAIL 0.52  | FAIL 0.46  | 
+    sente ->sente      | FAIL 0.46  | FAIL 0.60  | M2A- 0.72  | FAIL 0.51  | FAIL 0.56  | 
+
+
+  -- Gemma 2 9B per-layer arity-respecting transfer grid --
+
+  Rows: (train anchor, test anchor) pairs. Cols: layers.
+  Each entry shows verdict / M2-arity / M4b.
+
+  Direction N->F:
+    pair                 | L 2         | L 4         | L 8         | L16         | L17        
+    ------------------------------------------------------------------------------------------
+    opera ->opera      | LUCK 1.00* | LUCK 1.00* | LUCK 1.00* | LUCK 0.80* | LUCK 0.80* | 
+    opera ->first      | M2A- 0.75  | M2A- 0.97  | M2A- 0.93  | M2A- 0.83  | M2A- 0.75  | 
+    opera ->close      | M2A- 0.85  | FAIL 0.58  | LUCK 0.60* | LUCK 0.80* | LUCK 0.80* | 
+    opera ->sente      | M2A- 0.65  | FAIL 0.47  | LUCK 0.40* | FAIL 0.44  | FAIL 0.50  | 
+    sente ->opera      | LUCK 1.00* | PASS 1.00  | LUCK 1.00* | LUCK 1.00* | LUCK 1.00* | 
+    sente ->first      | M2A- 0.98  | M2A- 1.00  | PASS 1.00  | M2A- 0.74  | M2A- 0.76  | 
+    sente ->close      | M2A- 1.00  | FAIL 0.60  | M2A- 0.90  | M2A- 0.94  | M2A- 0.89  | 
+    sente ->sente      | M2A- 0.74  | M2A- 0.84  | M2A- 0.78  | M2A- 0.66  | M2A- 0.70  | 
+
+  Direction F->N:
+    pair                 | L 2         | L 4         | L 8         | L16         | L17        
+    ------------------------------------------------------------------------------------------
+    opera ->opera      | M2A- 0.93  | M2A- 0.98  | M2A- 0.91  | M2A- 0.88  | LUCK 0.86* | 
+    opera ->sente      | FAIL 0.63  | FAIL 0.62  | M2A- 0.73  | FAIL 0.46  | LUCK 0.43* | 
+    first ->opera      | M2A- 0.93  | M2A- 0.99  | M2A- 0.86  | M2A- 0.70  | FAIL 0.64  | 
+    first ->sente      | M2A- 0.80  | M2A- 0.72  | LUCK 0.60* | FAIL 0.56  | FAIL 0.48  | 
+    close ->opera      | M2A- 0.74  | FAIL 0.58  | M2A- 0.78  | M2A- 0.71  | M2A- 0.76  | 
+    close ->sente      | FAIL 0.52  | FAIL 0.59  | FAIL 0.60  | FAIL 0.64  | FAIL 0.53  | 
+    sente ->opera      | FAIL 0.58  | M2A- 0.89  | M2A- 0.87  | M2A- 0.84  | M2A- 0.72  | 
+    sente ->sente      | FAIL 0.60  | M2A- 0.71  | M2A- 0.91  | M2A- 0.76  | M2A- 0.68  | 
+
+
+========================================================================================================================================================================================================
+HEADLINE
+========================================================================================================================================================================================================
+
+  Total cells:                 160
+  PASS-arity cells:            4 (full arity-respecting transfer)
+  ARITY-AXIS-ONLY cells:       1 (M2-arity + M4b PASS but M4c collapsed)
+  Lucky-default cells:         40 (predict-all-one-canonical baseline)
+  FAIL cells:                  115
+
+  PASS-arity cells (M2-arity >= 0.65, M4b >= 0.65, M4c < 0.7, M4a in [0.10, 0.90]):
+    - OLMo 2 7B   F->N first->opera L7                        | M2arty=0.984 M4b=65.6% M4c=0.35 M4a=55.2%
+    - OLMo 2 7B   N->F sente->close L10                       | M2arty=1.000 M4b=90.0% M4c=0.57 M4a=30.0%
+    - Gemma 2 9B  N->F sente->opera L4                        | M2arty=1.000 M4b=72.8% M4c=0.51 M4a=57.6%
+    - Gemma 2 9B  N->F sente->first L8                        | M2arty=1.000 M4b=73.6% M4c=0.51 M4a=36.8%
+
+[logging] full transcript written to: /Users/brendan.budworth/dev/thesis/experiments/outputs/22b_20260520_083957.log

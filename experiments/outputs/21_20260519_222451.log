@@ -1,0 +1,207 @@
+[logging] tee'ing all output to /Users/brendan.budworth/dev/thesis/experiments/outputs/21_20260519_222451.log
+Script 21 - multi-anchor M1-M4 battery (post-call anchor re-test)
+  STIMULUS_VERSION: v3-multi-anchor
+  ANCHORS (NEUTRAL): ['operator-after', 'sentence-final']
+  ANCHORS (FUNC-PFX): ['operator-after', 'first-arg', 'close-paren', 'sentence-final']
+  N_PER_CLASS: 50
+  GATE_THRESHOLD: 0.65
+  M4B_PASS_THRESHOLD: 0.65
+  device: mps
+
+########  Gemma 2 9B  (google/gemma-2-9b)  ########
+  loading tokenizer + model (torch.bfloat16) on mps...
+Loading weights:   0%|          | 0/464 [00:00<?, ?it/s]Loading weights:   0%|          | 1/464 [00:04<37:06,  4.81s/it]Loading weights:  33%|###2      | 153/464 [00:04<00:07, 43.93it/s]Loading weights:  50%|#####     | 234/464 [00:08<00:07, 29.73it/s]Loading weights:  60%|######    | 279/464 [00:11<00:07, 24.73it/s]Loading weights:  66%|######6   | 307/464 [00:12<00:06, 24.85it/s]Loading weights:  70%|#######   | 326/464 [00:14<00:06, 22.02it/s]Loading weights:  73%|#######3  | 339/464 [00:14<00:05, 21.10it/s]Loading weights:  75%|#######5  | 349/464 [00:15<00:05, 19.57it/s]Loading weights:  77%|#######6  | 356/464 [00:16<00:05, 19.18it/s]Loading weights:  79%|#######8  | 366/464 [00:16<00:05, 18.24it/s]Loading weights:  81%|########1 | 377/464 [00:17<00:04, 17.52it/s]Loading weights:  84%|########3 | 388/464 [00:18<00:04, 16.69it/s]Loading weights:  86%|########5 | 399/464 [00:18<00:04, 15.88it/s]Loading weights:  88%|########8 | 410/464 [00:19<00:03, 16.06it/s]Loading weights:  89%|########9 | 413/464 [00:19<00:03, 16.79it/s]Loading weights:  91%|######### | 421/464 [00:20<00:02, 15.57it/s]Loading weights:  93%|#########3| 432/464 [00:21<00:02, 15.20it/s]Loading weights:  95%|#########5| 443/464 [00:21<00:01, 15.56it/s]Loading weights:  98%|#########7| 454/464 [00:22<00:00, 15.40it/s]Loading weights: 100%|##########| 464/464 [00:22<00:00, 20.63it/s]
+  model loaded, n_layers=42, hidden=3584
+
+  Building condition: NEUTRAL (anchors=['operator-after', 'sentence-final']; extracting)
+    extracting canonical activations (250 stim)...
+      33.1s, shape=(2, 250, 43, 3584)
+    extracting invented activations (250 stim)...
+      36.4s, shape=(2, 250, 43, 3584)
+    [cache] saved 21_Gemma_2_9B_NEUTRAL_npc50_v3-multi-anchor.npz (237.5 MB)
+
+  Building condition: FUNC-PFX (anchors=['operator-after', 'first-arg', 'close-paren', 'sentence-final']; extracting)
+    extracting canonical activations (250 stim)...
+      44.5s, shape=(4, 250, 43, 3584)
+    extracting invented activations (250 stim)...
+      45.4s, shape=(4, 250, 43, 3584)
+    [cache] saved 21_Gemma_2_9B_FUNC-PFX_npc50_v3-multi-anchor.npz (475.0 MB)
+
+====================================================================================================
+  Gemma 2 9B - MULTI-ANCHOR M1-M4 BATTERY
+====================================================================================================
+
+  Per-anchor x per-focus-layer M1-M4 battery.
+  NEUTRAL anchor mapping: operator-after->operator-after, first-arg->sentence-final, close-paren->sentence-final, sentence-final->sentence-final
+  Focus layers: [2, 4, 8, 16, 17]
+
+  anchor (F-PFX <- NEUT)        | L  | M1_N | M1_F | M2_N->F | M2_F->N | M3_cent | M3_prob | M4a_N->F | M4b_N->F | M4c_N->F | M4a_F->N | M4b_F->N | M4c_F->N | M2
+  ---------------------------------------------------------------------------------------------------------------------------------------------------------------
+  operator-after <- operator-after |  2 | 0.96 | 1.00 |   1.000 |   0.888 |  50.8° |  45.9° |   40.0% |   60.0% |    0.52 |   42.0% |   46.0% |    0.42 | PASS
+  operator-after <- operator-after |  4 | 0.99 | 1.00 |   1.000 |   0.956 |  56.5° |  54.3° |   80.0% |   60.0% |    0.68 |   24.0% |   61.6% |    0.61 | PASS
+  operator-after <- operator-after |  8 | 0.99 | 1.00 |   1.000 |   0.860 |  68.0° |  66.8° |  100.0% |   40.0% |    1.00 |   25.6% |   56.8% |    0.32 | PASS
+  operator-after <- operator-after | 16 | 0.99 | 1.00 |   0.800 |   0.724 |  63.9° |  70.4° |    0.0% |   60.0% |    1.00 |   99.2% |   40.0% |    0.89 | PASS
+  operator-after <- operator-after | 17 | 0.99 | 1.00 |   0.800 |   0.640 |  67.0° |  70.6° |    0.0% |   60.0% |    1.00 |   99.2% |   40.0% |    0.98 | AMBIG
+
+  first-arg     <- sentence-final |  2 | 0.97 | 1.00 |   0.636 |   0.576 |  60.2° |  59.6° |   17.2% |   62.0% |    0.38 |   38.0% |   50.0% |    0.42 | AMBIG
+  first-arg     <- sentence-final |  4 | 1.00 | 1.00 |   1.000 |   0.424 |  69.2° |  67.9° |   29.2% |   48.4% |    0.36 |   31.2% |   52.8% |    0.56 | AMBIG
+  first-arg     <- sentence-final |  8 | 0.99 | 1.00 |   1.000 |   0.200 |  78.8° |  76.8° |   36.8% |   73.6% |    0.51 |    0.0% |   60.0% |    1.00 | FAIL
+  first-arg     <- sentence-final | 16 | 0.94 | 1.00 |   0.580 |   0.320 |  83.5° |  82.7° |   57.2% |   42.0% |    0.29 |   62.4% |   45.6% |    0.53 | AMBIG
+  first-arg     <- sentence-final | 17 | 0.92 | 1.00 |   0.588 |   0.284 |  84.0° |  84.3° |   66.0% |   31.6% |    0.50 |   91.2% |   41.6% |    0.84 | FAIL
+
+  close-paren   <- sentence-final |  2 | 0.97 | 1.00 |   1.000 |   0.332 |  74.3° |  78.4° |   74.0% |   43.6% |    0.44 |   82.0% |   42.0% |    0.66 | AMBIG
+  close-paren   <- sentence-final |  4 | 1.00 | 1.00 |   0.600 |   0.468 |  84.3° |  84.4° |  100.0% |   40.0% |    0.92 |   44.0% |   51.2% |    0.44 | AMBIG
+  close-paren   <- sentence-final |  8 | 0.99 | 1.00 |   0.892 |   0.332 |  85.9° |  83.2° |   92.4% |   38.8% |    0.70 |    0.0% |   60.0% |    0.56 | AMBIG
+  close-paren   <- sentence-final | 16 | 0.94 | 1.00 |   0.804 |   0.504 |  84.8° |  81.5° |   49.6% |   49.6% |    0.47 |   40.0% |   56.0% |    0.32 | AMBIG
+  close-paren   <- sentence-final | 17 | 0.92 | 1.00 |   0.888 |   0.440 |  84.2° |  81.8° |   93.2% |   46.8% |    0.87 |   82.4% |   42.4% |    0.37 | AMBIG
+
+  sentence-final <- sentence-final |  2 | 0.97 | 1.00 |   0.420 |   0.416 |  61.4° |  62.6° |   40.8% |   52.0% |    0.52 |   64.8% |   46.4% |    0.31 | AMBIG
+  sentence-final <- sentence-final |  4 | 1.00 | 1.00 |   0.516 |   0.656 |  61.4° |  59.3° |   12.8% |   61.6% |    0.71 |   70.8% |   49.2% |    0.42 | AMBIG
+  sentence-final <- sentence-final |  8 | 0.99 | 1.00 |   0.608 |   0.816 |  66.6° |  65.7° |   64.4% |   48.4% |    0.54 |   28.4% |   54.8% |    0.43 | AMBIG
+  sentence-final <- sentence-final | 16 | 0.94 | 1.00 |   0.420 |   0.500 |  78.0° |  74.1° |   96.0% |   36.8% |    0.92 |   65.6% |   44.0% |    0.39 | AMBIG
+  sentence-final <- sentence-final | 17 | 0.92 | 1.00 |   0.472 |   0.476 |  79.5° |  74.3° |   96.8% |   37.6% |    0.92 |   69.6% |   42.4% |    0.44 | AMBIG
+
+
+  Per-invented-word predicted canonical (FUNC-PFX direction only,
+  N->F transfer at each anchor; intended-arity at top of each column):
+
+  (bliq=B dren=B vusp=U molex=B perph=U)
+
+  anchor | L  | bliq           | dren           | vusp           | molex          | perph         
+  ------------------------------------------------------------------------------------------------
+  operator-after |  2 | not       100% | implies    0%  | implies    0%  | implies    0%  | not       100%
+  operator-after |  4 | necessarily100% | and        0%  | necessarily100% | necessarily100% | necessarily100%
+  operator-after |  8 | necessarily100% | necessarily100% | necessarily100% | necessarily100% | necessarily100%
+  operator-after | 16 | implies    0%  | implies    0%  | implies    0%  | implies    0%  | implies    0% 
+  operator-after | 17 | implies    0%  | implies    0%  | implies    0%  | implies    0%  | implies    0% 
+  first-arg     |  2 | implies   16%  | and       10%  | and       34%  | and       12%  | implies   14% 
+  first-arg     |  4 | implies   34%  | and       34%  | and       12%  | and       34%  | and       32% 
+  first-arg     |  8 | and       34%  | and       24%  | necessarily92% | and        0%  | and       34% 
+  first-arg     | 16 | not       74%  | and       46%  | not       58%  | necessarily68% | and       40% 
+  first-arg     | 17 | necessarily90% | necessarily72% | necessarily76% | necessarily74% | or        18% 
+  close-paren   |  2 | necessarily70% | necessarily80% | necessarily80% | necessarily76% | necessarily64%
+  close-paren   |  4 | not       100% | not       100% | not       100% | not       100% | not       100%
+  close-paren   |  8 | necessarily100% | necessarily84% | necessarily92% | necessarily100% | necessarily86%
+  close-paren   | 16 | and       42%  | and       20%  | and       44%  | necessarily88% | necessarily54%
+  close-paren   | 17 | necessarily88% | necessarily80% | necessarily100% | necessarily98% | necessarily100%
+  sentence-final |  2 | implies   36%  | implies   50%  | necessarily52% | implies   36%  | implies   30% 
+  sentence-final |  4 | implies    0%  | implies   26%  | implies   22%  | implies    2%  | implies   14% 
+  sentence-final |  8 | necessarily62% | necessarily66% | necessarily74% | necessarily62% | necessarily58%
+  sentence-final | 16 | necessarily100% | necessarily98% | necessarily100% | necessarily100% | necessarily82%
+  sentence-final | 17 | necessarily100% | necessarily98% | necessarily100% | necessarily100% | necessarily86%
+
+  -- Gemma 2 9B total time: 321.6s --
+
+########  OLMo 2 7B  (allenai/OLMo-2-1124-7B)  ########
+  loading tokenizer + model (torch.float16) on mps...
+Loading weights:   0%|          | 0/355 [00:00<?, ?it/s]Loading weights:   0%|          | 1/355 [00:02<14:19,  2.43s/it]Loading weights:  13%|#3        | 47/355 [00:02<00:12, 23.74it/s]Loading weights:  16%|#6        | 58/355 [00:03<00:13, 21.42it/s]Loading weights:  18%|#8        | 65/355 [00:03<00:15, 18.80it/s]Loading weights:  20%|#9        | 70/355 [00:05<00:24, 11.43it/s]Loading weights:  21%|##        | 73/355 [00:05<00:23, 12.12it/s]Loading weights:  23%|##2       | 80/355 [00:05<00:20, 13.12it/s]Loading weights:  23%|##3       | 83/355 [00:06<00:20, 13.55it/s]Loading weights:  25%|##5       | 90/355 [00:06<00:14, 18.44it/s]Loading weights:  26%|##6       | 94/355 [00:06<00:21, 11.87it/s]Loading weights:  28%|##8       | 100/355 [00:07<00:16, 15.47it/s]Loading weights:  29%|##9       | 104/355 [00:07<00:22, 11.33it/s]Loading weights:  32%|###1      | 113/355 [00:08<00:18, 13.44it/s]Loading weights:  33%|###2      | 116/355 [00:08<00:17, 13.81it/s]Loading weights:  34%|###3      | 119/355 [00:09<00:24,  9.54it/s]Loading weights:  37%|###7      | 133/355 [00:09<00:11, 19.31it/s]Loading weights:  39%|###8      | 137/355 [00:09<00:16, 13.61it/s]Loading weights:  39%|###9      | 140/355 [00:10<00:14, 14.45it/s]Loading weights:  41%|####1     | 146/355 [00:10<00:13, 15.02it/s]Loading weights:  42%|####1     | 149/355 [00:10<00:14, 14.16it/s]Loading weights:  44%|####3     | 156/355 [00:10<00:09, 19.95it/s]Loading weights:  45%|####5     | 160/355 [00:11<00:14, 13.62it/s]Loading weights:  46%|####5     | 163/355 [00:12<00:20,  9.42it/s]Loading weights:  50%|####9     | 177/355 [00:12<00:09, 18.87it/s]Loading weights:  51%|#####     | 181/355 [00:12<00:12, 13.62it/s]Loading weights:  52%|#####1    | 184/355 [00:13<00:14, 12.10it/s]Loading weights:  54%|#####3    | 190/355 [00:13<00:10, 15.84it/s]Loading weights:  54%|#####4    | 193/355 [00:13<00:09, 16.40it/s]Loading weights:  56%|#####6    | 200/355 [00:13<00:07, 20.96it/s]Loading weights:  57%|#####7    | 203/355 [00:14<00:11, 13.38it/s]Loading weights:  58%|#####8    | 206/355 [00:15<00:16,  8.96it/s]Loading weights:  62%|######2   | 221/355 [00:15<00:06, 19.72it/s]Loading weights:  63%|######3   | 225/355 [00:15<00:09, 13.72it/s]Loading weights:  65%|######5   | 232/355 [00:16<00:06, 18.40it/s]Loading weights:  67%|######6   | 237/355 [00:16<00:08, 13.30it/s]Loading weights:  69%|######8   | 244/355 [00:16<00:06, 17.70it/s]Loading weights:  70%|######9   | 248/355 [00:17<00:09, 11.00it/s]Loading weights:  72%|#######2  | 256/355 [00:17<00:06, 15.34it/s]Loading weights:  73%|#######3  | 260/355 [00:18<00:08, 11.03it/s]Loading weights:  76%|#######5  | 269/355 [00:18<00:05, 16.76it/s]Loading weights:  77%|#######6  | 273/355 [00:19<00:07, 11.26it/s]Loading weights:  81%|########  | 287/355 [00:19<00:03, 20.18it/s]Loading weights:  82%|########2 | 292/355 [00:20<00:04, 13.80it/s]Loading weights:  85%|########4 | 300/355 [00:21<00:03, 14.90it/s]Loading weights:  85%|########5 | 303/355 [00:21<00:04, 11.15it/s]Loading weights:  88%|########7 | 312/355 [00:21<00:02, 16.54it/s]Loading weights:  89%|########9 | 316/355 [00:22<00:03, 11.54it/s]Loading weights:  93%|#########3| 331/355 [00:22<00:01, 21.47it/s]Loading weights:  95%|#########4| 337/355 [00:23<00:01, 14.16it/s]Loading weights:  97%|#########6| 344/355 [00:23<00:00, 15.38it/s]Loading weights:  98%|#########8| 348/355 [00:24<00:00, 15.16it/s]Loading weights: 100%|##########| 355/355 [00:24<00:00, 14.63it/s]
+  model loaded, n_layers=32, hidden=4096
+
+  Building condition: NEUTRAL (anchors=['operator-after', 'sentence-final']; extracting)
+    extracting canonical activations (250 stim)...
+      19.7s, shape=(2, 250, 33, 4096)
+    extracting invented activations (250 stim)...
+      22.9s, shape=(2, 250, 33, 4096)
+    [cache] saved 21_OLMo_2_7B_NEUTRAL_npc50_v3-multi-anchor.npz (249.4 MB)
+
+  Building condition: FUNC-PFX (anchors=['operator-after', 'first-arg', 'close-paren', 'sentence-final']; extracting)
+    extracting canonical activations (250 stim)...
+      31.0s, shape=(4, 250, 33, 4096)
+    extracting invented activations (250 stim)...
+      31.2s, shape=(4, 250, 33, 4096)
+    [cache] saved 21_OLMo_2_7B_FUNC-PFX_npc50_v3-multi-anchor.npz (498.7 MB)
+
+====================================================================================================
+  OLMo 2 7B - MULTI-ANCHOR M1-M4 BATTERY
+====================================================================================================
+
+  Per-anchor x per-focus-layer M1-M4 battery.
+  NEUTRAL anchor mapping: operator-after->operator-after, first-arg->sentence-final, close-paren->sentence-final, sentence-final->sentence-final
+  Focus layers: [4, 7, 10, 16, 24]
+
+  anchor (F-PFX <- NEUT)        | L  | M1_N | M1_F | M2_N->F | M2_F->N | M3_cent | M3_prob | M4a_N->F | M4b_N->F | M4c_N->F | M4a_F->N | M4b_F->N | M4c_F->N | M2
+  ---------------------------------------------------------------------------------------------------------------------------------------------------------------
+  operator-after <- operator-after |  4 | 0.99 | 1.00 |   1.000 |   0.264 |  74.1° |  71.4° |    0.0% |   60.0% |    1.00 |    0.0% |   60.0% |    1.00 | FAIL
+  operator-after <- operator-after |  7 | 1.00 | 1.00 |   1.000 |   0.212 |  75.6° |  74.9° |   20.0% |   80.0% |    0.68 |    0.0% |   60.0% |    1.00 | FAIL
+  operator-after <- operator-after | 10 | 1.00 | 1.00 |   0.800 |   0.688 |  71.3° |  74.4° |    0.0% |   60.0% |    1.00 |   17.2% |   48.4% |    0.42 | PASS
+  operator-after <- operator-after | 16 | 0.97 | 1.00 |   0.600 |   0.620 |  74.8° |  75.9° |    0.0% |   60.0% |    0.68 |   14.8% |   46.8% |    0.40 | AMBIG
+  operator-after <- operator-after | 24 | 0.91 | 1.00 |   1.000 |   0.640 |  74.9° |  72.2° |    0.0% |   60.0% |    0.68 |   14.0% |   53.2% |    0.65 | AMBIG
+
+  first-arg     <- sentence-final |  4 | 0.95 | 1.00 |   0.688 |   0.344 |  80.9° |  79.4° |   64.4% |   45.2% |    0.54 |   49.2% |   51.6% |    0.50 | AMBIG
+  first-arg     <- sentence-final |  7 | 0.96 | 1.00 |   0.596 |   0.500 |  82.2° |  82.2° |   80.0% |   26.4% |    0.41 |   69.6% |   43.2% |    0.36 | AMBIG
+  first-arg     <- sentence-final | 10 | 0.94 | 1.00 |   0.552 |   0.360 |  79.6° |  81.5° |   20.8% |   60.8% |    0.60 |   16.0% |   54.4% |    0.72 | AMBIG
+  first-arg     <- sentence-final | 16 | 0.88 | 1.00 |   0.724 |   0.308 |  84.1° |  82.7° |   25.6% |   64.8% |    0.58 |    6.4% |   59.2% |    0.88 | AMBIG
+  first-arg     <- sentence-final | 24 | 0.84 | 1.00 |   0.712 |   0.400 |  82.5° |  81.7° |   48.0% |   45.6% |    0.39 |   31.2% |   52.8% |    0.43 | AMBIG
+
+  close-paren   <- sentence-final |  4 | 0.95 | 1.00 |   0.600 |   0.328 |  86.7° |  85.7° |   85.2% |   54.8% |    0.75 |   19.2% |   56.8% |    0.69 | AMBIG
+  close-paren   <- sentence-final |  7 | 0.96 | 1.00 |   0.732 |   0.300 |  82.8° |  82.9° |   91.6% |   48.4% |    0.85 |   94.8% |   40.4% |    0.90 | AMBIG
+  close-paren   <- sentence-final | 10 | 0.94 | 1.00 |   0.616 |   0.332 |  80.6° |  81.1° |   30.0% |   90.0% |    0.57 |   96.0% |   40.8% |    0.92 | AMBIG
+  close-paren   <- sentence-final | 16 | 0.88 | 1.00 |   0.768 |   0.268 |  79.8° |  79.3° |   11.6% |   71.6% |    0.79 |   98.8% |   39.6% |    0.97 | FAIL
+  close-paren   <- sentence-final | 24 | 0.84 | 1.00 |   0.856 |   0.488 |  79.9° |  78.6° |    0.0% |   60.0% |    0.84 |   74.4% |   44.0% |    0.53 | AMBIG
+
+  sentence-final <- sentence-final |  4 | 0.95 | 1.00 |   0.596 |   0.392 |  73.6° |  73.0° |   19.6% |   61.2% |    0.65 |   93.2% |   42.0% |    0.70 | AMBIG
+  sentence-final <- sentence-final |  7 | 0.96 | 1.00 |   0.704 |   0.500 |  76.4° |  75.9° |   55.6% |   50.8% |    0.29 |   71.6% |   41.2% |    0.53 | AMBIG
+  sentence-final <- sentence-final | 10 | 0.94 | 1.00 |   0.688 |   0.552 |  74.1° |  73.1° |   40.0% |   55.2% |    0.28 |   68.4% |   42.8% |    0.43 | AMBIG
+  sentence-final <- sentence-final | 16 | 0.88 | 1.00 |   0.528 |   0.348 |  74.0° |  73.7° |    3.6% |   63.6% |    0.63 |   90.8% |   38.8% |    0.44 | AMBIG
+  sentence-final <- sentence-final | 24 | 0.84 | 1.00 |   0.972 |   0.520 |  66.4° |  67.4° |   27.2% |   60.0% |    0.41 |   90.8% |   37.2% |    0.75 | AMBIG
+
+
+  Per-invented-word predicted canonical (FUNC-PFX direction only,
+  N->F transfer at each anchor; intended-arity at top of each column):
+
+  (bliq=B dren=B vusp=U molex=B perph=U)
+
+  anchor | L  | bliq           | dren           | vusp           | molex          | perph         
+  ------------------------------------------------------------------------------------------------
+  operator-after |  4 | implies    0%  | implies    0%  | implies    0%  | implies    0%  | implies    0% 
+  operator-after |  7 | and        0%  | and        0%  | and        0%  | and        0%  | necessarily100%
+  operator-after | 10 | implies    0%  | implies    0%  | implies    0%  | implies    0%  | implies    0% 
+  operator-after | 16 | implies    0%  | implies    0%  | implies    0%  | implies    0%  | or         0% 
+  operator-after | 24 | and        0%  | or         0%  | or         0%  | or         0%  | or         0% 
+  first-arg     |  4 | not       74%  | not       52%  | not       72%  | not       72%  | not       52% 
+  first-arg     |  7 | not       84%  | not       100% | and       30%  | not       100% | necessarily86%
+  first-arg     | 10 | and       20%  | and       20%  | and       42%  | and       10%  | and       12% 
+  first-arg     | 16 | or         0%  | necessarily52% | necessarily58% | or         0%  | or        18% 
+  first-arg     | 24 | or        18%  | necessarily80% | or        22%  | necessarily58% | necessarily62%
+  close-paren   |  4 | not       90%  | not       100% | not       100% | implies   36%  | not       100%
+  close-paren   |  7 | not       58%  | not       100% | not       100% | not       100% | not       100%
+  close-paren   | 10 | and        0%  | and        0%  | necessarily100% | and        0%  | and       50% 
+  close-paren   | 16 | or         0%  | or         0%  | necessarily58% | or         0%  | or         0% 
+  close-paren   | 24 | or         0%  | or         0%  | or         0%  | or         0%  | or         0% 
+  sentence-final |  4 | implies   12%  | implies   28%  | implies   38%  | implies    6%  | implies   14% 
+  sentence-final |  7 | and       38%  | not       52%  | necessarily64% | necessarily72% | and       52% 
+  sentence-final | 10 | and       30%  | and       42%  | and       50%  | and       40%  | and       38% 
+  sentence-final | 16 | and        0%  | and        0%  | and        6%  | and        0%  | and       12% 
+  sentence-final | 24 | and       20%  | and       24%  | and       32%  | and       24%  | and       36% 
+
+  -- OLMo 2 7B total time: 233.6s --
+
+====================================================================================================
+CROSS-ANCHOR HEADLINE: does M4b (intended-arity agreement) pass anywhere?
+====================================================================================================
+
+  Threshold for 'M4b PASS': intended-arity agreement >= 0.65
+  Random-by-arity baseline: 2 unary + 3 binary canonicals; if invented split 2-unary / 3-binary intended, random matching = (2*2 + 3*3) / (5*5) = 0.52
+  So M4b PASS at >= 0.65 is ~25% above random-by-arity baseline.
+
+  Best M4b across all (model, anchor, layer, direction) cells:
+
+    model        | anchor         | L   | dir  | M4b     | M4a     | M4c   | gate    | verdict
+    ------------------------------------------------------------------------------------------
+    OLMo 2 7B    | close-paren    |  10 | N->F | 90.0%  | 30.0%  |  0.57 |   0.616 | AMBIG
+    OLMo 2 7B    | operator-after |   7 | N->F | 80.0%  | 20.0%  |  0.68 |   1.000 | FAIL
+    Gemma 2 9B   | first-arg      |   8 | N->F | 73.6%  | 36.8%  |  0.51 |   1.000 | FAIL
+    OLMo 2 7B    | close-paren    |  16 | N->F | 71.6%  | 11.6%  |  0.79 |   0.768 | FAIL
+    OLMo 2 7B    | first-arg      |  16 | N->F | 64.8%  | 25.6%  |  0.58 |   0.724 | AMBIG
+    OLMo 2 7B    | sentence-final |  16 | N->F | 63.6%  |  3.6%  |  0.63 |   0.528 | AMBIG
+    Gemma 2 9B   | first-arg      |   2 | N->F | 62.0%  | 17.2%  |  0.38 |   0.636 | AMBIG
+    Gemma 2 9B   | operator-after |   4 | F->N | 61.6%  | 24.0%  |  0.61 |   0.956 | PASS
+    Gemma 2 9B   | sentence-final |   4 | N->F | 61.6%  | 12.8%  |  0.71 |   0.516 | AMBIG
+    OLMo 2 7B    | sentence-final |   4 | N->F | 61.2%  | 19.6%  |  0.65 |   0.596 | AMBIG
+
+  *** M4b PASSES at best cell (90.0% >= 65%). ***
+  This RETRACTS the §3.7.8 negative-result headline in favour of
+  a positive cross-notation arity-respecting transfer finding at
+  the anchor / layer / direction above. Update paper_notes §3.7.8.
+
+[logging] full transcript written to: /Users/brendan.budworth/dev/thesis/experiments/outputs/21_20260519_222451.log

@@ -1,0 +1,148 @@
+# ============================================================================
+# thesis repo .gitignore
+# ============================================================================
+# Tracked: source (.py, .md, .bib), pre-registration docs, log files of record
+#          (small, cited in the paper), and rendered figure artefacts (PDF/PNG).
+# Ignored: model-activation caches (multi-GB NPZ), venvs, OS / IDE noise, build
+#          artefacts, model weights.
+
+# ----------------------------------------------------------------------------
+# Heavy experimental artefacts (model activations)
+# ----------------------------------------------------------------------------
+# Per-script activation caches: re-generatable by re-running the upstream
+# extraction (see experiments/README.md). At ~19 GB across the v2-v6 sweep
+# they would dominate the repo and are not portable between machines.
+experiments/outputs/cache/
+experiments/cache/
+**/cache/*.npz
+*.npz
+*.npy
+
+# Model weights / HuggingFace shards if anyone ever stages them inside the repo
+*.safetensors
+*.bin
+*.pt
+*.pth
+*.ckpt
+
+# ----------------------------------------------------------------------------
+# Python environments
+# ----------------------------------------------------------------------------
+.venv/
+venv/
+env/
+**/.venv/
+**/venv/
+**/env/
+*.egg-info/
+*.egg
+build/
+dist/
+pip-wheel-metadata/
+
+# ----------------------------------------------------------------------------
+# Python bytecode / cache
+# ----------------------------------------------------------------------------
+__pycache__/
+*.py[cod]
+*$py.class
+.mypy_cache/
+.pytest_cache/
+.ruff_cache/
+.tox/
+.nox/
+.coverage
+.coverage.*
+htmlcov/
+coverage.xml
+.pytype/
+
+# ----------------------------------------------------------------------------
+# Notebook checkpoints
+# ----------------------------------------------------------------------------
+.ipynb_checkpoints/
+*.ipynb_checkpoints
+
+# ----------------------------------------------------------------------------
+# matplotlib font cache
+# ----------------------------------------------------------------------------
+experiments/figures/_mpl_cache/
+
+# ----------------------------------------------------------------------------
+# OS noise
+# ----------------------------------------------------------------------------
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
+
+# ----------------------------------------------------------------------------
+# Editor / IDE state
+# ----------------------------------------------------------------------------
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.project
+.pydevproject
+.settings/
+.history/
+
+# ----------------------------------------------------------------------------
+# Local / private overrides (never commit secrets)
+# ----------------------------------------------------------------------------
+.env
+.env.*
+*.env.local
+*.local
+secrets.*
+credentials.*
+*.key
+*.pem
+.huggingface_token
+.hf_token
+
+# ----------------------------------------------------------------------------
+# Cursor / Claude side-state (the agent stores transcripts outside the repo,
+# but defensively ignore in case anything gets copied in)
+# ----------------------------------------------------------------------------
+.cursor/
+.cursorignore.local
+
+# ----------------------------------------------------------------------------
+# LaTeX build artefacts (relevant if paper.md is converted to .tex)
+# ----------------------------------------------------------------------------
+*.aux
+*.bbl
+*.blg
+*.fdb_latexmk
+*.fls
+*.log
+!experiments/outputs/*.log
+*.out
+*.synctex.gz
+*.toc
+*.lof
+*.lot
+*.nav
+*.snm
+*.vrb
+*.dvi
+*.ps
+*.pdf
+!experiments/figures/out/*.pdf
+!**/paper.pdf
+!**/non-technical-summary.pdf
+
+# ----------------------------------------------------------------------------
+# Misc
+# ----------------------------------------------------------------------------
+*.tmp
+*.bak
+*.orig
+*.rej

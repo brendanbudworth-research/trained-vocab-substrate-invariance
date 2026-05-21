@@ -1,0 +1,433 @@
+[logging] tee'ing all output to /Users/brendan.budworth/dev/thesis/experiments/outputs/22d_20260520_154737.log
+Script 22d - expanded canonical set (10 canonicals: 5B + 5U)
+STIMULUS_VERSION=v5-expanded-canonical  SEED=17  N_PER_CLASS=50
+
+Canonical set:   ['and', 'or', 'implies', 'xor', 'nand', 'not', 'necessarily', 'possibly', 'always', 'negate']
+  (5 binary, 5 unary)
+Original 5:      ['and', 'or', 'not', 'implies', 'necessarily']
+New 5:           ['xor', 'nand', 'possibly', 'always', 'negate']
+  - new binaries:  xor, nand
+  - new unaries:   possibly, always, negate
+  - modal-adv U:   ['necessarily', 'possibly', 'always']
+  - operational U: ['not', 'negate']
+
+Invented set (16, unchanged from 22c): ['bliq', 'dren', 'molex', 'krev', 'sond', 'glin', 'twiv', 'fump', 'vusp', 'perph', 'kelm', 'zorf', 'gleph', 'drelth', 'vrith', 'nilph']
+
+====================================================================================================
+TOKENIZATION AUDIT (10 canonicals + 16 invented words under both tokenizers)
+====================================================================================================
+
+  Gemma 2 9B (google/gemma-2-9b)
+    CANONICALS:
+      word           subwords                                   n
+      and (B)        [' and']                                   1
+      or (B)         [' or']                                    1
+      implies (B)    [' implies']                               1
+      xor (B)        [' xor']                                   1 (NEW)
+      nand (B)       [' nand']                                  1 (NEW)
+      not (U)        [' not']                                   1
+      necessarily (U) [' necessarily']                           1
+      possibly (U)   [' possibly']                              1 (NEW)
+      always (U)     [' always']                                1 (NEW)
+      negate (U)     [' negate']                                1 (NEW)
+    (invented words: see 22c tokenization audit -- unchanged here)
+
+  OLMo 2 7B (allenai/OLMo-2-1124-7B)
+    CANONICALS:
+      word           subwords                                   n
+      and (B)        [' and']                                   1
+      or (B)         [' or']                                    1
+      implies (B)    [' implies']                               1
+      xor (B)        [' xor']                                   1 (NEW)
+      nand (B)       [' n', 'and']                              2 (NEW)
+      not (U)        [' not']                                   1
+      necessarily (U) [' necessarily']                           1
+      possibly (U)   [' possibly']                              1 (NEW)
+      always (U)     [' always']                                1 (NEW)
+      negate (U)     [' negate']                                1 (NEW)
+    (invented words: see 22c tokenization audit -- unchanged here)
+
+Device: MPS (Apple Silicon)
+
+====================================================================================================
+MODEL: Gemma 2 9B
+====================================================================================================
+
+  Loading model: google/gemma-2-9b
+Loading weights:   0%|          | 0/464 [00:00<?, ?it/s]Loading weights:   0%|          | 1/464 [00:04<37:56,  4.92s/it]Loading weights:  31%|###1      | 146/464 [00:05<00:07, 41.13it/s]Loading weights:  50%|####9     | 231/464 [00:09<00:08, 26.13it/s]Loading weights:  60%|#####9    | 278/464 [00:13<00:08, 21.25it/s]Loading weights:  66%|######6   | 307/464 [00:14<00:07, 21.74it/s]Loading weights:  70%|#######   | 327/464 [00:15<00:06, 20.14it/s]Loading weights:  73%|#######3  | 341/464 [00:16<00:06, 20.19it/s]Loading weights:  76%|#######5  | 351/464 [00:17<00:05, 19.26it/s]Loading weights:  77%|#######7  | 359/464 [00:17<00:05, 18.77it/s]Loading weights:  79%|#######8  | 366/464 [00:18<00:05, 17.45it/s]Loading weights:  80%|#######9  | 371/464 [00:18<00:04, 18.84it/s]Loading weights:  81%|########1 | 377/464 [00:18<00:05, 15.56it/s]Loading weights:  84%|########3 | 388/464 [00:19<00:05, 14.63it/s]Loading weights:  86%|########5 | 399/464 [00:20<00:04, 14.74it/s]Loading weights:  88%|########8 | 410/464 [00:21<00:03, 14.88it/s]Loading weights:  91%|######### | 421/464 [00:21<00:02, 15.41it/s]Loading weights:  93%|#########3| 432/464 [00:22<00:02, 15.18it/s]Loading weights:  95%|#########5| 443/464 [00:23<00:01, 15.46it/s]Loading weights:  98%|#########7| 454/464 [00:24<00:00, 15.44it/s]Loading weights: 100%|##########| 464/464 [00:24<00:00, 19.29it/s]
+    loaded in 87.4s
+
+  -- Building NEUTRAL condition --
+
+  Building condition: NEUTRAL (anchors=['operator-after', 'sentence-final']; extracting)
+    extracting canonical activations (500 stim)...
+      66.5s, shape=(2, 500, 43, 3584)
+    extracting invented activations (800 stim)...
+      120.2s, shape=(2, 800, 43, 3584)
+    [cache] saved 22d_Gemma_2_9B_NEUTRAL_npc50_v5-expanded-canonical.npz (617.7 MB)
+
+  -- Building FUNC-PFX condition --
+
+  Building condition: FUNC-PFX (anchors=['operator-after', 'first-arg', 'close-paren', 'sentence-final']; extracting)
+    extracting canonical activations (500 stim)...
+      88.5s, shape=(4, 500, 43, 3584)
+    extracting invented activations (800 stim)...
+      144.8s, shape=(4, 800, 43, 3584)
+    [cache] saved 22d_Gemma_2_9B_FUNC-PFX_npc50_v5-expanded-canonical.npz (1235.0 MB)
+
+====================================================================================================
+  Gemma sente->opa L4 N->F   [survivor-basin]
+  model=Gemma 2 9B  train=NEUTRAL/sentence-final@L4  test=FUNC-PFX/operator-after@L4
+====================================================================================================
+
+  M1-train CV: 1.000  M1-test CV: 1.000
+  M2-canonical: 1.000  (10-class accuracy; chance = 0.10; PASS >= 0.65)
+  M2-arity:     1.000  (binary-vs-unary; chance = 0.50; PASS >= 0.65)
+
+  ===== M4 (16 × 50 = 800 invented stims, 10-canonical readout) =====
+  M4a (inv unary mass):            12.5%   (22c-5cano: 67.9%)
+  M4b (intended-arity agree):      62.5%   (22c-5cano: 66.9%)
+  M4c (Herfindahl over 10):        0.78   (0.10 = uniform; 1.00 = collapsed)
+  M4c-unary (within 5 unaries):    1.00   (0.20 = uniform across 5 unaries; 1.00 = all on one)
+  M4c-binary (within 5 binaries):  1.00   (0.20 = uniform across 5 binaries; 1.00 = all on one)
+
+  Bootstrap M4b: mean 0.625 std 0.000  95% CI [0.625, 0.625]  P(>= 0.65) = 0.0%
+
+  ===== Disambiguating metrics =====
+  new-canonical uptake (mass on the 5 NEW canonicals):
+    total: 100.0%
+      xor          (B)   0.0%  
+      nand         (B)  87.5%  ###################################
+      possibly     (U)   0.0%  
+      always       (U)   0.0%  
+      negate       (U)  12.5%  #####
+
+  Within-unary breakdown:
+    modal-adverbial fraction (necessarily, possibly, always):   0.0%
+    operational fraction    (not, negate): 100.0%
+
+  Full predicted-canonical breakdown (over 800 invented stims):
+    and           (B)         0.0%  
+    or            (B)         0.0%  
+    implies       (B)         0.0%  
+    xor           (B) (NEW)   0.0%  
+    nand          (B) (NEW)  87.5%  ###################################
+    not           (U)         0.0%  
+    necessarily   (U)         0.0%  
+    possibly      (U) (NEW)   0.0%  
+    always        (U) (NEW)   0.0%  
+    negate        (U) (NEW)  12.5%  #####
+
+  Per-word breakdown (16 words):
+    word       int. int.cano    top            top% unary% match
+    ---------- ---- ----------- ------------- ----- ------ -----
+    bliq          B and         nand          100.0   0.0  YES   *
+    dren          B or          nand          100.0   0.0  YES   *
+    molex         B implies     nand          100.0   0.0  YES   *
+    krev          B and         nand          100.0   0.0  YES   *
+    sond          B or          nand          100.0   0.0  YES   *
+    glin          B implies     nand          100.0   0.0  YES   *
+    twiv          B and         nand          100.0   0.0  YES   *
+    fump          B or          nand          100.0   0.0  YES   *
+    vusp          U not         nand          100.0   0.0  no    *
+    perph         U necessarily negate        100.0 100.0  YES   *
+    kelm          U not         nand          100.0   0.0  no    *
+    zorf          U not         nand          100.0   0.0  no    *
+    gleph         U necessarily negate        100.0 100.0  YES   *
+    drelth        U necessarily nand          100.0   0.0  no    *
+    vrith         U not         nand          100.0   0.0  no    *
+    nilph         U necessarily nand          100.0   0.0  no    *
+
+  Lucky-default flag: YES
+
+
+====================================================================================================
+  [LUCKY-NEG] Gemma first->sf L8 F->N   [lucky-default-control]
+  model=Gemma 2 9B  train=FUNC-PFX/first-arg@L8  test=NEUTRAL/sentence-final@L8
+====================================================================================================
+
+  M1-train CV: 1.000  M1-test CV: 0.988
+  M2-canonical: 0.156  (10-class accuracy; chance = 0.10; PASS >= 0.65)
+  M2-arity:     0.544  (binary-vs-unary; chance = 0.50; PASS >= 0.65)
+
+  ===== M4 (16 × 50 = 800 invented stims, 10-canonical readout) =====
+  M4a (inv unary mass):            30.2%   (22c-5cano: 0.0%)
+  M4b (intended-arity agree):      51.0%   (22c-5cano: 50.0%)
+  M4c (Herfindahl over 10):        0.58   (0.10 = uniform; 1.00 = collapsed)
+  M4c-unary (within 5 unaries):    1.00   (0.20 = uniform across 5 unaries; 1.00 = all on one)
+  M4c-binary (within 5 binaries):  1.00   (0.20 = uniform across 5 binaries; 1.00 = all on one)
+
+  Bootstrap M4b: mean 0.509 std 0.016  95% CI [0.480, 0.544]  P(>= 0.65) = 0.0%
+
+  ===== Disambiguating metrics =====
+  new-canonical uptake (mass on the 5 NEW canonicals):
+    total:  30.4%
+      xor          (B)   0.1%  
+      nand         (B)   0.0%  
+      possibly     (U)   0.0%  
+      always       (U)   0.0%  
+      negate       (U)  30.2%  ############
+
+  Within-unary breakdown:
+    modal-adverbial fraction (necessarily, possibly, always):   0.0%
+    operational fraction    (not, negate): 100.0%
+
+  Full predicted-canonical breakdown (over 800 invented stims):
+    and           (B)         0.0%  
+    or            (B)         0.0%  
+    implies       (B)        69.6%  ###########################
+    xor           (B) (NEW)   0.1%  
+    nand          (B) (NEW)   0.0%  
+    not           (U)         0.0%  
+    necessarily   (U)         0.0%  
+    possibly      (U) (NEW)   0.0%  
+    always        (U) (NEW)   0.0%  
+    negate        (U) (NEW)  30.2%  ############
+
+  Per-word breakdown (16 words):
+    word       int. int.cano    top            top% unary% match
+    ---------- ---- ----------- ------------- ----- ------ -----
+    bliq          B and         implies        72.0  28.0  YES    
+    dren          B or          implies        70.0  30.0  YES    
+    molex         B implies     implies        60.0  40.0  YES    
+    krev          B and         implies        72.0  28.0  YES    
+    sond          B or          implies        82.0  18.0  YES    
+    glin          B implies     implies        72.0  28.0  YES    
+    twiv          B and         implies        68.0  32.0  YES    
+    fump          B or          implies        70.0  30.0  YES    
+    vusp          U not         implies        68.0  32.0  no     
+    perph         U necessarily implies        70.0  28.0  no     
+    kelm          U not         implies        70.0  30.0  no     
+    zorf          U not         implies        68.0  32.0  no     
+    gleph         U necessarily implies        72.0  28.0  no     
+    drelth        U necessarily implies        68.0  32.0  no     
+    vrith         U not         implies        70.0  30.0  no     
+    nilph         U necessarily implies        62.0  38.0  no     
+
+  Lucky-default flag: no
+
+
+  -- Gemma 2 9B total time: 652.1s --
+
+====================================================================================================
+MODEL: OLMo 2 7B
+====================================================================================================
+
+  Loading model: allenai/OLMo-2-1124-7B
+Loading weights:   0%|          | 0/355 [00:00<?, ?it/s]Loading weights:   0%|          | 1/355 [00:02<12:37,  2.14s/it]Loading weights:  13%|#3        | 47/355 [00:02<00:11, 26.71it/s]Loading weights:  16%|#6        | 58/355 [00:02<00:09, 30.21it/s]Loading weights:  19%|#9        | 69/355 [00:02<00:08, 32.45it/s]Loading weights:  23%|##2       | 80/355 [00:03<00:07, 34.76it/s]Loading weights:  25%|##5       | 90/355 [00:03<00:06, 41.77it/s]Loading weights:  28%|##7       | 98/355 [00:03<00:06, 39.37it/s]Loading weights:  29%|##9       | 104/355 [00:03<00:07, 33.21it/s]Loading weights:  32%|###1      | 113/355 [00:03<00:06, 36.44it/s]Loading weights:  35%|###4      | 123/355 [00:04<00:05, 45.21it/s]Loading weights:  37%|###6      | 130/355 [00:04<00:05, 40.13it/s]Loading weights:  38%|###8      | 136/355 [00:04<00:06, 35.36it/s]Loading weights:  41%|####1     | 146/355 [00:04<00:05, 37.54it/s]Loading weights:  44%|####3     | 156/355 [00:04<00:04, 47.09it/s]Loading weights:  46%|####5     | 162/355 [00:05<00:04, 40.30it/s]Loading weights:  47%|####7     | 168/355 [00:05<00:05, 36.10it/s]Loading weights:  50%|#####     | 179/355 [00:05<00:04, 38.98it/s]Loading weights:  53%|#####3    | 189/355 [00:05<00:03, 48.24it/s]Loading weights:  55%|#####4    | 195/355 [00:05<00:04, 39.77it/s]Loading weights:  57%|#####6    | 201/355 [00:06<00:04, 34.24it/s]Loading weights:  60%|#####9    | 212/355 [00:06<00:03, 37.19it/s]Loading weights:  63%|######2   | 222/355 [00:06<00:02, 46.70it/s]Loading weights:  64%|######4   | 228/355 [00:06<00:03, 39.76it/s]Loading weights:  66%|######5   | 234/355 [00:07<00:04, 26.80it/s]Loading weights:  67%|######7   | 238/355 [00:07<00:04, 27.91it/s]Loading weights:  69%|######9   | 245/355 [00:07<00:04, 24.05it/s]Loading weights:  70%|#######   | 249/355 [00:07<00:04, 25.41it/s]Loading weights:  72%|#######2  | 256/355 [00:08<00:05, 18.87it/s]Loading weights:  73%|#######2  | 259/355 [00:08<00:06, 15.93it/s]Loading weights:  75%|#######4  | 265/355 [00:08<00:04, 20.38it/s]Loading weights:  75%|#######5  | 268/355 [00:09<00:09,  9.50it/s]Loading weights:  78%|#######7  | 276/355 [00:10<00:05, 14.79it/s]Loading weights:  79%|#######8  | 280/355 [00:10<00:06, 11.35it/s]Loading weights:  81%|########1 | 289/355 [00:11<00:04, 13.21it/s]Loading weights:  82%|########2 | 292/355 [00:11<00:04, 13.75it/s]Loading weights:  84%|########4 | 299/355 [00:11<00:02, 18.98it/s]Loading weights:  85%|########5 | 303/355 [00:11<00:03, 14.17it/s]Loading weights:  88%|########7 | 311/355 [00:12<00:02, 15.88it/s]Loading weights:  88%|########8 | 314/355 [00:12<00:02, 17.27it/s]Loading weights:  91%|######### | 322/355 [00:13<00:02, 16.44it/s]Loading weights:  92%|#########1| 325/355 [00:13<00:01, 17.78it/s]Loading weights:  93%|#########3| 331/355 [00:13<00:01, 23.07it/s]Loading weights:  94%|#########4| 335/355 [00:13<00:01, 14.31it/s]Loading weights:  97%|#########6| 343/355 [00:13<00:00, 21.29it/s]Loading weights:  98%|#########7| 347/355 [00:14<00:00, 13.20it/s]Loading weights: 100%|##########| 355/355 [00:14<00:00, 24.16it/s]
+    loaded in 68.7s
+
+  -- Building NEUTRAL condition --
+
+  Building condition: NEUTRAL (anchors=['operator-after', 'sentence-final']; extracting)
+    extracting canonical activations (500 stim)...
+      40.5s, shape=(2, 500, 33, 4096)
+    extracting invented activations (800 stim)...
+      74.1s, shape=(2, 800, 33, 4096)
+    [cache] saved 22d_OLMo_2_7B_NEUTRAL_npc50_v5-expanded-canonical.npz (648.5 MB)
+
+  -- Building FUNC-PFX condition --
+
+  Building condition: FUNC-PFX (anchors=['operator-after', 'first-arg', 'close-paren', 'sentence-final']; extracting)
+    extracting canonical activations (500 stim)...
+      61.4s, shape=(4, 500, 33, 4096)
+    extracting invented activations (800 stim)...
+      98.7s, shape=(4, 800, 33, 4096)
+    [cache] saved 22d_OLMo_2_7B_FUNC-PFX_npc50_v5-expanded-canonical.npz (1296.7 MB)
+
+====================================================================================================
+  §3.7.9 OLMo sente->cp L10 N->F   [survivor-distributed]
+  model=OLMo 2 7B  train=NEUTRAL/sentence-final@L10  test=FUNC-PFX/close-paren@L10
+====================================================================================================
+
+  M1-train CV: 0.920  M1-test CV: 1.000
+  M2-canonical: 0.812  (10-class accuracy; chance = 0.10; PASS >= 0.65)
+  M2-arity:     1.000  (binary-vs-unary; chance = 0.50; PASS >= 0.65)
+
+  ===== M4 (16 × 50 = 800 invented stims, 10-canonical readout) =====
+  M4a (inv unary mass):             0.0%   (22c-5cano: 34.9%)
+  M4b (intended-arity agree):      50.0%   (22c-5cano: 79.6%)
+  M4c (Herfindahl over 10):        1.00   (0.10 = uniform; 1.00 = collapsed)
+  M4c-unary (within 5 unaries):    0.00   (0.20 = uniform across 5 unaries; 1.00 = all on one)
+  M4c-binary (within 5 binaries):  1.00   (0.20 = uniform across 5 binaries; 1.00 = all on one)
+
+  Bootstrap M4b: mean 0.500 std 0.000  95% CI [0.500, 0.500]  P(>= 0.65) = 0.0%
+
+  ===== Disambiguating metrics =====
+  new-canonical uptake (mass on the 5 NEW canonicals):
+    total: 100.0%
+      xor          (B)   0.0%  
+      nand         (B) 100.0%  ########################################
+      possibly     (U)   0.0%  
+      always       (U)   0.0%  
+      negate       (U)   0.0%  
+
+  Within-unary breakdown: N/A (M4a = 0%)
+
+  Full predicted-canonical breakdown (over 800 invented stims):
+    and           (B)         0.0%  
+    or            (B)         0.0%  
+    implies       (B)         0.0%  
+    xor           (B) (NEW)   0.0%  
+    nand          (B) (NEW) 100.0%  ########################################
+    not           (U)         0.0%  
+    necessarily   (U)         0.0%  
+    possibly      (U) (NEW)   0.0%  
+    always        (U) (NEW)   0.0%  
+    negate        (U) (NEW)   0.0%  
+
+  Per-word breakdown (16 words):
+    word       int. int.cano    top            top% unary% match
+    ---------- ---- ----------- ------------- ----- ------ -----
+    bliq          B and         nand          100.0   0.0  YES   *
+    dren          B or          nand          100.0   0.0  YES   *
+    molex         B implies     nand          100.0   0.0  YES   *
+    krev          B and         nand          100.0   0.0  YES   *
+    sond          B or          nand          100.0   0.0  YES   *
+    glin          B implies     nand          100.0   0.0  YES   *
+    twiv          B and         nand          100.0   0.0  YES   *
+    fump          B or          nand          100.0   0.0  YES   *
+    vusp          U not         nand          100.0   0.0  no    *
+    perph         U necessarily nand          100.0   0.0  no    *
+    kelm          U not         nand          100.0   0.0  no    *
+    zorf          U not         nand          100.0   0.0  no    *
+    gleph         U necessarily nand          100.0   0.0  no    *
+    drelth        U necessarily nand          100.0   0.0  no    *
+    vrith         U not         nand          100.0   0.0  no    *
+    nilph         U necessarily nand          100.0   0.0  no    *
+
+  Lucky-default flag: YES
+
+
+====================================================================================================
+  [LUCKY-NEG] OLMo opa->opa L7 F->N   [lucky-default-control]
+  model=OLMo 2 7B  train=FUNC-PFX/operator-after@L7  test=NEUTRAL/operator-after@L7
+====================================================================================================
+
+  M1-train CV: 1.000  M1-test CV: 0.994
+  M2-canonical: 0.206  (10-class accuracy; chance = 0.10; PASS >= 0.65)
+  M2-arity:     0.610  (binary-vs-unary; chance = 0.50; PASS >= 0.65)
+
+  ===== M4 (16 × 50 = 800 invented stims, 10-canonical readout) =====
+  M4a (inv unary mass):           100.0%   (22c-5cano: 0.0%)
+  M4b (intended-arity agree):      50.0%   (22c-5cano: 50.0%)
+  M4c (Herfindahl over 10):        1.00   (0.10 = uniform; 1.00 = collapsed)
+  M4c-unary (within 5 unaries):    1.00   (0.20 = uniform across 5 unaries; 1.00 = all on one)
+  M4c-binary (within 5 binaries):  0.00   (0.20 = uniform across 5 binaries; 1.00 = all on one)
+
+  Bootstrap M4b: mean 0.500 std 0.000  95% CI [0.500, 0.500]  P(>= 0.65) = 0.0%
+
+  ===== Disambiguating metrics =====
+  new-canonical uptake (mass on the 5 NEW canonicals):
+    total: 100.0%
+      xor          (B)   0.0%  
+      nand         (B)   0.0%  
+      possibly     (U)   0.0%  
+      always       (U)   0.0%  
+      negate       (U) 100.0%  ########################################
+
+  Within-unary breakdown:
+    modal-adverbial fraction (necessarily, possibly, always):   0.0%
+    operational fraction    (not, negate): 100.0%
+
+  Full predicted-canonical breakdown (over 800 invented stims):
+    and           (B)         0.0%  
+    or            (B)         0.0%  
+    implies       (B)         0.0%  
+    xor           (B) (NEW)   0.0%  
+    nand          (B) (NEW)   0.0%  
+    not           (U)         0.0%  
+    necessarily   (U)         0.0%  
+    possibly      (U) (NEW)   0.0%  
+    always        (U) (NEW)   0.0%  
+    negate        (U) (NEW) 100.0%  ########################################
+
+  Per-word breakdown (16 words):
+    word       int. int.cano    top            top% unary% match
+    ---------- ---- ----------- ------------- ----- ------ -----
+    bliq          B and         negate        100.0 100.0  no    *
+    dren          B or          negate        100.0 100.0  no    *
+    molex         B implies     negate        100.0 100.0  no    *
+    krev          B and         negate        100.0 100.0  no    *
+    sond          B or          negate        100.0 100.0  no    *
+    glin          B implies     negate        100.0 100.0  no    *
+    twiv          B and         negate        100.0 100.0  no    *
+    fump          B or          negate        100.0 100.0  no    *
+    vusp          U not         negate        100.0 100.0  YES   *
+    perph         U necessarily negate        100.0 100.0  YES   *
+    kelm          U not         negate        100.0 100.0  YES   *
+    zorf          U not         negate        100.0 100.0  YES   *
+    gleph         U necessarily negate        100.0 100.0  YES   *
+    drelth        U necessarily negate        100.0 100.0  YES   *
+    vrith         U not         negate        100.0 100.0  YES   *
+    nilph         U necessarily negate        100.0 100.0  YES   *
+
+  Lucky-default flag: YES
+
+
+  -- OLMo 2 7B total time: 400.1s --
+
+
+====================================================================================================
+SUMMARY: M4b across 22c (5-canonical) and 22d (10-canonical) readouts
+====================================================================================================
+
+  cell                                             role                    M4b(22c)  M4b(22d)  new-cano%  unary-Hfdl
+  ------------------------------------------------ ---------------------- --------- --------- ---------- -----------
+  Gemma sente->opa L4 N->F                         survivor-basin             0.669     0.625     100.0%        1.00
+  [LUCKY-NEG] Gemma first->sf L8 F->N              lucky-default-control      0.500     0.510      30.4%        1.00
+  §3.7.9 OLMo sente->cp L10 N->F                   survivor-distributed       0.796     0.500     100.0%        0.00
+  [LUCKY-NEG] OLMo opa->opa L7 F->N                lucky-default-control      0.500     0.500     100.0%        1.00
+
+====================================================================================================
+INTERPRETATION: strict-logical-arity vs generic-modifier-basin
+====================================================================================================
+
+  Reading guide:
+    M4b 22d ≈ M4b 22c: arity-respecting transfer is invariant to canonical
+                       set expansion (necessary for the strict-arity claim).
+    M4b 22d << M4b 22c: arity claim was canonical-set-specific (5-word artifact).
+
+    new-cano % > 5%:   model is using the new canonicals (some redistribution).
+    new-cano % near 0: invented mass stays on the original 5 canonicals.
+
+    M4c-unary near 0.20: invented unary mass distributes uniformly across the 5
+                         unaries (strict-logical-arity prediction).
+    M4c-unary near 1.00: invented unary mass collapses onto one canonical
+                         (modifier-basin or default-canonical prediction).
+
+    modal-adv frac of unary > 0.80: modifier-basin reading (mass on modal-
+                                    adverbial necessarily/possibly/always).
+    modal-adv frac of unary ≈ 0.60: strict-arity reading (uniform 3/5 split).
+    modal-adv frac of unary < 0.40: operational reading (mass on not/negate).
+
+  Per-cell verdict:
+
+  >> Gemma sente->opa L4 N->F  [survivor-basin]
+     M4b 22d = 0.625  (22c was 0.669; delta -0.044)
+     M4b PASS at 22d: NO
+     new-canonical uptake: 100.0% of invented mass
+     M4c-unary: 1.00 (0.20=uniform, 1.00=collapsed)
+     modal-adverbial fraction of unary: 0.0%
+     operational fraction of unary:     100.0%
+
+     => Verdict: ARITY CLAIM FAILS 22d: M4b drops below 0.65 when canonical set is expanded. The 22c PASS was specific to the original 5-canonical readout. Retract the cross-notation arity-respecting transfer claim at this cell.
+
+  >> §3.7.9 OLMo sente->cp L10 N->F  [survivor-distributed]
+     M4b 22d = 0.500  (22c was 0.796; delta -0.296)
+     M4b PASS at 22d: NO
+     new-canonical uptake: 100.0% of invented mass
+     M4c-unary: 0.00 (0.20=uniform, 1.00=collapsed)
+     modal-adverbial fraction of unary: 0.0%
+     operational fraction of unary:     0.0%
+
+     => Verdict: ARITY CLAIM FAILS 22d: M4b drops below 0.65 when canonical set is expanded. The 22c PASS was specific to the original 5-canonical readout. Retract the cross-notation arity-respecting transfer claim at this cell.
+
+
+  Lucky-default negative controls (sanity check):
+    [LUCKY-NEG] Gemma first->sf L8 F->N: M4b 22c=0.500, M4b 22d=0.510, lucky-default-flag=no, new-cano%=30.4%
+    [LUCKY-NEG] OLMo opa->opa L7 F->N: M4b 22c=0.500, M4b 22d=0.500, lucky-default-flag=YES, new-cano%=100.0%
+    (Expected: M4b stays at floor 0.50; lucky-default flag may flip if the
+     default-canonical shifts when extra canonicals are added.)
+
+[logging] full transcript written to: /Users/brendan.budworth/dev/thesis/experiments/outputs/22d_20260520_154737.log

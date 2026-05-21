@@ -1,0 +1,246 @@
+[logging] tee'ing all output to /Users/brendan.budworth/dev/thesis/experiments/outputs/25c_20260521_092243.log
+[start] 2026-05-21T09:22:43.161817
+[stimulus_version] 25c-content-word-control
+[content_words] ['house', 'water', 'music', 'light', 'paper', 'pattern', 'theory', 'system', 'region', 'period', 'archipelago', 'mosaic', 'plinth', 'ledger', 'cassowary']
+[N_PER_CLASS] 50
+[N_BOOTSTRAP] 500
+[M2C_REFRAME_THRESHOLD] 0.65
+[device] mps
+
+[cache] Gemma 2 9B cache hit at /Users/brendan.budworth/dev/thesis/experiments/cache/25c_gemma_2_9b.npz
+
+[audit] Gemma 2 9B content-word tokenization:
+  word            pcs pieces
+  house             1  ['▁house']
+  water             1  ['▁water']
+  music             1  ['▁music']
+  light             1  ['▁light']
+  paper             1  ['▁paper']
+  pattern           1  ['▁pattern']
+  theory            1  ['▁theory']
+  system            1  ['▁system']
+  region            1  ['▁region']
+  period            1  ['▁period']
+  archipelago       1  ['▁archipelago']
+  mosaic            1  ['▁mosaic']
+  plinth            2  ['▁pl', 'inth']
+  ledger            1  ['▁ledger']
+  cassowary         3  ['▁cass', 'ow', 'ary']
+  [summary] 2/15 multi-piece (matching v6 canonical set: 1/15 multi-piece for `unprovably`)
+
+[diagnose] Gemma 2 9B FUNC-PFX tokenization (1 sample per word):
+  [OK] house         prompt='The function house(p, y) executes during program runtime.'
+           decoded=['<bos>', 'The', ' function', ' house', '(', 'p', ',', ' y', ')', ' executes', ' during', ' program', ' runtime', '.']
+  [OK] water         prompt='The function water(p, s) returns a boolean when invoked.'
+           decoded=['<bos>', 'The', ' function', ' water', '(', 'p', ',', ' s', ')', ' returns', ' a', ' boolean', ' when', ' invoked', '.']
+  [OK] music         prompt='The function music(r, s) is used in the algorithm.'
+           decoded=['<bos>', 'The', ' function', ' music', '(', 'r', ',', ' s', ')', ' is', ' used', ' in', ' the', ' algorithm', '.']
+  [OK] light         prompt='The function light(p, r) produces a result.'
+           decoded=['<bos>', 'The', ' function', ' light', '(', 'p', ',', ' r', ')', ' produces', ' a', ' result', '.']
+  [OK] paper         prompt='The function paper(x, r) is called within the loop.'
+           decoded=['<bos>', 'The', ' function', ' paper', '(', 'x', ',', ' r', ')', ' is', ' called', ' within', ' the', ' loop', '.']
+  [OK] pattern       prompt='The function pattern(r, x) returns a boolean when invoked.'
+           decoded=['<bos>', 'The', ' function', ' pattern', '(', 'r', ',', ' x', ')', ' returns', ' a', ' boolean', ' when', ' invoked', '.']
+  [OK] theory        prompt='The function theory(y, q) executes during program runtime.'
+           decoded=['<bos>', 'The', ' function', ' theory', '(', 'y', ',', ' q', ')', ' executes', ' during', ' program', ' runtime', '.']
+  [OK] system        prompt='The function system(x, p) executes during program runtime.'
+           decoded=['<bos>', 'The', ' function', ' system', '(', 'x', ',', ' p', ')', ' executes', ' during', ' program', ' runtime', '.']
+  [OK] region        prompt='The function region(r) evaluates to true or false.'
+           decoded=['<bos>', 'The', ' function', ' region', '(', 'r', ')', ' evaluates', ' to', ' true', ' or', ' false', '.']
+  [OK] period        prompt='The function period(p) accepts inputs and returns a boolean output.'
+           decoded=['<bos>', 'The', ' function', ' period', '(', 'p', ')', ' accepts', ' inputs', ' and', ' returns', ' a', ' boolean', ' output', '.']
+  [OK] archipelago   prompt='The function archipelago(r) is defined in the standard library.'
+           decoded=['<bos>', 'The', ' function', ' archipelago', '(', 'r', ')', ' is', ' defined', ' in', ' the', ' standard', ' library', '.']
+  [OK] mosaic        prompt='The function mosaic(q) is used in the algorithm.'
+           decoded=['<bos>', 'The', ' function', ' mosaic', '(', 'q', ')', ' is', ' used', ' in', ' the', ' algorithm', '.']
+  [OK] plinth        prompt='The function plinth(s) evaluates to true or false.'
+           decoded=['<bos>', 'The', ' function', ' pl', 'inth', '(', 's', ')', ' evaluates', ' to', ' true', ' or', ' false', '.']
+  [OK] ledger        prompt='The function ledger(y) returns a boolean when invoked.'
+           decoded=['<bos>', 'The', ' function', ' ledger', '(', 'y', ')', ' returns', ' a', ' boolean', ' when', ' invoked', '.']
+  [OK] cassowary     prompt='The function cassowary(y) returns a boolean when invoked.'
+           decoded=['<bos>', 'The', ' function', ' cass', 'ow', 'ary', '(', 'y', ')', ' returns', ' a', ' boolean', ' when', ' invoked', '.']
+  [summary] 15/15 prompts contain a token with literal '('  ;  15/15 contain ')'
+  (if either summary count is < n, _find_token_after will fall back to sentence-final for that anchor)
+
+[run] Gemma 2 9B
+  N->F operator-after->operator-after L4: M1n=0.999 M1f=1.000 M2c=1.000 (mean 1.000 CI [1.000, 1.000])
+  N->F operator-after->operator-after L8: M1n=0.996 M1f=1.000 M2c=1.000 (mean 1.000 CI [1.000, 1.000])
+  F->N operator-after->operator-after L4: M1n=1.000 M1f=1.000 M2c=0.836 (mean 0.835 CI [0.820, 0.852])
+[done] Gemma 2 9B in 11.0s
+
+[extract] OLMo 2 7B -> /Users/brendan.budworth/dev/thesis/experiments/cache/25c_olmo_2_7b.npz
+  loading model allenai/OLMo-2-1124-7B ...
+Loading weights:   0%|          | 0/355 [00:00<?, ?it/s]Loading weights:   0%|          | 1/355 [00:02<12:33,  2.13s/it]Loading weights:  13%|#3        | 47/355 [00:02<00:11, 27.33it/s]Loading weights:  17%|#6        | 60/355 [00:02<00:09, 31.13it/s]Loading weights:  19%|#9        | 69/355 [00:02<00:08, 32.95it/s]Loading weights:  23%|##2       | 80/355 [00:03<00:07, 35.22it/s]Loading weights:  25%|##5       | 90/355 [00:03<00:06, 41.90it/s]Loading weights:  27%|##7       | 97/355 [00:03<00:06, 39.26it/s]Loading weights:  29%|##9       | 103/355 [00:03<00:07, 34.71it/s]Loading weights:  32%|###1      | 113/355 [00:03<00:06, 37.64it/s]Loading weights:  35%|###4      | 123/355 [00:04<00:05, 45.50it/s]Loading weights:  36%|###6      | 129/355 [00:04<00:06, 34.23it/s]Loading weights:  38%|###7      | 134/355 [00:04<00:06, 36.20it/s]Loading weights:  39%|###9      | 139/355 [00:04<00:09, 23.16it/s]Loading weights:  41%|####1     | 146/355 [00:05<00:09, 21.36it/s]Loading weights:  42%|####1     | 149/355 [00:05<00:10, 20.55it/s]Loading weights:  44%|####4     | 157/355 [00:05<00:09, 21.27it/s]Loading weights:  47%|####6     | 166/355 [00:05<00:06, 29.24it/s]Loading weights:  48%|####8     | 171/355 [00:06<00:07, 25.90it/s]Loading weights:  50%|#####     | 179/355 [00:06<00:05, 29.34it/s]Loading weights:  52%|#####1    | 183/355 [00:06<00:05, 29.97it/s]Loading weights:  54%|#####3    | 190/355 [00:07<00:07, 22.92it/s]Loading weights:  54%|#####4    | 193/355 [00:07<00:06, 23.44it/s]Loading weights:  57%|#####6    | 201/355 [00:07<00:07, 20.47it/s]Loading weights:  57%|#####7    | 204/355 [00:07<00:07, 21.19it/s]Loading weights:  59%|#####9    | 210/355 [00:07<00:05, 26.11it/s]Loading weights:  60%|######    | 214/355 [00:09<00:13, 10.08it/s]Loading weights:  63%|######2   | 223/355 [00:09<00:11, 11.73it/s]Loading weights:  64%|######3   | 226/355 [00:09<00:10, 12.45it/s]Loading weights:  65%|######5   | 232/355 [00:09<00:07, 16.74it/s]Loading weights:  66%|######6   | 236/355 [00:10<00:09, 12.10it/s]Loading weights:  69%|######8   | 244/355 [00:10<00:06, 18.42it/s]Loading weights:  70%|#######   | 249/355 [00:11<00:06, 15.69it/s]Loading weights:  72%|#######1  | 255/355 [00:11<00:05, 19.54it/s]Loading weights:  73%|#######2  | 259/355 [00:11<00:06, 14.30it/s]Loading weights:  75%|#######4  | 266/355 [00:11<00:04, 19.80it/s]Loading weights:  76%|#######6  | 270/355 [00:12<00:06, 13.93it/s]Loading weights:  78%|#######8  | 277/355 [00:12<00:04, 18.77it/s]Loading weights:  79%|#######9  | 281/355 [00:13<00:05, 13.37it/s]Loading weights:  81%|########1 | 288/355 [00:13<00:03, 18.34it/s]Loading weights:  82%|########2 | 292/355 [00:13<00:04, 13.15it/s]Loading weights:  84%|########4 | 299/355 [00:14<00:03, 17.60it/s]Loading weights:  85%|########5 | 303/355 [00:14<00:03, 13.15it/s]Loading weights:  87%|########7 | 310/355 [00:14<00:02, 18.60it/s]Loading weights:  88%|########8 | 314/355 [00:15<00:02, 15.13it/s]Loading weights:  91%|######### | 322/355 [00:15<00:02, 14.10it/s]Loading weights:  92%|#########1| 325/355 [00:15<00:02, 14.73it/s]Loading weights:  94%|#########3| 332/355 [00:16<00:01, 20.34it/s]Loading weights:  95%|#########4| 336/355 [00:16<00:01, 13.44it/s]Loading weights:  97%|#########6| 344/355 [00:17<00:00, 14.85it/s]Loading weights:  98%|#########7| 347/355 [00:17<00:00, 15.71it/s]Loading weights: 100%|##########| 355/355 [00:17<00:00, 20.50it/s]
+  loaded in 70.2s; dtype=torch.float16; device=mps
+
+[audit] OLMo 2 7B content-word tokenization:
+  word            pcs pieces
+  house             1  ['Ġhouse']
+  water             1  ['Ġwater']
+  music             1  ['Ġmusic']
+  light             1  ['Ġlight']
+  paper             1  ['Ġpaper']
+  pattern           1  ['Ġpattern']
+  theory            1  ['Ġtheory']
+  system            1  ['Ġsystem']
+  region            1  ['Ġregion']
+  period            1  ['Ġperiod']
+  archipelago       3  ['Ġarch', 'ipel', 'ago']
+  mosaic            1  ['Ġmosaic']
+  plinth            2  ['Ġpl', 'inth']
+  ledger            1  ['Ġledger']
+  cassowary         3  ['Ġcass', 'ow', 'ary']
+  [summary] 3/15 multi-piece (matching v6 canonical set: 1/15 multi-piece for `unprovably`)
+
+[diagnose] OLMo 2 7B FUNC-PFX tokenization (1 sample per word):
+  [OK] house         prompt='The function house(s, q) is used in the algorithm.'
+           decoded=['The', ' function', ' house', '(', 's', ',', ' q', ')', ' is', ' used', ' in', ' the', ' algorithm', '.']
+  [OK] water         prompt='The function water(r, x) is defined in the standard library.'
+           decoded=['The', ' function', ' water', '(', 'r', ',', ' x', ')', ' is', ' defined', ' in', ' the', ' standard', ' library', '.']
+  [OK] music         prompt='The function music(s, y) evaluates to true or false.'
+           decoded=['The', ' function', ' music', '(', 's', ',', ' y', ')', ' evaluates', ' to', ' true', ' or', ' false', '.']
+  [OK] light         prompt='The function light(q, r) computes a value from its inputs.'
+           decoded=['The', ' function', ' light', '(', 'q', ',', ' r', ')', ' computes', ' a', ' value', ' from', ' its', ' inputs', '.']
+  [OK] paper         prompt='The function paper(s, r) is defined in the standard library.'
+           decoded=['The', ' function', ' paper', '(', 's', ',', ' r', ')', ' is', ' defined', ' in', ' the', ' standard', ' library', '.']
+  [OK] pattern       prompt='The function pattern(x, y) evaluates to true or false.'
+           decoded=['The', ' function', ' pattern', '(', 'x', ',', ' y', ')', ' evaluates', ' to', ' true', ' or', ' false', '.']
+  [OK] theory        prompt='The function theory(x, q) accepts inputs and returns a boolean output.'
+           decoded=['The', ' function', ' theory', '(', 'x', ',', ' q', ')', ' accepts', ' inputs', ' and', ' returns', ' a', ' boolean', ' output', '.']
+  [OK] system        prompt='The function system(x, r) returns a boolean when invoked.'
+           decoded=['The', ' function', ' system', '(', 'x', ',', ' r', ')', ' returns', ' a', ' boolean', ' when', ' invoked', '.']
+  [OK] region        prompt='The function region(q) returns a boolean when invoked.'
+           decoded=['The', ' function', ' region', '(', 'q', ')', ' returns', ' a', ' boolean', ' when', ' invoked', '.']
+  [OK] period        prompt='The function period(x) is called within the loop.'
+           decoded=['The', ' function', ' period', '(', 'x', ')', ' is', ' called', ' within', ' the', ' loop', '.']
+  [OK] archipelago   prompt='The function archipelago(s) computes a value from its inputs.'
+           decoded=['The', ' function', ' arch', 'ipel', 'ago', '(', 's', ')', ' computes', ' a', ' value', ' from', ' its', ' inputs', '.']
+  [OK] mosaic        prompt='The function mosaic(r) evaluates to true or false.'
+           decoded=['The', ' function', ' mosaic', '(', 'r', ')', ' evaluates', ' to', ' true', ' or', ' false', '.']
+  [OK] plinth        prompt='The function plinth(s) is defined in the standard library.'
+           decoded=['The', ' function', ' pl', 'inth', '(', 's', ')', ' is', ' defined', ' in', ' the', ' standard', ' library', '.']
+  [OK] ledger        prompt='The function ledger(r) is called within the loop.'
+           decoded=['The', ' function', ' ledger', '(', 'r', ')', ' is', ' called', ' within', ' the', ' loop', '.']
+  [OK] cassowary     prompt='The function cassowary(y) is defined in the standard library.'
+           decoded=['The', ' function', ' cass', 'ow', 'ary', '(', 'y', ')', ' is', ' defined', ' in', ' the', ' standard', ' library', '.']
+  [summary] 15/15 prompts contain a token with literal '('  ;  15/15 contain ')'
+  (if either summary count is < n, _find_token_after will fall back to sentence-final for that anchor)
+
+[extract] NEUTRAL n=750 stimuli ...
+  NEUTRAL shape=(2, 750, 33, 4096) in 63.1s
+
+[extract] FUNC-PFX n=750 stimuli ...
+    [anchor] first-arg: 750/750 stimuli fell back to sentence-final (anchor not findable)
+    [anchor] close-paren: 750/750 stimuli fell back to sentence-final (anchor not findable)
+  FUNC-PFX shape=(4, 750, 33, 4096) in 92.8s
+[cache] saved to /Users/brendan.budworth/dev/thesis/experiments/cache/25c_olmo_2_7b.npz
+
+[run] OLMo 2 7B
+  N->F operator-after->operator-after L4: M1n=0.959 M1f=1.000 M2c=1.000 (mean 1.000 CI [1.000, 1.000])
+  N->F operator-after->operator-after L10: M1n=0.963 M1f=1.000 M2c=1.000 (mean 1.000 CI [1.000, 1.000])
+  F->N operator-after->operator-after L4: M1n=1.000 M1f=0.965 M2c=0.376 (mean 0.376 CI [0.357, 0.396])
+[done] OLMo 2 7B in 452.3s
+
+[extract] Pythia 6.9B-deduped -> /Users/brendan.budworth/dev/thesis/experiments/cache/25c_pythia_6.9b_deduped.npz
+  loading model EleutherAI/pythia-6.9b-deduped ...
+Loading weights:   0%|          | 0/388 [00:00<?, ?it/s]Loading weights: 100%|##########| 388/388 [00:00<00:00, 70596.48it/s]
+  loaded in 57.8s; dtype=torch.float16; device=mps
+
+[audit] Pythia 6.9B-deduped content-word tokenization:
+  word            pcs pieces
+  house             1  ['Ġhouse']
+  water             1  ['Ġwater']
+  music             1  ['Ġmusic']
+  light             1  ['Ġlight']
+  paper             1  ['Ġpaper']
+  pattern           1  ['Ġpattern']
+  theory            1  ['Ġtheory']
+  system            1  ['Ġsystem']
+  region            1  ['Ġregion']
+  period            1  ['Ġperiod']
+  archipelago       3  ['Ġarch', 'ipel', 'ago']
+  mosaic            1  ['Ġmosaic']
+  plinth            2  ['Ġpl', 'inth']
+  ledger            2  ['Ġled', 'ger']
+  cassowary         3  ['Ġcass', 'ow', 'ary']
+  [summary] 4/15 multi-piece (matching v6 canonical set: 1/15 multi-piece for `unprovably`)
+
+[diagnose] Pythia 6.9B-deduped FUNC-PFX tokenization (1 sample per word):
+  [OK] house         prompt='The function house(y, x) is called within the loop.'
+           decoded=['The', ' function', ' house', '(', 'y', ',', ' x', ')', ' is', ' called', ' within', ' the', ' loop', '.']
+  [OK] water         prompt='The function water(q, s) appears in this code listing.'
+           decoded=['The', ' function', ' water', '(', 'q', ',', ' s', ')', ' appears', ' in', ' this', ' code', ' listing', '.']
+  [OK] music         prompt='The function music(q, s) executes during program runtime.'
+           decoded=['The', ' function', ' music', '(', 'q', ',', ' s', ')', ' executes', ' during', ' program', ' runtime', '.']
+  [OK] light         prompt='The function light(x, r) produces a result.'
+           decoded=['The', ' function', ' light', '(', 'x', ',', ' r', ')', ' produces', ' a', ' result', '.']
+  [OK] paper         prompt='The function paper(q, r) executes during program runtime.'
+           decoded=['The', ' function', ' paper', '(', 'q', ',', ' r', ')', ' executes', ' during', ' program', ' runtime', '.']
+  [OK] pattern       prompt='The function pattern(y, r) is called within the loop.'
+           decoded=['The', ' function', ' pattern', '(', 'y', ',', ' r', ')', ' is', ' called', ' within', ' the', ' loop', '.']
+  [OK] theory        prompt='The function theory(s, y) executes during program runtime.'
+           decoded=['The', ' function', ' theory', '(', 's', ',', ' y', ')', ' executes', ' during', ' program', ' runtime', '.']
+  [OK] system        prompt='The function system(r, q) produces a result.'
+           decoded=['The', ' function', ' system', '(', 'r', ',', ' q', ')', ' produces', ' a', ' result', '.']
+  [OK] region        prompt='The function region(y) returns a boolean when invoked.'
+           decoded=['The', ' function', ' region', '(', 'y', ')', ' returns', ' a', ' boolean', ' when', ' invoked', '.']
+  [OK] period        prompt='The function period(y) appears in this code listing.'
+           decoded=['The', ' function', ' period', '(', 'y', ')', ' appears', ' in', ' this', ' code', ' listing', '.']
+  [OK] archipelago   prompt='The function archipelago(q) evaluates to true or false.'
+           decoded=['The', ' function', ' arch', 'ipel', 'ago', '(', 'q', ')', ' evaluates', ' to', ' true', ' or', ' false', '.']
+  [OK] mosaic        prompt='The function mosaic(x) accepts inputs and returns a boolean output.'
+           decoded=['The', ' function', ' mosaic', '(', 'x', ')', ' accepts', ' inputs', ' and', ' returns', ' a', ' boolean', ' output', '.']
+  [OK] plinth        prompt='The function plinth(x) accepts inputs and returns a boolean output.'
+           decoded=['The', ' function', ' pl', 'inth', '(', 'x', ')', ' accepts', ' inputs', ' and', ' returns', ' a', ' boolean', ' output', '.']
+  [OK] ledger        prompt='The function ledger(p) is defined in the standard library.'
+           decoded=['The', ' function', ' led', 'ger', '(', 'p', ')', ' is', ' defined', ' in', ' the', ' standard', ' library', '.']
+  [OK] cassowary     prompt='The function cassowary(q) is used in the algorithm.'
+           decoded=['The', ' function', ' cass', 'ow', 'ary', '(', 'q', ')', ' is', ' used', ' in', ' the', ' algorithm', '.']
+  [summary] 15/15 prompts contain a token with literal '('  ;  15/15 contain ')'
+  (if either summary count is < n, _find_token_after will fall back to sentence-final for that anchor)
+
+[extract] NEUTRAL n=750 stimuli ...
+  NEUTRAL shape=(2, 750, 33, 4096) in 59.8s
+
+[extract] FUNC-PFX n=750 stimuli ...
+    [anchor] first-arg: 750/750 stimuli fell back to sentence-final (anchor not findable)
+    [anchor] close-paren: 750/750 stimuli fell back to sentence-final (anchor not findable)
+  FUNC-PFX shape=(4, 750, 33, 4096) in 82.4s
+[cache] saved to /Users/brendan.budworth/dev/thesis/experiments/cache/25c_pythia_6.9b_deduped.npz
+
+[run] Pythia 6.9B-deduped
+  N->F operator-after->operator-after L4: M1n=1.000 M1f=1.000 M2c=1.000 (mean 1.000 CI [1.000, 1.000])
+  N->F operator-after->operator-after L10: M1n=1.000 M1f=1.000 M2c=1.000 (mean 1.000 CI [1.000, 1.000])
+  F->N operator-after->operator-after L4: M1n=1.000 M1f=1.000 M2c=0.943 (mean 0.943 CI [0.932, 0.956])
+[done] Pythia 6.9B-deduped in 428.4s
+
+==============================================================================
+Pre-registered adjudication (M2-canonical at principal Fact-1 cell)
+==============================================================================
+
+Threshold: M2c >= 0.65 on content words at the
+           N->F opera->opera L 4 cell triggers a REFRAME of paper.md
+           §1, abstract, §4.1, §5.1 from 'operator-set-bound' to
+           'trained-vocabulary-set-bound'.
+
+           Chance baseline: 1/15 = 0.067
+           v6 canonical-set comparison: M2c = 1.000, CI [1.000, 1.000]
+           per paper.md §4.1 / paper_notes §3.7.16.
+
+Model                  Cell                                M2c                 CI Verdict                 
+----------------------------------------------------------------------------------------------------
+Gemma 2 9B             N->F operator-after->operator-after L4  1.000     [1.000, 1.000] REFRAME-TRIGGER         
+Gemma 2 9B             N->F operator-after->operator-after L8  1.000     [1.000, 1.000] REFRAME-TRIGGER         
+Gemma 2 9B             F->N operator-after->operator-after L4  0.836     [0.820, 0.852] REFRAME-TRIGGER         
+OLMo 2 7B              N->F operator-after->operator-after L4  1.000     [1.000, 1.000] REFRAME-TRIGGER         
+OLMo 2 7B              N->F operator-after->operator-after L10  1.000     [1.000, 1.000] REFRAME-TRIGGER         
+OLMo 2 7B              F->N operator-after->operator-after L4  0.376     [0.357, 0.396] operator-class-specific 
+Pythia 6.9B-deduped    N->F operator-after->operator-after L4  1.000     [1.000, 1.000] REFRAME-TRIGGER         
+Pythia 6.9B-deduped    N->F operator-after->operator-after L10  1.000     [1.000, 1.000] REFRAME-TRIGGER         
+Pythia 6.9B-deduped    F->N operator-after->operator-after L4  0.943     [0.932, 0.956] REFRAME-TRIGGER         
+
+[adjudication] ALL principal Fact-1 cells trigger REFRAME.
+    -> Fact 1 generalises to trained-vocabulary-set-bound.
+    -> Update paper.md §1, abstract, §4.1, §5.1 accordingly.
+
+[end] 2026-05-21T09:37:34.909041

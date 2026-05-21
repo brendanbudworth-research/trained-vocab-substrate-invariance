@@ -1,0 +1,457 @@
+[logging] tee'ing all output to /Users/brendan.budworth/dev/thesis/experiments/outputs/22c_20260520_121629.log
+Script 22c - expanded invented-word set (16 words, 8B + 8U)
+STIMULUS_VERSION=v4-expanded-invented  SEED=17  N_PER_CLASS=50
+
+Invented set: ['bliq', 'dren', 'molex', 'krev', 'sond', 'glin', 'twiv', 'fump', 'vusp', 'perph', 'kelm', 'zorf', 'gleph', 'drelth', 'vrith', 'nilph']
+  (8 intended-binary, 8 intended-unary)
+Original 5: ['bliq', 'dren', 'vusp', 'molex', 'perph']
+New 11:     ['krev', 'sond', 'glin', 'twiv', 'fump', 'kelm', 'zorf', 'gleph', 'drelth', 'vrith', 'nilph']
+
+============================================================================================
+TOKENIZATION AUDIT (16 invented words under both tokenizers)
+============================================================================================
+
+  Gemma 2 9B (google/gemma-2-9b)
+    word       subwords                                   n
+    bliq       [' bli', 'q']                              2 (orig)
+    dren       [' dren']                                  1 (orig)
+    molex      [' mo', 'lex']                             2 (orig)
+    krev       [' k', 'rev']                              2
+    sond       [' sond']                                  1
+    glin       [' g', 'lin']                              2
+    twiv       [' tw', 'iv']                              2
+    fump       [' f', 'ump']                              2
+    vusp       [' v', 'usp']                              2 (orig)
+    perph      [' per', 'ph']                             2 (orig)
+    kelm       [' kel', 'm']                              2
+    zorf       [' z', 'orf']                              2
+    gleph      [' gle', 'ph']                             2
+    drelth     [' d', 'rel', 'th']                        3
+    vrith      [' vri', 'th']                             2
+    nilph      [' nil', 'ph']                             2
+
+  OLMo 2 7B (allenai/OLMo-2-1124-7B)
+    word       subwords                                   n
+    bliq       [' bli', 'q']                              2 (orig)
+    dren       [' d', 'ren']                              2 (orig)
+    molex      [' mole', 'x']                             2 (orig)
+    krev       [' k', 'rev']                              2
+    sond       [' sond']                                  1
+    glin       [' gl', 'in']                              2
+    twiv       [' tw', 'iv']                              2
+    fump       [' f', 'ump']                              2
+    vusp       [' v', 'usp']                              2 (orig)
+    perph      [' per', 'ph']                             2 (orig)
+    kelm       [' k', 'elm']                              2
+    zorf       [' z', 'orf']                              2
+    gleph      [' gle', 'ph']                             2
+    drelth     [' d', 'rel', 'th']                        3
+    vrith      [' vr', 'ith']                             2
+    nilph      [' nil', 'ph']                             2
+
+Device: MPS (Apple Silicon)
+
+============================================================================================
+MODEL: Gemma 2 9B
+============================================================================================
+
+  Loading model: google/gemma-2-9b
+Loading weights:   0%|          | 0/464 [00:00<?, ?it/s]Loading weights:   0%|          | 1/464 [00:06<46:32,  6.03s/it]Loading weights:  31%|###1      | 146/464 [00:06<00:10, 31.51it/s]Loading weights:  36%|###6      | 168/464 [00:07<00:11, 26.41it/s]Loading weights:  39%|###9      | 181/464 [00:08<00:11, 24.18it/s]Loading weights:  41%|####      | 190/464 [00:09<00:12, 21.87it/s]Loading weights:  43%|####3     | 201/464 [00:10<00:13, 19.89it/s]Loading weights:  46%|####5     | 212/464 [00:10<00:13, 18.81it/s]Loading weights:  48%|####8     | 223/464 [00:11<00:12, 20.01it/s]Loading weights:  50%|#####     | 234/464 [00:12<00:12, 18.34it/s]Loading weights:  53%|#####2    | 245/464 [00:12<00:12, 17.48it/s]Loading weights:  55%|#####5    | 256/464 [00:13<00:12, 17.26it/s]Loading weights:  58%|#####7    | 267/464 [00:14<00:11, 16.62it/s]Loading weights:  60%|#####9    | 278/464 [00:14<00:10, 17.04it/s]Loading weights:  62%|######2   | 289/464 [00:15<00:09, 19.42it/s]Loading weights:  65%|######4   | 300/464 [00:15<00:09, 18.18it/s]Loading weights:  67%|######7   | 311/464 [00:16<00:09, 16.76it/s]Loading weights:  69%|######9   | 322/464 [00:17<00:08, 16.02it/s]Loading weights:  72%|#######1  | 333/464 [00:18<00:08, 14.91it/s]Loading weights:  74%|#######4  | 344/464 [00:19<00:08, 14.84it/s]Loading weights:  77%|#######6  | 355/464 [00:19<00:06, 16.68it/s]Loading weights:  79%|#######8  | 366/464 [00:20<00:06, 15.71it/s]Loading weights:  81%|########1 | 377/464 [00:21<00:05, 15.41it/s]Loading weights:  84%|########3 | 388/464 [00:21<00:05, 15.11it/s]Loading weights:  86%|########5 | 399/464 [00:22<00:04, 14.84it/s]Loading weights:  88%|########8 | 410/464 [00:23<00:03, 14.82it/s]Loading weights:  91%|######### | 421/464 [00:24<00:02, 14.98it/s]Loading weights:  93%|#########3| 432/464 [00:24<00:02, 15.42it/s]Loading weights:  95%|#########5| 443/464 [00:25<00:01, 15.12it/s]Loading weights:  98%|#########7| 454/464 [00:26<00:00, 15.08it/s]Loading weights: 100%|##########| 464/464 [00:26<00:00, 17.68it/s]
+    loaded in 92.2s
+
+  -- Building NEUTRAL condition --
+
+  Building condition: NEUTRAL (anchors=['operator-after', 'sentence-final']; extracting)
+    extracting canonical activations (250 stim)...
+      33.1s, shape=(2, 250, 43, 3584)
+    extracting invented activations (800 stim)...
+      117.7s, shape=(2, 800, 43, 3584)
+    [cache] saved 22c_Gemma_2_9B_NEUTRAL_npc50_v4-expanded-invented.npz (498.9 MB)
+
+  -- Building FUNC-PFX condition --
+
+  Building condition: FUNC-PFX (anchors=['operator-after', 'first-arg', 'close-paren', 'sentence-final']; extracting)
+    extracting canonical activations (250 stim)...
+      44.5s, shape=(4, 250, 43, 3584)
+    extracting invented activations (800 stim)...
+      144.5s, shape=(4, 800, 43, 3584)
+    [cache] saved 22c_Gemma_2_9B_FUNC-PFX_npc50_v4-expanded-invented.npz (997.5 MB)
+
+============================================================================================
+  Gemma sf->opa L4 N->F
+  model=Gemma 2 9B  train=NEUTRAL/sentence-final@L4  test=FUNC-PFX/operator-after@L4
+============================================================================================
+
+  M1-train CV:   1.000
+  M1-test  CV:   1.000
+  M2-canonical:  1.000  (5-class accuracy on test canonicals)
+  M2-arity:      1.000  (binary-vs-unary coarsened)
+
+  M4a (inv unary mass):         67.9%
+  M4b (intended-arity agree):   66.9%   (expected at 5-word 72.8%)
+  M4c (Herfindahl):             0.56   (0.20 = uniform across 5 canonicals)
+
+  Bootstrap M4b: mean 0.669 std 0.004 95% CI [0.659, 0.676]  P(M4b >= 0.65) = 100.0%
+
+  Breakdown by predicted canonical (over 800 invented stims):
+    and            32.1%  ############
+    or              0.0%  
+    not             0.0%  
+    implies         0.0%  
+    necessarily    67.9%  ###########################
+
+  Per-word breakdown (16 words, sorted by intended arity):
+    word       int. int.cano    top            top% unary% arity match
+    ---------- ---- ----------- ------------- ----- ------ -----------
+    bliq          B and         and            92.0   8.0  YES   (orig)
+    dren          B or          necessarily   100.0 100.0  no    (orig)
+    molex         B implies     and           100.0   0.0  YES   (orig)
+    krev          B and         necessarily   100.0 100.0  no   
+    sond          B or          necessarily   100.0 100.0  no   
+    glin          B implies     and           100.0   0.0  YES  
+    twiv          B and         and           100.0   0.0  YES  
+    fump          B or          necessarily   100.0 100.0  no   
+    vusp          U not         necessarily    78.0  78.0  YES   (orig)
+    perph         U necessarily necessarily   100.0 100.0  YES   (orig)
+    kelm          U not         necessarily   100.0 100.0  YES  
+    zorf          U not         and           100.0   0.0  no   
+    gleph         U necessarily necessarily   100.0 100.0  YES  
+    drelth        U necessarily necessarily   100.0 100.0  YES  
+    vrith         U not         necessarily   100.0 100.0  YES  
+    nilph         U necessarily necessarily   100.0 100.0  YES  
+
+  Per-intended-arity correct counts:
+    intended-binary correct (predicted binary): 196/400
+    intended-unary  correct (predicted unary):  339/400
+
+  Lucky-default flag: no
+
+
+============================================================================================
+  Gemma sf->first L8 N->F
+  model=Gemma 2 9B  train=NEUTRAL/sentence-final@L8  test=FUNC-PFX/first-arg@L8
+============================================================================================
+
+  M1-train CV:   0.992
+  M1-test  CV:   1.000
+  M2-canonical:  1.000  (5-class accuracy on test canonicals)
+  M2-arity:      1.000  (binary-vs-unary coarsened)
+
+  M4a (inv unary mass):         39.9%
+  M4b (intended-arity agree):   56.1%   (expected at 5-word 73.6%)
+  M4c (Herfindahl):             0.49   (0.20 = uniform across 5 canonicals)
+
+  Bootstrap M4b: mean 0.561 std 0.014 95% CI [0.532, 0.589]  P(M4b >= 0.65) = 0.0%
+
+  Breakdown by predicted canonical (over 800 invented stims):
+    and            59.4%  #######################
+    or              0.8%  
+    not             3.0%  #
+    implies         0.0%  
+    necessarily    36.9%  ##############
+
+  Per-word breakdown (16 words, sorted by intended arity):
+    word       int. int.cano    top            top% unary% arity match
+    ---------- ---- ----------- ------------- ----- ------ -----------
+    bliq          B and         and            62.0  38.0  YES   (orig)
+    dren          B or          and            74.0  26.0  YES   (orig)
+    molex         B implies     and            88.0   0.0  YES   (orig)
+    krev          B and         necessarily    70.0  70.0  no   
+    sond          B or          and            98.0   2.0  YES  
+    glin          B implies     and            62.0  38.0  YES  
+    twiv          B and         and            56.0  44.0  YES  
+    fump          B or          and            48.0  52.0  YES  
+    vusp          U not         necessarily    86.0  86.0  YES   (orig)
+    perph         U necessarily and            68.0  32.0  no    (orig)
+    kelm          U not         and            74.0  26.0  no   
+    zorf          U not         necessarily    94.0  94.0  YES  
+    gleph         U necessarily and            54.0  46.0  no   
+    drelth        U necessarily and            78.0  22.0  no   
+    vrith         U not         and            84.0  16.0  no   
+    nilph         U necessarily and            54.0  46.0  no   
+
+  Per-intended-arity correct counts:
+    intended-binary correct (predicted binary): 265/400
+    intended-unary  correct (predicted unary):  184/400
+
+  Lucky-default flag: no
+
+
+============================================================================================
+  [LUCKY-NEG] Gemma first->sf L8 F->N
+  model=Gemma 2 9B  train=FUNC-PFX/first-arg@L8  test=NEUTRAL/sentence-final@L8
+============================================================================================
+
+  M1-train CV:   1.000
+  M1-test  CV:   0.992
+  M2-canonical:  0.200  (5-class accuracy on test canonicals)
+  M2-arity:      0.600  (binary-vs-unary coarsened)
+
+  M4a (inv unary mass):          0.0%
+  M4b (intended-arity agree):   50.0%   (expected at 5-word 73.6%)
+  M4c (Herfindahl):             1.00   (0.20 = uniform across 5 canonicals)
+
+  Bootstrap M4b: mean 0.500 std 0.000 95% CI [0.500, 0.500]  P(M4b >= 0.65) = 0.0%
+
+  Breakdown by predicted canonical (over 800 invented stims):
+    and             0.0%  
+    or              0.0%  
+    not             0.0%  
+    implies       100.0%  ########################################
+    necessarily     0.0%  
+
+  Per-word breakdown (16 words, sorted by intended arity):
+    word       int. int.cano    top            top% unary% arity match
+    ---------- ---- ----------- ------------- ----- ------ -----------
+    bliq          B and         implies       100.0   0.0  YES   (orig)
+    dren          B or          implies       100.0   0.0  YES   (orig)
+    molex         B implies     implies       100.0   0.0  YES   (orig)
+    krev          B and         implies       100.0   0.0  YES  
+    sond          B or          implies       100.0   0.0  YES  
+    glin          B implies     implies       100.0   0.0  YES  
+    twiv          B and         implies       100.0   0.0  YES  
+    fump          B or          implies       100.0   0.0  YES  
+    vusp          U not         implies       100.0   0.0  no    (orig)
+    perph         U necessarily implies       100.0   0.0  no    (orig)
+    kelm          U not         implies       100.0   0.0  no   
+    zorf          U not         implies       100.0   0.0  no   
+    gleph         U necessarily implies       100.0   0.0  no   
+    drelth        U necessarily implies       100.0   0.0  no   
+    vrith         U not         implies       100.0   0.0  no   
+    nilph         U necessarily implies       100.0   0.0  no   
+
+  Per-intended-arity correct counts:
+    intended-binary correct (predicted binary): 400/400
+    intended-unary  correct (predicted unary):  0/400
+
+  Lucky-default flag: YES (all per-word top_pct >= 0.95)
+
+
+  -- Gemma 2 9B total time: 552.3s --
+
+============================================================================================
+MODEL: OLMo 2 7B
+============================================================================================
+
+  Loading model: allenai/OLMo-2-1124-7B
+Loading weights:   0%|          | 0/355 [00:00<?, ?it/s]Loading weights:   0%|          | 1/355 [00:02<12:15,  2.08s/it]Loading weights:  13%|#3        | 47/355 [00:02<00:11, 27.69it/s]Loading weights:  17%|#6        | 59/355 [00:02<00:09, 31.52it/s]Loading weights:  19%|#9        | 69/355 [00:02<00:08, 32.99it/s]Loading weights:  23%|##2       | 80/355 [00:03<00:07, 35.58it/s]Loading weights:  25%|##5       | 90/355 [00:03<00:06, 41.60it/s]Loading weights:  27%|##7       | 97/355 [00:03<00:06, 39.13it/s]Loading weights:  29%|##9       | 103/355 [00:03<00:07, 34.61it/s]Loading weights:  32%|###1      | 113/355 [00:03<00:06, 36.63it/s]Loading weights:  35%|###4      | 123/355 [00:04<00:05, 44.90it/s]Loading weights:  36%|###6      | 129/355 [00:04<00:05, 39.37it/s]Loading weights:  38%|###8      | 135/355 [00:04<00:06, 34.41it/s]Loading weights:  41%|####1     | 146/355 [00:04<00:05, 37.95it/s]Loading weights:  44%|####3     | 156/355 [00:04<00:04, 46.52it/s]Loading weights:  46%|####5     | 162/355 [00:05<00:04, 40.08it/s]Loading weights:  47%|####7     | 168/355 [00:05<00:05, 34.04it/s]Loading weights:  50%|#####     | 179/355 [00:05<00:04, 38.39it/s]Loading weights:  53%|#####3    | 189/355 [00:05<00:03, 46.50it/s]Loading weights:  55%|#####4    | 195/355 [00:05<00:03, 40.05it/s]Loading weights:  57%|#####6    | 201/355 [00:06<00:04, 34.14it/s]Loading weights:  60%|#####9    | 212/355 [00:06<00:03, 37.69it/s]Loading weights:  63%|######2   | 222/355 [00:06<00:02, 46.61it/s]Loading weights:  64%|######4   | 228/355 [00:06<00:03, 39.81it/s]Loading weights:  66%|######5   | 234/355 [00:06<00:03, 34.04it/s]Loading weights:  69%|######9   | 245/355 [00:07<00:03, 30.47it/s]Loading weights:  70%|#######   | 249/355 [00:07<00:03, 31.64it/s]Loading weights:  72%|#######2  | 256/355 [00:08<00:04, 20.55it/s]Loading weights:  73%|#######2  | 259/355 [00:08<00:05, 17.72it/s]Loading weights:  75%|#######4  | 266/355 [00:08<00:04, 21.55it/s]Loading weights:  76%|#######5  | 269/355 [00:09<00:08,  9.86it/s]Loading weights:  78%|#######7  | 276/355 [00:09<00:05, 14.31it/s]Loading weights:  79%|#######8  | 280/355 [00:10<00:06, 12.14it/s]Loading weights:  81%|########1 | 289/355 [00:10<00:04, 14.65it/s]Loading weights:  82%|########2 | 292/355 [00:10<00:04, 15.64it/s]Loading weights:  84%|########4 | 299/355 [00:11<00:02, 20.59it/s]Loading weights:  85%|########5 | 303/355 [00:11<00:03, 15.14it/s]Loading weights:  87%|########7 | 310/355 [00:11<00:02, 20.71it/s]Loading weights:  88%|########8 | 314/355 [00:12<00:02, 16.06it/s]Loading weights:  91%|######### | 322/355 [00:12<00:02, 15.71it/s]Loading weights:  92%|#########1| 325/355 [00:12<00:01, 16.64it/s]Loading weights:  93%|#########3| 331/355 [00:12<00:01, 21.38it/s]Loading weights:  94%|#########4| 335/355 [00:13<00:01, 13.63it/s]Loading weights:  97%|#########6| 344/355 [00:13<00:00, 15.38it/s]Loading weights:  98%|#########7| 347/355 [00:14<00:00, 16.02it/s]Loading weights: 100%|##########| 355/355 [00:14<00:00, 25.06it/s]
+    loaded in 70.0s
+
+  -- Building NEUTRAL condition --
+
+  Building condition: NEUTRAL (anchors=['operator-after', 'sentence-final']; extracting)
+    extracting canonical activations (250 stim)...
+      20.0s, shape=(2, 250, 33, 4096)
+    extracting invented activations (800 stim)...
+      73.9s, shape=(2, 800, 33, 4096)
+    [cache] saved 22c_OLMo_2_7B_NEUTRAL_npc50_v4-expanded-invented.npz (523.8 MB)
+
+  -- Building FUNC-PFX condition --
+
+  Building condition: FUNC-PFX (anchors=['operator-after', 'first-arg', 'close-paren', 'sentence-final']; extracting)
+    extracting canonical activations (250 stim)...
+      30.9s, shape=(4, 250, 33, 4096)
+    extracting invented activations (800 stim)...
+      98.7s, shape=(4, 800, 33, 4096)
+    [cache] saved 22c_OLMo_2_7B_FUNC-PFX_npc50_v4-expanded-invented.npz (1047.3 MB)
+
+============================================================================================
+  §3.7.9: OLMo sf->cp L10 N->F
+  model=OLMo 2 7B  train=NEUTRAL/sentence-final@L10  test=FUNC-PFX/close-paren@L10
+============================================================================================
+
+  M1-train CV:   0.952
+  M1-test  CV:   1.000
+  M2-canonical:  0.616  (5-class accuracy on test canonicals)
+  M2-arity:      1.000  (binary-vs-unary coarsened)
+
+  M4a (inv unary mass):         34.9%
+  M4b (intended-arity agree):   79.6%   (expected at 5-word 90.0%)
+  M4c (Herfindahl):             0.50   (0.20 = uniform across 5 canonicals)
+
+  Bootstrap M4b: mean 0.797 std 0.012 95% CI [0.772, 0.819]  P(M4b >= 0.65) = 100.0%
+
+  Breakdown by predicted canonical (over 800 invented stims):
+    and            65.1%  ##########################
+    or              0.0%  
+    not             7.5%  ###
+    implies         0.0%  
+    necessarily    27.4%  ##########
+
+  Per-word breakdown (16 words, sorted by intended arity):
+    word       int. int.cano    top            top% unary% arity match
+    ---------- ---- ----------- ------------- ----- ------ -----------
+    bliq          B and         and           100.0   0.0  YES   (orig)
+    dren          B or          and           100.0   0.0  YES   (orig)
+    molex         B implies     and            96.0   4.0  YES   (orig)
+    krev          B and         and            88.0  12.0  YES  
+    sond          B or          and           100.0   0.0  YES  
+    glin          B implies     and            98.0   2.0  YES  
+    twiv          B and         and            76.0  24.0  YES  
+    fump          B or          and           100.0   0.0  YES  
+    vusp          U not         necessarily   100.0 100.0  YES   (orig)
+    perph         U necessarily and            50.0  50.0  no    (orig)
+    kelm          U not         necessarily    56.0  56.0  YES  
+    zorf          U not         necessarily    54.0  54.0  YES  
+    gleph         U necessarily and            54.0  46.0  no   
+    drelth        U necessarily necessarily    74.0  74.0  YES  
+    vrith         U not         and            64.0  36.0  no   
+    nilph         U necessarily not           100.0 100.0  YES  
+
+  Per-intended-arity correct counts:
+    intended-binary correct (predicted binary): 379/400
+    intended-unary  correct (predicted unary):  258/400
+
+  Lucky-default flag: no
+
+
+============================================================================================
+  OLMo first->opa L7 F->N
+  model=OLMo 2 7B  train=FUNC-PFX/first-arg@L7  test=NEUTRAL/operator-after@L7
+============================================================================================
+
+  M1-train CV:   1.000
+  M1-test  CV:   0.996
+  M2-canonical:  0.980  (5-class accuracy on test canonicals)
+  M2-arity:      0.984  (binary-vs-unary coarsened)
+
+  M4a (inv unary mass):         54.5%
+  M4b (intended-arity agree):   57.2%   (expected at 5-word 65.6%)
+  M4c (Herfindahl):             0.35   (0.20 = uniform across 5 canonicals)
+
+  Bootstrap M4b: mean 0.572 std 0.017 95% CI [0.539, 0.604]  P(M4b >= 0.65) = 0.0%
+
+  Breakdown by predicted canonical (over 800 invented stims):
+    and             0.1%  
+    or              0.9%  
+    not            24.8%  #########
+    implies        44.5%  #################
+    necessarily    29.8%  ###########
+
+  Per-word breakdown (16 words, sorted by intended arity):
+    word       int. int.cano    top            top% unary% arity match
+    ---------- ---- ----------- ------------- ----- ------ -----------
+    bliq          B and         implies        58.0  42.0  YES   (orig)
+    dren          B or          implies        54.0  44.0  YES   (orig)
+    molex         B implies     implies        60.0  38.0  YES   (orig)
+    krev          B and         implies        52.0  48.0  YES  
+    sond          B or          implies        70.0  26.0  YES  
+    glin          B implies     implies        48.0  48.0  YES  
+    twiv          B and         necessarily    52.0  80.0  no   
+    fump          B or          implies        48.0  52.0  YES  
+    vusp          U not         necessarily    36.0  70.0  YES   (orig)
+    perph         U necessarily necessarily    66.0  82.0  YES   (orig)
+    kelm          U not         implies        52.0  48.0  no   
+    zorf          U not         implies        60.0  38.0  no   
+    gleph         U necessarily necessarily    56.0  82.0  YES  
+    drelth        U necessarily implies        54.0  46.0  no   
+    vrith         U not         necessarily    56.0  78.0  YES  
+    nilph         U necessarily implies        48.0  50.0  no   
+
+  Per-intended-arity correct counts:
+    intended-binary correct (predicted binary): 211/400
+    intended-unary  correct (predicted unary):  247/400
+
+  Lucky-default flag: no
+
+
+============================================================================================
+  [LUCKY-NEG] OLMo opa->opa L7 F->N
+  model=OLMo 2 7B  train=FUNC-PFX/operator-after@L7  test=NEUTRAL/operator-after@L7
+============================================================================================
+
+  M1-train CV:   1.000
+  M1-test  CV:   0.996
+  M2-canonical:  0.212  (5-class accuracy on test canonicals)
+  M2-arity:      0.612  (binary-vs-unary coarsened)
+
+  M4a (inv unary mass):          0.0%
+  M4b (intended-arity agree):   50.0%   (expected at 5-word 80.0%)
+  M4c (Herfindahl):             1.00   (0.20 = uniform across 5 canonicals)
+
+  Bootstrap M4b: mean 0.500 std 0.000 95% CI [0.500, 0.500]  P(M4b >= 0.65) = 0.0%
+
+  Breakdown by predicted canonical (over 800 invented stims):
+    and             0.0%  
+    or              0.0%  
+    not             0.0%  
+    implies       100.0%  ########################################
+    necessarily     0.0%  
+
+  Per-word breakdown (16 words, sorted by intended arity):
+    word       int. int.cano    top            top% unary% arity match
+    ---------- ---- ----------- ------------- ----- ------ -----------
+    bliq          B and         implies       100.0   0.0  YES   (orig)
+    dren          B or          implies       100.0   0.0  YES   (orig)
+    molex         B implies     implies       100.0   0.0  YES   (orig)
+    krev          B and         implies       100.0   0.0  YES  
+    sond          B or          implies       100.0   0.0  YES  
+    glin          B implies     implies       100.0   0.0  YES  
+    twiv          B and         implies       100.0   0.0  YES  
+    fump          B or          implies       100.0   0.0  YES  
+    vusp          U not         implies       100.0   0.0  no    (orig)
+    perph         U necessarily implies       100.0   0.0  no    (orig)
+    kelm          U not         implies       100.0   0.0  no   
+    zorf          U not         implies       100.0   0.0  no   
+    gleph         U necessarily implies       100.0   0.0  no   
+    drelth        U necessarily implies       100.0   0.0  no   
+    vrith         U not         implies       100.0   0.0  no   
+    nilph         U necessarily implies       100.0   0.0  no   
+
+  Per-intended-arity correct counts:
+    intended-binary correct (predicted binary): 400/400
+    intended-unary  correct (predicted unary):  0/400
+
+  Lucky-default flag: YES (all per-word top_pct >= 0.95)
+
+
+  -- OLMo 2 7B total time: 338.1s --
+
+
+============================================================================================
+SUMMARY: M4b at the 4 PASS-arity cells + 2 lucky-default controls
+============================================================================================
+
+  cell                                              M4b(5w) M4b(16w) CI95                  lucky?
+  ------------------------------------------------ -------- -------- -------------------- -------
+  Gemma sf->opa L4 N->F                               0.728    0.669 [0.659, 0.676]            no
+  Gemma sf->first L8 N->F                             0.736    0.561 [0.532, 0.589]            no
+  [LUCKY-NEG] Gemma first->sf L8 F->N                 0.736    0.500 [0.500, 0.500]           YES
+  §3.7.9: OLMo sf->cp L10 N->F                        0.900    0.796 [0.772, 0.819]            no
+  OLMo first->opa L7 F->N                             0.656    0.573 [0.539, 0.604]            no
+  [LUCKY-NEG] OLMo opa->opa L7 F->N                   0.800    0.500 [0.500, 0.500]           YES
+
+  At the 4 PASS-arity cells:
+    Cells with point M4b >= 0.65: 2/4
+    Cells with bootstrap M4b CI lower bound >= 0.65: 2/4
+
+============================================================================================
+INTERPRETATION
+============================================================================================
+
+  Phase 1 falsification test: did the 4 PASS-arity cells survive the
+  expansion from 5 to 16 invented words?
+
+  Point M4b >= 0.65 with 16 words: 2/4 cells
+  Bootstrap M4b CI floor >= 0.65 with 16 words: 2/4 cells
+
+  => 2 of 4 PASS-arity cells survive expansion under the strict
+     bootstrap CI floor criterion. The cross-notation arity-
+     respecting transfer finding holds at a subset of cells; the
+     others were partially dependent on the 5-word sample.
+     Identify the surviving cell(s) as the principal Phase 1
+     finding(s) and document the non-surviving cells as 5-word-
+     specific.
+
+  Lucky-default negative controls (should stay at floor with 16 words):
+    [LUCKY-NEG] Gemma first->sf L8 F->N: M4b 5w=0.736 -> 16w=0.500  (REMAINS lucky-default)
+    [LUCKY-NEG] OLMo opa->opa L7 F->N: M4b 5w=0.800 -> 16w=0.500  (REMAINS lucky-default)
+
+  If lucky-default cells drop from M4b ~ 0.80 (5-word) to ~ 0.50 (16-word),
+  the M4b ≥ 0.65 threshold is the right discriminator: it accepts PASS-
+  arity transfer and rejects lucky-default when the invented set is
+  balanced 8/8. If lucky-default cells STAY high, they're not lucky-
+  default but something genuinely arity-preserving (which would be a
+  surprise).
+
+[logging] full transcript written to: /Users/brendan.budworth/dev/thesis/experiments/outputs/22c_20260520_121629.log

@@ -1,0 +1,117 @@
+[logging] tee'ing all output to /Users/brendan.budworth/dev/thesis/experiments/outputs/20_20260519_210415.log
+[logging] (set NO_LOG=1 to disable)
+Script 20 - gated invented-mass re-test at 19b-identified pairings
+  cache dir: experiments/outputs/cache/
+  threshold: gate PASS >= 0.65 (~3x chance for 5-class)
+
+============================================================================================
+LOADING CACHES
+============================================================================================
+  [cache] loaded 19b_OLMo_2_7B_NEUTRAL_npc50.npz (n_layers=33, dim=4096)
+  [cache] loaded 19b_OLMo_2_7B_FUNC-PFX_npc50.npz (n_layers=33, dim=4096)
+  [cache] loaded 19b_Gemma_2_9B_NEUTRAL_npc50.npz (n_layers=43, dim=3584)
+  [cache] loaded 19b_Gemma_2_9B_FUNC-PFX_npc50.npz (n_layers=43, dim=3584)
+
+============================================================================================
+  OLMo 2 7B - GATED INVENTED-MASS RE-TEST
+============================================================================================
+
+  pairing                | gate acc | unary mass | centroid |  probe | verdict  | note
+  --------------------------------------------------------------------------------------------------------------
+  baseline-1             |    1.000 |     20.0% |    75.6° |  74.9° | PASS     | script-18 baseline (was 0% unary)
+  baseline-2             |    0.212 |      0.0% |    75.6° |  74.9° | FAIL     | script-18 reverse baseline (was 0% unary)
+  L10-same-N->F          |    0.800 |      0.0% |    71.3° |  74.4° | PASS     | NEW: 19b gate-PASS 0.800; never tested
+  L10-same-F->N          |    0.688 |     17.2% |    71.3° |  74.4° | PASS     | NEW: 19b gate-PASS 0.688; never tested
+  L10->L7-N->F           |    0.800 |      0.0% |    80.0° |  80.2° | PASS     | cross-layer 19b gate-PASS 0.800
+  L10->L7-F->N           |    0.664 |      2.8% |    78.4° |  78.4° | PASS     | cross-layer 19b gate-PASS 0.664
+
+  Predicted-canonical breakdown (% of invented predictions per class):
+
+  pairing                |         and |          or |         not |     implies | necessarily
+  --------------------------------------------------------------------------------------------
+  baseline-1             |       80.0% |        0.0% |        0.0% |        0.0% |       20.0%
+  baseline-2             |        0.0% |        0.0% |        0.0% |      100.0% |        0.0%
+  L10-same-N->F          |        0.0% |        0.0% |        0.0% |      100.0% |        0.0%
+  L10-same-F->N          |        0.0% |       25.6% |       17.2% |       57.2% |        0.0%
+  L10->L7-N->F           |        0.0% |        0.0% |        0.0% |      100.0% |        0.0%
+  L10->L7-F->N           |        0.0% |        0.4% |        2.8% |       96.8% |        0.0%
+
+  Per-invented-word predicted canonical (and unary share per word):
+
+  (intended arity per word from W_TO_CANONICAL mapping: bliq=2 dren=2 vusp=1 molex=2 perph=1)
+
+  pairing                | bliq           | dren           | vusp           | molex          | perph         
+  --------------------------------------------------------------------------------------------------------------
+  baseline-1             | and        0%  | and        0%  | and        0%  | and        0%  | necessarily100%
+  baseline-2             | implies    0%  | implies    0%  | implies    0%  | implies    0%  | implies    0% 
+  L10-same-N->F          | implies    0%  | implies    0%  | implies    0%  | implies    0%  | implies    0% 
+  L10-same-F->N          | implies   20%  | implies   32%  | or        14%  | implies   20%  | or         0% 
+  L10->L7-N->F           | implies    0%  | implies    0%  | implies    0%  | implies    0%  | implies    0% 
+  L10->L7-F->N           | implies    4%  | implies    4%  | implies    4%  | implies    2%  | implies    0% 
+
+============================================================================================
+  Gemma 2 9B - GATED INVENTED-MASS RE-TEST
+============================================================================================
+
+  pairing                | gate acc | unary mass | centroid |  probe | verdict  | note
+  --------------------------------------------------------------------------------------------------------------
+  baseline-L4            |    1.000 |     80.0% |    56.5° |  54.3° | PASS     | script-18 / 19b baseline (was 99.6% unary)
+  L2-sweet-N->F          |    1.000 |     40.0% |    50.8° |  45.9° | PASS     | 19b sweet spot; gate 1.000
+  L2-sweet-F->N          |    0.884 |     42.0% |    50.8° |  45.9° | PASS     | 19b gate 0.884
+  L8-failmode-N->F       |    1.000 |    100.0% |    68.0° |  66.8° | PASS     | gate-PASS-angle-wide test; 19b gate 1.000
+  L8-failmode-F->N       |    0.864 |     23.6% |    68.0° |  66.8° | PASS     | gate-PASS-angle-wide test; 19b gate 0.864
+
+  Predicted-canonical breakdown (% of invented predictions per class):
+
+  pairing                |         and |          or |         not |     implies | necessarily
+  --------------------------------------------------------------------------------------------
+  baseline-L4            |       20.0% |        0.0% |        0.0% |        0.0% |       80.0%
+  L2-sweet-N->F          |        0.0% |        0.0% |       40.0% |       60.0% |        0.0%
+  L2-sweet-F->N          |        0.4% |        0.4% |       24.4% |       57.2% |       17.6%
+  L8-failmode-N->F       |        0.0% |        0.0% |        0.0% |        0.0% |      100.0%
+  L8-failmode-F->N       |       37.6% |        0.0% |        7.2% |       38.8% |       16.4%
+
+  Per-invented-word predicted canonical (and unary share per word):
+
+  (intended arity per word from W_TO_CANONICAL mapping: bliq=2 dren=2 vusp=1 molex=2 perph=1)
+
+  pairing                | bliq           | dren           | vusp           | molex          | perph         
+  --------------------------------------------------------------------------------------------------------------
+  baseline-L4            | necessarily100% | and        0%  | necessarily100% | necessarily100% | necessarily100%
+  L2-sweet-N->F          | not       100% | implies    0%  | implies    0%  | implies    0%  | not       100%
+  L2-sweet-F->N          | not       90%  | implies   24%  | implies   24%  | implies   26%  | implies   46% 
+  L8-failmode-N->F       | necessarily100% | necessarily100% | necessarily100% | necessarily100% | necessarily100%
+  L8-failmode-F->N       | implies   20%  | and       28%  | implies   20%  | implies   20%  | implies   30% 
+
+============================================================================================
+CROSS-MODEL SYNTHESIS
+============================================================================================
+
+  Gemma 2 9B (script-18 reproducibility check):
+    L4 (baseline, script-18 was 99.6%):       unary=80.0%, gate=1.000 (PASS)
+
+  Gemma 2 9B (NEW: L2 sweet spot vs L8 gate-PASS-angle-wide):
+    L2 N->F (gate 1.000, centroid 58, probe 47): unary=40.0%
+    L2 F->N (gate 0.884, centroid 58, probe 47): unary=42.0%
+    L8 N->F (gate 1.000, centroid 69, probe 67): unary=100.0%
+    L8 F->N (gate 0.864, centroid 69, probe 67): unary=23.6%
+
+  OLMo 2 7B (script-18 reproducibility check):
+    L7 N->F (baseline, script-18 was ~0%):    unary=20.0%, gate=1.000 (PASS)
+    L7 F->N (baseline, script-18 was ~0%):    unary=0.0%, gate=0.212 (FAIL)
+
+  OLMo 2 7B (NEW: L10 gate-PASS layer never tested for invented mass):
+    L10 same N->F (gate 0.800, centroid 72, probe 75): unary=0.0%
+    L10 same F->N (gate 0.688, centroid 72, probe 75): unary=17.2%
+    L10 -> L7 N->F (cross-layer):                       unary=0.0%
+    L10 -> L7 F->N (cross-layer):                       unary=2.8%
+
+  OLMo 2 L10 outcome: (i)  OLMo 2 L10 invented mass at floor
+  (mean L10 same-layer invented unary mass = 8.6%)
+
+  Interpretation guidance for paper_notes.md:
+    'notation-local' framing reinforced.
+    OLMo 2 has NO cross-notation arity transfer in residual stream space even at the bidirectionally gate-PASS layer L10.
+    The gate-PASS at L10 represents a 5-class canonical-discrimination axis that transfers, but the binary unary-vs-binary axis does not.
+
+[logging] full transcript written to: /Users/brendan.budworth/dev/thesis/experiments/outputs/20_20260519_210415.log

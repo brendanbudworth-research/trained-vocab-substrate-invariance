@@ -1,0 +1,179 @@
+[logging] tee'ing all output to /Users/brendan.budworth/dev/thesis/experiments/outputs/19_20260519_200901.log
+[logging] (set NO_LOG=1 to disable)
+Script 19 - directional-angle analysis
+  HF_HUB_OFFLINE=<unset>
+  TRANSFORMERS_OFFLINE=<unset>
+  device: mps
+  seed:   17
+  N_PER_CLASS: 50
+  models: ['Gemma 2 9B', 'OLMo 2 7B']
+
+########  Gemma 2 9B  (google/gemma-2-9b)  ########
+  loading tokenizer + model (torch.bfloat16) on mps...
+Loading weights:   0%|          | 0/464 [00:00<?, ?it/s]Loading weights:   0%|          | 1/464 [00:04<37:04,  4.81s/it]Loading weights:  31%|###1      | 146/464 [00:04<00:07, 41.88it/s]Loading weights:  47%|####7     | 220/464 [00:09<00:09, 25.98it/s]Loading weights:  56%|#####6    | 261/464 [00:11<00:08, 23.28it/s]Loading weights:  62%|######1   | 287/464 [00:13<00:08, 21.87it/s]Loading weights:  66%|######5   | 304/464 [00:14<00:07, 20.62it/s]Loading weights:  68%|######8   | 316/464 [00:14<00:07, 19.63it/s]Loading weights:  70%|#######   | 325/464 [00:15<00:07, 18.03it/s]Loading weights:  72%|#######1  | 333/464 [00:16<00:07, 16.90it/s]Loading weights:  74%|#######4  | 344/464 [00:17<00:07, 16.38it/s]Loading weights:  77%|#######6  | 355/464 [00:17<00:06, 18.03it/s]Loading weights:  79%|#######8  | 366/464 [00:18<00:05, 17.64it/s]Loading weights:  80%|#######9  | 369/464 [00:18<00:05, 18.24it/s]Loading weights:  81%|########1 | 377/464 [00:18<00:05, 16.50it/s]Loading weights:  84%|########3 | 388/464 [00:19<00:04, 15.76it/s]Loading weights:  86%|########5 | 399/464 [00:20<00:04, 14.92it/s]Loading weights:  88%|########8 | 410/464 [00:21<00:03, 14.15it/s]Loading weights:  91%|######### | 421/464 [00:22<00:03, 14.28it/s]Loading weights:  93%|#########3| 432/464 [00:22<00:02, 14.50it/s]Loading weights:  95%|#########5| 443/464 [00:23<00:01, 15.00it/s]Loading weights:  96%|#########5| 445/464 [00:23<00:01, 15.24it/s]Loading weights:  98%|#########7| 454/464 [00:24<00:00, 14.75it/s]Loading weights: 100%|##########| 464/464 [00:24<00:00, 19.03it/s]
+  model loaded, n_layers=42, hidden=3584
+
+  -- Building NEUTRAL condition --
+
+  Building condition: NEUTRAL
+    canonicals: 250 stimuli (5 classes)
+    invented:   250 stimuli (5 words)
+    extracting canonical activations...
+      33.6s, n_layers=43, dim=3584
+    extracting invented activations...
+      36.4s
+
+  -- Building FUNCTIONAL-PREFIX condition --
+
+  Building condition: FUNC-PFX
+    canonicals: 250 stimuli (5 classes)
+    invented:   250 stimuli (5 words)
+    extracting canonical activations...
+      41.4s, n_layers=43, dim=3584
+    extracting invented activations...
+      41.6s
+
+================================================================================
+DIRECTIONAL-ANGLE ANALYSIS - Gemma 2 9B
+================================================================================
+
+  Reading: small cross-notation angle => the arity direction is
+  approximately the same vector in residual stream space across
+  notations (consistent with script 18 cross-condition transfer
+  succeeding). Near-90-degree angle => the two arity directions
+  are approximately unrelated despite both being structural within
+  their own notation (consistent with cross-condition transfer
+  failing). The random-unit-vector baseline establishes what an
+  unrelated direction looks like in this dim - the cross-notation
+  angle should be interpreted relative to that baseline.
+
+  Random-direction baseline (dim=3584, n=200):
+    mean angle to random unit vector: 90.02 deg (std 0.99 deg, 95% CI [88.06, 91.90])
+    mean |cos|: 0.0136  (= 1/sqrt(D)~0.0167)
+
+  Per-layer cross-notation angles (NEUTRAL <-> FUNC-PFX):
+    layer | centroid (cos, deg) | probe (cos, deg) | within-NEUT C<->P (deg) | within-FUNC C<->P (deg)
+    ------+--------------------+------------------+-------------------------+------------------------
+        2 | +0.6316,  50.83 | +0.6962,  45.88 |   29.16  |   28.92
+        4 | +0.5525,  56.46 | +0.5831,  54.33 |   26.60  |   27.89
+        8 | +0.3749,  67.98 | +0.3939,  66.81 |   35.45  |   19.36
+       16 | +0.4400,  63.89 | +0.3353,  70.41 |   45.27  |   24.87
+       17 | +0.3911,  66.98 | +0.3326,  70.58 |   45.75  |   26.22
+
+  Invented projections onto centroid directions (raw space).
+  Positive => mean invented activation lies on the unary side of
+  the binary centroid, measured along the named direction.
+
+    layer | inv_NEUT . d_C^NEUT | inv_NEUT . d_C^FUNC | inv_FUNC . d_C^FUNC | inv_FUNC . d_C^NEUT
+    ------+--------------------+--------------------+--------------------+--------------------
+        2 | +6.6096             | +4.0146             | +9.4706             | +4.1815
+        4 | +13.3943             | +5.9570             | +21.5608             | +8.7952
+        8 | +26.4628             | +6.2592             | +30.4290             | +17.5616
+       16 | +50.9716             | +22.6873             | +53.6624             | +43.9325
+       17 | +49.1089             | +19.6409             | +54.4681             | +39.2707
+
+  Headline at cond-1 focus layer L=4:
+    centroid cross-notation angle: 56.46 deg (cos +0.5525)
+    probe    cross-notation angle: 54.33 deg (cos +0.5831)
+    within-NEUT centroid-vs-probe: 26.60 deg
+    within-FUNC centroid-vs-probe: 27.89 deg
+  (random-direction baseline for this dim: 90.02 +/- 0.99 deg)
+
+  -- Gemma 2 9B total time: 241.0s --
+
+########  OLMo 2 7B  (allenai/OLMo-2-1124-7B)  ########
+  loading tokenizer + model (torch.float16) on mps...
+Loading weights:   0%|          | 0/355 [00:00<?, ?it/s]Loading weights:   0%|          | 1/355 [00:04<25:43,  4.36s/it]Loading weights:   1%|          | 2/355 [00:04<11:03,  1.88s/it]Loading weights:  13%|#3        | 47/355 [00:05<00:18, 16.78it/s]Loading weights:  15%|#4        | 52/355 [00:05<00:17, 17.69it/s]Loading weights:  16%|#5        | 56/355 [00:05<00:21, 13.64it/s]Loading weights:  19%|#9        | 69/355 [00:06<00:17, 16.36it/s]Loading weights:  20%|##        | 72/355 [00:06<00:19, 14.52it/s]Loading weights:  23%|##2       | 80/355 [00:07<00:17, 15.48it/s]Loading weights:  23%|##3       | 82/355 [00:07<00:18, 14.46it/s]Loading weights:  25%|##5       | 90/355 [00:07<00:13, 20.20it/s]Loading weights:  26%|##6       | 94/355 [00:08<00:18, 14.28it/s]Loading weights:  28%|##8       | 100/355 [00:08<00:13, 18.45it/s]Loading weights:  29%|##9       | 104/355 [00:09<00:21, 11.87it/s]Loading weights:  30%|###       | 107/355 [00:09<00:22, 11.20it/s]Loading weights:  32%|###1      | 113/355 [00:09<00:16, 14.47it/s]Loading weights:  33%|###2      | 116/355 [00:09<00:15, 15.16it/s]Loading weights:  35%|###4      | 123/355 [00:09<00:11, 20.97it/s]Loading weights:  36%|###5      | 127/355 [00:10<00:16, 13.44it/s]Loading weights:  37%|###6      | 130/355 [00:11<00:22, 10.02it/s]Loading weights:  39%|###8      | 137/355 [00:11<00:14, 14.83it/s]Loading weights:  39%|###9      | 140/355 [00:11<00:14, 14.90it/s]Loading weights:  41%|####1     | 146/355 [00:11<00:14, 14.25it/s]Loading weights:  42%|####1     | 149/355 [00:12<00:13, 14.80it/s]Loading weights:  44%|####3     | 156/355 [00:12<00:09, 21.30it/s]Loading weights:  45%|####5     | 160/355 [00:12<00:14, 13.12it/s]Loading weights:  46%|####5     | 163/355 [00:13<00:21,  8.85it/s]Loading weights:  50%|#####     | 178/355 [00:13<00:08, 20.22it/s]Loading weights:  52%|#####1    | 184/355 [00:14<00:10, 16.66it/s]Loading weights:  53%|#####3    | 189/355 [00:14<00:11, 14.47it/s]Loading weights:  54%|#####4    | 193/355 [00:15<00:10, 14.85it/s]Loading weights:  56%|#####6    | 200/355 [00:15<00:08, 18.92it/s]Loading weights:  57%|#####7    | 204/355 [00:15<00:11, 13.21it/s]Loading weights:  58%|#####8    | 207/355 [00:16<00:16,  8.91it/s]Loading weights:  62%|######2   | 221/355 [00:16<00:07, 18.05it/s]Loading weights:  64%|######3   | 226/355 [00:17<00:09, 13.99it/s]Loading weights:  65%|######4   | 230/355 [00:18<00:11, 10.73it/s]Loading weights:  68%|######8   | 243/355 [00:18<00:05, 19.11it/s]Loading weights:  70%|######9   | 248/355 [00:18<00:07, 15.04it/s]Loading weights:  71%|#######   | 252/355 [00:19<00:06, 14.75it/s]Loading weights:  72%|#######2  | 256/355 [00:19<00:06, 14.45it/s]Loading weights:  73%|#######2  | 259/355 [00:19<00:06, 14.50it/s]Loading weights:  75%|#######4  | 266/355 [00:19<00:04, 19.72it/s]Loading weights:  76%|#######5  | 269/355 [00:20<00:06, 13.06it/s]Loading weights:  78%|#######7  | 276/355 [00:20<00:04, 18.05it/s]Loading weights:  79%|#######8  | 279/355 [00:21<00:06, 11.45it/s]Loading weights:  81%|########1 | 288/355 [00:21<00:03, 18.82it/s]Loading weights:  83%|########2 | 293/355 [00:21<00:04, 13.40it/s]Loading weights:  84%|########3 | 297/355 [00:22<00:04, 12.27it/s]Loading weights:  85%|########4 | 300/355 [00:22<00:04, 13.00it/s]Loading weights:  85%|########5 | 303/355 [00:22<00:03, 13.62it/s]Loading weights:  87%|########7 | 310/355 [00:22<00:02, 19.69it/s]Loading weights:  88%|########8 | 313/355 [00:23<00:03, 13.03it/s]Loading weights:  89%|########9 | 316/355 [00:23<00:04,  9.66it/s]Loading weights:  91%|#########1| 324/355 [00:24<00:02, 15.32it/s]Loading weights:  92%|#########2| 327/355 [00:24<00:02,  9.70it/s]Loading weights:  96%|#########6| 342/355 [00:25<00:00, 20.04it/s]Loading weights:  97%|#########7| 346/355 [00:25<00:00, 13.58it/s]Loading weights: 100%|##########| 355/355 [00:25<00:00, 13.73it/s]
+  model loaded, n_layers=32, hidden=4096
+
+  -- Building NEUTRAL condition --
+
+  Building condition: NEUTRAL
+    canonicals: 250 stimuli (5 classes)
+    invented:   250 stimuli (5 words)
+    extracting canonical activations...
+      19.5s, n_layers=33, dim=4096
+    extracting invented activations...
+      21.8s
+
+  -- Building FUNCTIONAL-PREFIX condition --
+
+  Building condition: FUNC-PFX
+    canonicals: 250 stimuli (5 classes)
+    invented:   250 stimuli (5 words)
+    extracting canonical activations...
+      27.1s, n_layers=33, dim=4096
+    extracting invented activations...
+      27.2s
+
+================================================================================
+DIRECTIONAL-ANGLE ANALYSIS - OLMo 2 7B
+================================================================================
+
+  Reading: small cross-notation angle => the arity direction is
+  approximately the same vector in residual stream space across
+  notations (consistent with script 18 cross-condition transfer
+  succeeding). Near-90-degree angle => the two arity directions
+  are approximately unrelated despite both being structural within
+  their own notation (consistent with cross-condition transfer
+  failing). The random-unit-vector baseline establishes what an
+  unrelated direction looks like in this dim - the cross-notation
+  angle should be interpreted relative to that baseline.
+
+  Random-direction baseline (dim=4096, n=200):
+    mean angle to random unit vector: 90.02 deg (std 0.84 deg, 95% CI [88.49, 91.69])
+    mean |cos|: 0.0122  (= 1/sqrt(D)~0.0156)
+
+  Per-layer cross-notation angles (NEUTRAL <-> FUNC-PFX):
+    layer | centroid (cos, deg) | probe (cos, deg) | within-NEUT C<->P (deg) | within-FUNC C<->P (deg)
+    ------+--------------------+------------------+-------------------------+------------------------
+        4 | +0.2733,  74.14 | +0.3196,  71.36 |   19.65  |   25.45
+        7 | +0.2494,  75.56 | +0.2598,  74.94 |   21.21  |   18.57
+       10 | +0.3202,  71.32 | +0.2684,  74.43 |   29.92  |   16.88
+       16 | +0.2626,  74.78 | +0.2443,  75.86 |   38.24  |   12.32
+       24 | +0.2601,  74.92 | +0.3060,  72.18 |   41.17  |   13.92
+
+  Invented projections onto centroid directions (raw space).
+  Positive => mean invented activation lies on the unary side of
+  the binary centroid, measured along the named direction.
+
+    layer | inv_NEUT . d_C^NEUT | inv_NEUT . d_C^FUNC | inv_FUNC . d_C^FUNC | inv_FUNC . d_C^NEUT
+    ------+--------------------+--------------------+--------------------+--------------------
+        4 | +0.9184             | +0.2958             | +2.5293             | +0.5881
+        7 | +2.0136             | +0.6158             | +4.1941             | +1.1178
+       10 | +2.4260             | +0.9504             | +4.0377             | +2.3265
+       16 | +2.3432             | +0.1607             | +3.7222             | +2.4106
+       24 | +2.2251             | +0.6486             | +6.4155             | +1.4292
+
+  Headline at cond-1 focus layer L=7:
+    centroid cross-notation angle: 75.56 deg (cos +0.2494)
+    probe    cross-notation angle: 74.94 deg (cos +0.2598)
+    within-NEUT centroid-vs-probe: 21.21 deg
+    within-FUNC centroid-vs-probe: 18.57 deg
+  (random-direction baseline for this dim: 90.02 +/- 0.84 deg)
+
+  -- OLMo 2 7B total time: 192.1s --
+
+================================================================================
+CROSS-MODEL SUMMARY
+================================================================================
+
+  Headline cross-notation angles at each model's cond-1 focus layer:
+
+    model        | centroid (deg) | probe (deg) | within-NEUT C<->P | within-FUNC C<->P | baseline (deg)
+    -------------+----------------+-------------+-------------------+-------------------+----------------
+    Gemma 2 9B   |   56.46        |   54.33     |   26.60           |   27.89           |  90.02 +/- 0.99
+    OLMo 2 7B    |   75.56        |   74.94     |   21.21           |   18.57           |  90.02 +/- 0.84
+
+  Interpretation (per script 18 transfer asymmetry):
+    centroid + probe cross-notation angle WELL below the random
+    baseline (~90 deg) => globally-aligned arity direction across
+    notations. Angle near baseline => notation-local arity directions.
+
+  Within-notation centroid-vs-probe should be small in both models
+  if the centroid direction and the probe weight are both reading
+  the same arity structure. A large within-notation angle would
+  indicate the probe is fitting something other than the centroid-
+  geometry arity attractor.
+
+[logging] full transcript written to: /Users/brendan.budworth/dev/thesis/experiments/outputs/19_20260519_200901.log

@@ -1,0 +1,57 @@
+[logging] tee'ing all output to /Users/brendan.budworth/dev/thesis/experiments/outputs/25c_20260521_090438.log
+[start] 2026-05-21T09:04:38.669682
+[stimulus_version] 25c-content-word-control
+[content_words] ['house', 'water', 'music', 'light', 'paper', 'pattern', 'theory', 'system', 'region', 'period', 'archipelago', 'mosaic', 'plinth', 'ledger', 'cassowary']
+[N_PER_CLASS] 50
+[N_BOOTSTRAP] 500
+[M2C_REFRAME_THRESHOLD] 0.65
+[device] mps
+
+[extract] Gemma 2 9B -> /Users/brendan.budworth/dev/thesis/experiments/cache/25c_gemma_2_9b.npz
+  loading model google/gemma-2-9b ...
+Loading weights:   0%|          | 0/464 [00:00<?, ?it/s]Loading weights:   0%|          | 1/464 [00:04<37:06,  4.81s/it]Loading weights:  33%|###2      | 153/464 [00:04<00:07, 43.85it/s]Loading weights:  50%|####9     | 230/464 [00:06<00:05, 42.44it/s]Loading weights:  59%|#####9    | 274/464 [00:08<00:05, 36.77it/s]Loading weights:  65%|######5   | 302/464 [00:11<00:06, 25.43it/s]Loading weights:  69%|######8   | 320/464 [00:11<00:05, 25.51it/s]Loading weights:  72%|#######1  | 333/464 [00:13<00:06, 21.07it/s]Loading weights:  74%|#######4  | 344/464 [00:13<00:05, 20.28it/s]Loading weights:  77%|#######6  | 355/464 [00:14<00:05, 20.81it/s]Loading weights:  79%|#######8  | 366/464 [00:14<00:04, 19.76it/s]Loading weights:  81%|########1 | 377/464 [00:15<00:04, 18.62it/s]Loading weights:  84%|########3 | 388/464 [00:16<00:04, 17.24it/s]Loading weights:  86%|########5 | 399/464 [00:17<00:03, 16.40it/s]Loading weights:  88%|########8 | 410/464 [00:17<00:03, 16.04it/s]Loading weights:  91%|######### | 421/464 [00:18<00:02, 15.57it/s]Loading weights:  93%|#########3| 432/464 [00:19<00:02, 14.90it/s]Loading weights:  95%|#########5| 443/464 [00:20<00:01, 15.15it/s]Loading weights:  98%|#########7| 454/464 [00:20<00:00, 15.25it/s]Loading weights: 100%|##########| 464/464 [00:20<00:00, 22.22it/s]
+  loaded in 86.2s; dtype=torch.bfloat16; device=mps
+
+[audit] Gemma 2 9B content-word tokenization:
+  word            pcs pieces
+  house             1  ['▁house']
+  water             1  ['▁water']
+  music             1  ['▁music']
+  light             1  ['▁light']
+  paper             1  ['▁paper']
+  pattern           1  ['▁pattern']
+  theory            1  ['▁theory']
+  system            1  ['▁system']
+  region            1  ['▁region']
+  period            1  ['▁period']
+  archipelago       1  ['▁archipelago']
+  mosaic            1  ['▁mosaic']
+  plinth            2  ['▁pl', 'inth']
+  ledger            1  ['▁ledger']
+  cassowary         3  ['▁cass', 'ow', 'ary']
+  [summary] 2/15 multi-piece (matching v6 canonical set: 1/15 multi-piece for `unprovably`)
+
+[extract] NEUTRAL n=750 stimuli ...
+  NEUTRAL shape=(2, 750, 43, 3584) in 105.4s
+
+[extract] FUNC-PFX n=750 stimuli ...
+    [anchor] first-arg: 750/750 stimuli fell back to sentence-final (anchor not findable)
+    [anchor] close-paren: 750/750 stimuli fell back to sentence-final (anchor not findable)
+  FUNC-PFX shape=(4, 750, 43, 3584) in 133.3s
+[cache] saved to /Users/brendan.budworth/dev/thesis/experiments/cache/25c_gemma_2_9b.npz
+
+[run] Gemma 2 9B
+Traceback (most recent call last):
+  File "/Users/brendan.budworth/dev/thesis/experiments/25c_corpus_frequency_control.py", line 664, in <module>
+    main()
+    ~~~~^^
+  File "/Users/brendan.budworth/dev/thesis/experiments/25c_corpus_frequency_control.py", line 656, in main
+    per_model[spec.short_name] = run_for_model(spec, cache)
+                                 ~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/Users/brendan.budworth/dev/thesis/experiments/25c_corpus_frequency_control.py", line 555, in run_for_model
+    m1_n = m1_cv(train_X, train_labels.astype(str),
+                 seed=seed)
+  File "/Users/brendan.budworth/dev/thesis/experiments/25c_corpus_frequency_control.py", line 475, in m1_cv
+    clf = LogisticRegression(max_iter=5000, C=1.0, solver="lbfgs",
+                             multi_class="auto")
+TypeError: LogisticRegression.__init__() got an unexpected keyword argument 'multi_class'

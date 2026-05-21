@@ -1,0 +1,189 @@
+[logging] tee'ing all output to /Users/brendan.budworth/dev/thesis/experiments/outputs/19b_20260519_214431.log
+[logging] (set NO_LOG=1 to disable)
+Script 19b - directional-angle + canonical-transfer gate + bootstrap CI
+  HF_HUB_OFFLINE=1
+  TRANSFORMERS_OFFLINE=1
+  device: cpu
+  seed:   17
+  N_PER_CLASS: 50
+  N_BOOTSTRAP: 100
+  GATE_THRESHOLD: 0.65
+  models: ['Gemma 2 9B', 'OLMo 2 7B']
+  cache dir: experiments/outputs/cache/
+
+########  Gemma 2 9B  (google/gemma-2-9b)  ########
+  loading tokenizer + model (torch.bfloat16) on cpu...
+Loading weights:   0%|          | 0/464 [00:00<?, ?it/s]Loading weights:   0%|          | 1/464 [00:04<36:10,  4.69s/it]Loading weights:  31%|###1      | 146/464 [00:04<00:07, 42.92it/s]Loading weights:  48%|####7     | 222/464 [00:07<00:07, 34.38it/s]Loading weights:  57%|#####7    | 265/464 [00:10<00:07, 24.95it/s]Loading weights:  63%|######2   | 292/464 [00:12<00:07, 22.30it/s]Loading weights:  67%|######6   | 310/464 [00:13<00:06, 23.33it/s]Loading weights:  70%|######9   | 323/464 [00:14<00:07, 19.30it/s]Loading weights:  72%|#######1  | 333/464 [00:15<00:07, 18.02it/s]Loading weights:  74%|#######4  | 344/464 [00:16<00:06, 17.27it/s]Loading weights:  77%|#######6  | 355/464 [00:16<00:05, 18.55it/s]Loading weights:  79%|#######8  | 366/464 [00:17<00:05, 17.96it/s]Loading weights:  80%|#######9  | 370/464 [00:17<00:04, 18.96it/s]Loading weights:  81%|########1 | 377/464 [00:17<00:05, 15.79it/s]Loading weights:  84%|########3 | 388/464 [00:18<00:05, 14.69it/s]Loading weights:  86%|########5 | 399/464 [00:19<00:04, 14.89it/s]Loading weights:  88%|########8 | 410/464 [00:20<00:03, 14.66it/s]Loading weights:  89%|########8 | 412/464 [00:20<00:03, 14.86it/s]Loading weights:  91%|######### | 421/464 [00:21<00:03, 14.19it/s]Loading weights:  93%|#########3| 432/464 [00:21<00:02, 14.28it/s]Loading weights:  95%|#########5| 443/464 [00:22<00:01, 15.02it/s]Loading weights:  98%|#########7| 454/464 [00:23<00:00, 14.90it/s]Loading weights: 100%|##########| 464/464 [00:23<00:00, 19.90it/s]
+  model loaded, n_layers=42, hidden=3584
+
+  -- Building NEUTRAL condition --
+
+  Building condition: NEUTRAL (no cache; extracting)
+    canonicals: 250 stimuli (5 classes)
+    invented:   250 stimuli (5 words)
+    canon_prompts_hash=944958e09a4d51d8...
+    inv_prompts_hash=ffcecb1b088c864f...
+    extracting canonical activations...
+      137.3s, n_layers=43, dim=3584
+    extracting invented activations...
+      153.5s
+    [cache] saved /Users/brendan.budworth/dev/thesis/experiments/outputs/cache/19b_Gemma_2_9B_NEUTRAL_npc50_v2-stable-seeds.npz  (107.2 MB)
+    [cache]   meta: stimulus_version=v2-stable-seeds, anchor_mode=operator-after, dtype=bfloat16
+    [cache]   canon_prompts_hash=944958e09a4d51d8..., inv_prompts_hash=ffcecb1b088c864f...
+
+  -- Building FUNCTIONAL-PREFIX condition --
+
+  Building condition: FUNC-PFX (no cache; extracting)
+    canonicals: 250 stimuli (5 classes)
+    invented:   250 stimuli (5 words)
+    canon_prompts_hash=6d651d3eefa6f36c...
+    inv_prompts_hash=10753e80c76dca9c...
+    extracting canonical activations...
+      215.4s, n_layers=43, dim=3584
+    extracting invented activations...
+      229.7s
+    [cache] saved /Users/brendan.budworth/dev/thesis/experiments/outputs/cache/19b_Gemma_2_9B_FUNC-PFX_npc50_v2-stable-seeds.npz  (3.5 MB)
+    [cache]   meta: stimulus_version=v2-stable-seeds, anchor_mode=operator-after, dtype=bfloat16
+    [cache]   canon_prompts_hash=6d651d3eefa6f36c..., inv_prompts_hash=10753e80c76dca9c...
+
+========================================================================================
+DIRECTIONAL-ANGLE + GATE ANALYSIS - Gemma 2 9B
+========================================================================================
+  Bootstrap: 100 within-class resamples per measurement.
+  Gate threshold: cross-canonical 5-class accuracy >= 0.65
+  (= ~3x chance for 5-class; ambiguous between 0.30 and 0.65; FAIL below 0.30).
+
+  Same-layer cross-notation angles, with gate (NEUTRAL@L <-> FUNC-PFX@L):
+    Each row: NEUTRAL CV / FUNC-PFX CV (within-cond 5-class), then
+    cross-canonical accuracies in both directions, then centroid and
+    probe angles with 95% bootstrap CIs, then the gate verdict.
+
+    layer | NEUT CV | FUNC CV | gate N->F | gate F->N | centroid deg [95% CI] | probe deg [95% CI] | gate
+    -----------------------------------------------------------------------------------------------------
+        2 |   0.964 |   1.000 |     1.000 |     0.884 |  57.4 [54.1,61.3]  |  47.2 [45.3,49.5]  | PASS
+        4 |   0.992 |   1.000 |     1.000 |     0.956 |  58.1 [56.6,59.9]  |  55.2 [53.7,56.9]  | PASS
+        8 |   0.992 |   1.000 |     1.000 |     0.852 |  68.8 [67.2,70.4]  |  67.4 [66.1,68.7]  | PASS
+       16 |   0.988 |   1.000 |     0.800 |     0.708 |  64.7 [62.7,66.8]  |  70.3 [69.0,71.5]  | PASS
+       17 |   0.992 |   1.000 |     0.800 |     0.652 |  67.6 [65.6,70.3]  |  70.6 [69.2,71.9]  | PASS
+
+  Cross-layer critical pairings (script-18 table reproduced with
+  directional-angle measurements layered on top):
+
+    src_cond  src_L  ->  tgt_cond  tgt_L | gate src->tgt | centroid deg [95% CI] | probe deg [95% CI] | gate
+    --------------------------------------------------------------------------------------------------------
+    NEUTRAL   L4     ->  FUNC-PFX  L4    |         1.000 |  58.2 [56.7,59.9]  |  55.3 [53.6,57.1]  | PASS
+    NEUTRAL   L4     ->  FUNC-PFX  L2    |         0.400 |  72.7 [71.9,73.5]  |  70.1 [69.6,70.8]  | AMBIG
+    NEUTRAL   L2     ->  FUNC-PFX  L2    |         1.000 |  57.6 [54.1,63.2]  |  47.6 [44.9,50.1]  | PASS
+    FUNC-PFX  L2     ->  NEUTRAL   L2    |         0.884 |  57.6 [54.4,61.9]  |  47.1 [44.9,50.0]  | PASS
+    FUNC-PFX  L2     ->  NEUTRAL   L4    |         0.932 |  72.6 [71.8,73.6]  |  70.0 [69.5,70.5]  | PASS
+    FUNC-PFX  L8     ->  NEUTRAL   L4    |         0.788 |  75.2 [74.2,76.2]  |  75.1 [74.5,75.9]  | PASS
+    FUNC-PFX  L16    ->  NEUTRAL   L16   |         0.708 |  64.8 [62.6,67.3]  |  70.3 [68.8,71.5]  | PASS
+    FUNC-PFX  L16    ->  NEUTRAL   L4    |         0.608 |  82.7 [81.8,83.5]  |  81.8 [81.3,82.3]  | AMBIG
+
+  Headline at cond-1 focus layer L=4:
+    NEUTRAL CV: 0.992,  FUNC-PFX CV: 1.000
+    canonical-transfer N->F: 1.000 (PASS)
+    canonical-transfer F->N: 0.956 (PASS)
+    centroid cross-notation: 58.09 deg [56.58, 59.86]
+    probe    cross-notation: 55.25 deg [53.75, 56.86]
+    same-layer gate verdict: PASS
+
+  -- Gemma 2 9B total time: 844.8s --
+
+########  OLMo 2 7B  (allenai/OLMo-2-1124-7B)  ########
+  loading tokenizer + model (torch.float16) on cpu...
+Loading weights:   0%|          | 0/355 [00:00<?, ?it/s]Loading weights:   0%|          | 1/355 [00:02<12:49,  2.17s/it]Loading weights:  13%|#3        | 47/355 [00:02<00:11, 26.76it/s]Loading weights:  17%|#6        | 60/355 [00:02<00:09, 30.64it/s]Loading weights:  19%|#9        | 69/355 [00:02<00:08, 32.52it/s]Loading weights:  22%|##2       | 79/355 [00:02<00:07, 39.21it/s]Loading weights:  25%|##4       | 87/355 [00:03<00:07, 37.88it/s]Loading weights:  26%|##6       | 94/355 [00:03<00:07, 35.04it/s]Loading weights:  29%|##8       | 102/355 [00:03<00:07, 34.22it/s]Loading weights:  32%|###1      | 113/355 [00:03<00:06, 37.70it/s]Loading weights:  33%|###3      | 118/355 [00:04<00:06, 39.09it/s]Loading weights:  35%|###4      | 124/355 [00:04<00:08, 28.57it/s]Loading weights:  37%|###7      | 133/355 [00:04<00:06, 33.35it/s]Loading weights:  39%|###8      | 138/355 [00:05<00:09, 21.71it/s]Loading weights:  41%|####      | 144/355 [00:05<00:08, 26.14it/s]Loading weights:  42%|####1     | 148/355 [00:05<00:12, 16.75it/s]Loading weights:  44%|####4     | 157/355 [00:06<00:10, 18.67it/s]Loading weights:  47%|####6     | 166/355 [00:06<00:07, 24.17it/s]Loading weights:  48%|####7     | 170/355 [00:06<00:10, 18.36it/s]Loading weights:  50%|#####     | 179/355 [00:07<00:07, 23.12it/s]Loading weights:  52%|#####1    | 183/355 [00:07<00:07, 24.40it/s]Loading weights:  54%|#####3    | 190/355 [00:07<00:07, 23.09it/s]Loading weights:  54%|#####4    | 193/355 [00:07<00:06, 23.48it/s]Loading weights:  56%|#####6    | 200/355 [00:07<00:05, 30.69it/s]Loading weights:  57%|#####7    | 204/355 [00:08<00:07, 21.20it/s]Loading weights:  59%|#####9    | 210/355 [00:08<00:05, 26.08it/s]Loading weights:  60%|######    | 214/355 [00:08<00:08, 17.30it/s]Loading weights:  63%|######2   | 223/355 [00:09<00:06, 19.67it/s]Loading weights:  64%|######3   | 226/355 [00:09<00:06, 20.42it/s]Loading weights:  66%|######5   | 233/355 [00:09<00:04, 26.67it/s]Loading weights:  67%|######6   | 237/355 [00:09<00:06, 18.01it/s]Loading weights:  69%|######8   | 244/355 [00:09<00:04, 24.25it/s]Loading weights:  70%|######9   | 248/355 [00:10<00:05, 19.54it/s]Loading weights:  72%|#######2  | 256/355 [00:11<00:07, 14.00it/s]Loading weights:  73%|#######2  | 259/355 [00:11<00:06, 13.81it/s]Loading weights:  75%|#######4  | 266/355 [00:11<00:04, 19.12it/s]Loading weights:  76%|#######6  | 270/355 [00:12<00:07, 11.65it/s]Loading weights:  78%|#######7  | 276/355 [00:12<00:05, 14.78it/s]Loading weights:  79%|#######8  | 279/355 [00:12<00:06, 11.24it/s]Loading weights:  79%|#######9  | 281/355 [00:13<00:06, 11.84it/s]Loading weights:  81%|########  | 287/355 [00:13<00:03, 17.38it/s]Loading weights:  82%|########1 | 291/355 [00:13<00:05, 11.24it/s]Loading weights:  84%|########4 | 299/355 [00:14<00:03, 17.72it/s]Loading weights:  85%|########5 | 303/355 [00:14<00:04, 12.90it/s]Loading weights:  88%|########7 | 311/355 [00:15<00:02, 14.71it/s]Loading weights:  88%|########8 | 314/355 [00:15<00:02, 15.92it/s]Loading weights:  91%|######### | 322/355 [00:15<00:02, 15.18it/s]Loading weights:  92%|#########1| 325/355 [00:15<00:01, 16.39it/s]Loading weights:  93%|#########3| 331/355 [00:15<00:01, 21.10it/s]Loading weights:  94%|#########4| 335/355 [00:16<00:01, 13.04it/s]Loading weights:  97%|#########6| 344/355 [00:17<00:00, 14.51it/s]Loading weights:  98%|#########7| 347/355 [00:17<00:00, 14.80it/s]Loading weights: 100%|##########| 355/355 [00:17<00:00, 20.46it/s]
+  model loaded, n_layers=32, hidden=4096
+
+  -- Building NEUTRAL condition --
+
+  Building condition: NEUTRAL (no cache; extracting)
+    canonicals: 250 stimuli (5 classes)
+    invented:   250 stimuli (5 words)
+    canon_prompts_hash=944958e09a4d51d8...
+    inv_prompts_hash=ffcecb1b088c864f...
+    extracting canonical activations...
+      70.5s, n_layers=33, dim=4096
+    extracting invented activations...
+      77.4s
+    [cache] saved /Users/brendan.budworth/dev/thesis/experiments/outputs/cache/19b_OLMo_2_7B_NEUTRAL_npc50_v2-stable-seeds.npz  (113.7 MB)
+    [cache]   meta: stimulus_version=v2-stable-seeds, anchor_mode=operator-after, dtype=float16
+    [cache]   canon_prompts_hash=944958e09a4d51d8..., inv_prompts_hash=ffcecb1b088c864f...
+
+  -- Building FUNCTIONAL-PREFIX condition --
+
+  Building condition: FUNC-PFX (no cache; extracting)
+    canonicals: 250 stimuli (5 classes)
+    invented:   250 stimuli (5 words)
+    canon_prompts_hash=6d651d3eefa6f36c...
+    inv_prompts_hash=10753e80c76dca9c...
+    extracting canonical activations...
+      110.6s, n_layers=33, dim=4096
+    extracting invented activations...
+      118.5s
+    [cache] saved /Users/brendan.budworth/dev/thesis/experiments/outputs/cache/19b_OLMo_2_7B_FUNC-PFX_npc50_v2-stable-seeds.npz  (3.5 MB)
+    [cache]   meta: stimulus_version=v2-stable-seeds, anchor_mode=operator-after, dtype=float16
+    [cache]   canon_prompts_hash=6d651d3eefa6f36c..., inv_prompts_hash=10753e80c76dca9c...
+
+========================================================================================
+DIRECTIONAL-ANGLE + GATE ANALYSIS - OLMo 2 7B
+========================================================================================
+  Bootstrap: 100 within-class resamples per measurement.
+  Gate threshold: cross-canonical 5-class accuracy >= 0.65
+  (= ~3x chance for 5-class; ambiguous between 0.30 and 0.65; FAIL below 0.30).
+
+  Same-layer cross-notation angles, with gate (NEUTRAL@L <-> FUNC-PFX@L):
+    Each row: NEUTRAL CV / FUNC-PFX CV (within-cond 5-class), then
+    cross-canonical accuracies in both directions, then centroid and
+    probe angles with 95% bootstrap CIs, then the gate verdict.
+
+    layer | NEUT CV | FUNC CV | gate N->F | gate F->N | centroid deg [95% CI] | probe deg [95% CI] | gate
+    -----------------------------------------------------------------------------------------------------
+        4 |   0.992 |   1.000 |     1.000 |     0.264 |  74.8 [74.2,75.7]  |  72.0 [71.2,72.8]  | FAIL
+        7 |   0.996 |   1.000 |     1.000 |     0.276 |  76.1 [74.8,77.4]  |  75.4 [74.8,76.2]  | FAIL
+       10 |   1.000 |   1.000 |     0.800 |     0.688 |  71.8 [70.9,73.0]  |  74.8 [74.1,75.5]  | PASS
+       16 |   0.972 |   1.000 |     0.600 |     0.620 |  75.5 [74.0,76.9]  |  76.2 [75.3,76.9]  | AMBIG
+       24 |   0.920 |   1.000 |     1.000 |     0.640 |  76.4 [74.7,78.4]  |  73.0 [72.1,74.3]  | AMBIG
+
+  Cross-layer critical pairings (script-18 table reproduced with
+  directional-angle measurements layered on top):
+
+    src_cond  src_L  ->  tgt_cond  tgt_L | gate src->tgt | centroid deg [95% CI] | probe deg [95% CI] | gate
+    --------------------------------------------------------------------------------------------------------
+    NEUTRAL   L7     ->  FUNC-PFX  L7    |         1.000 |  76.2 [74.8,77.5]  |  75.4 [74.6,76.3]  | PASS
+    FUNC-PFX  L7     ->  NEUTRAL   L7    |         0.276 |  76.1 [74.8,77.5]  |  75.3 [74.5,76.1]  | FAIL
+    NEUTRAL   L7     ->  FUNC-PFX  L10   |         1.000 |  78.7 [78.0,79.6]  |  78.7 [78.1,79.4]  | PASS
+    FUNC-PFX  L10    ->  NEUTRAL   L7    |         0.664 |  78.7 [77.9,79.9]  |  78.7 [78.0,79.2]  | PASS
+    NEUTRAL   L4     ->  FUNC-PFX  L4    |         1.000 |  74.9 [74.0,75.7]  |  72.0 [71.0,73.1]  | PASS
+    FUNC-PFX  L16    ->  NEUTRAL   L7    |         0.748 |  81.7 [81.2,82.4]  |  81.0 [80.5,81.6]  | PASS
+
+  Headline at cond-1 focus layer L=7:
+    NEUTRAL CV: 0.996,  FUNC-PFX CV: 1.000
+    canonical-transfer N->F: 1.000 (PASS)
+    canonical-transfer F->N: 0.276 (FAIL)
+    centroid cross-notation: 76.08 deg [74.75, 77.45]
+    probe    cross-notation: 75.45 deg [74.80, 76.23]
+    same-layer gate verdict: FAIL
+
+  -- OLMo 2 7B total time: 461.5s --
+
+========================================================================================
+CROSS-MODEL SUMMARY (focus-layer same-layer pairing)
+========================================================================================
+
+    model        | NEUT CV | FUNC CV | gate N->F | gate F->N | centroid deg (CI) | probe deg (CI) | gate
+    ----------------------------------------------------------------------------------------------------
+    Gemma 2 9B   |   0.992 |   1.000 |     1.000 |     0.956 |  58.1 [56.6,59.9] |  55.2 [53.7,56.9] | PASS
+    OLMo 2 7B    |   0.996 |   1.000 |     1.000 |     0.276 |  76.1 [74.8,77.4] |  75.4 [74.8,76.2] | FAIL
+
+  Interpretation guide:
+    PASS  cross-canonical >= 0.65 in both directions; the per-layer
+          arity direction is mutually transportable across notations.
+    AMBIG one direction passes, the other is borderline; treat the
+          corresponding directional-angle as suggestive, not
+          confirmed.
+    FAIL  one direction has chance-level canonical-transfer; the
+          directional-angle at this pairing reflects decision-
+          boundary bias rather than a transferable arity direction.
+
+[logging] full transcript written to: /Users/brendan.budworth/dev/thesis/experiments/outputs/19b_20260519_214431.log

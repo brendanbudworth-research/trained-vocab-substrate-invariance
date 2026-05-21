@@ -1,0 +1,204 @@
+[logging] tee'ing all output to /Users/brendan.budworth/dev/thesis/experiments/outputs/25b_20260520_213424.log
+=== Script 25b - embedding-similarity probe (scope=v6) ===
+    SEED=17  N_PER_CLASS=50  N_BOOTSTRAP=50
+    L0_ONLY=False  SKIP_L0=True  MODEL_FILTER='olmo'
+    canonicals (n=15): ['and', 'or', 'implies', 'xor', 'nand', 'not', 'necessarily', 'possibly', 'always', 'negate', 'nor', 'iff', 'unless', 'definitely', 'unprovably']
+    invented   (n=16): ['bliq', 'dren', 'molex', 'krev', 'sond', 'glin', 'twiv', 'fump', 'vusp', 'perph', 'kelm', 'zorf', 'gleph', 'drelth', 'vrith', 'nilph']
+
+    Notes:
+    * Similarity is computed at the *same* (cond, anchor, layer) where
+      the probe makes its predictions on invented activations (= the
+      target side). Each invented-word vector mu_w is mean over its 50
+      stim residuals; each canonical mu_c is mean over 50 stim.
+    * The probe is trained on source-cond canonical at source-anchor x
+      layer (mirrors script 24's m2 protocol exactly).
+
+
+########################################################################################
+#  Model: OLMo 2 7B
+#  Focus layers: [4, 7, 10, 16, 24]
+#  Scope: v6  (canon n=15, inv n=16)
+########################################################################################
+  [cache] HIT  24_OLMo_2_7B_NEUTRAL_npc50_v6-expanded-canonical.npz canon=(2, 750, 33, 4096) inv=(2, 800, 33, 4096) (773.2 MB)
+  [cache] HIT  24_OLMo_2_7B_FUNC-PFX_npc50_v6-expanded-canonical.npz canon=(4, 750, 33, 4096) inv=(4, 800, 33, 4096) (1546.0 MB)
+  Sweeping 80 cells across layers [4, 7, 10, 16, 24]
+    [16/80] elapsed=4s rate=3.86 cell/s
+    [32/80] elapsed=8s rate=3.99 cell/s
+    [48/80] elapsed=11s rate=4.29 cell/s
+    [64/80] elapsed=15s rate=4.35 cell/s
+    [80/80] elapsed=18s rate=4.44 cell/s
+
+================================================================================================================================================================
+  OLMo 2 7B - per-cell agreement: probe per-word top vs cosine-similarity argmax (scope=v6, 80 cells)
+================================================================================================================================================================
+  cell                               | M2c   | M2a   | M4b   | M4c   | pwmin | agree-all | agree-arity | agree-arity (arity-only)
+  ------------------------------------------------------------------------------------------------------------------------------------------------------------
+  N->F opera->opera L 4              | 1.00  | 1.00  | 0.50  | 0.88  | 1.00  |  50.0%    |  25.0%      |  50.0%                  
+  N->F opera->first L 4              | 0.97  | 0.97  | 0.50  | 0.39  | 0.38  |  43.8%    |   6.2%      |  50.0%                  
+  N->F opera->close L 4              | 0.29  | 0.69  | 0.50  | 0.91  | 0.60  |  50.0%    |  50.0%      |  50.0%                  
+  N->F opera->sente L 4              | 0.16  | 0.61  | 0.54  | 0.89  | 0.80  |   0.0%    |   0.0%      |  50.0%                  
+  N->F sente->opera L 4              | 0.87  | 0.87  | 0.50  | 1.00  | 1.00  |  50.0%    |  18.8%      |  50.0%                  
+  N->F sente->first L 4              | 0.72  | 0.79  | 0.50  | 0.65  | 0.56  |  87.5%    |  43.8%      |  50.0%                  
+  N->F sente->close L 4              | 0.33  | 0.60  | 0.50  | 0.97  | 0.78  |  50.0%    |  50.0%      |  50.0%                  
+  N->F sente->sente L 4              | 0.39  | 0.67  | 0.52  | 0.73  | 0.64  |   0.0%    |   0.0%      |  50.0%                  
+  F->N opera->opera L 4              | 0.21  | 0.63  | 0.51  | 0.93  | 0.86  |   0.0%    |  50.0%      |  50.0%                  
+  F->N opera->sente L 4              | 0.07  | 0.48  | 0.50  | 1.00  | 1.00  |   6.2%    |  50.0%      |  50.0%                  
+  F->N first->opera L 4              | 0.27  | 0.64  | 0.50  | 0.99  | 0.98  |  93.8%    |  43.8%      |  50.0%                  
+  F->N first->sente L 4              | 0.07  | 0.53  | 0.50  | 1.00  | 1.00  |  93.8%    |  50.0%      |  50.0%                  
+  F->N close->opera L 4              | 0.19  | 0.52  | 0.47  | 0.54  | 0.48  |   0.0%    |  50.0%      |  50.0%                  
+  F->N close->sente L 4              | 0.12  | 0.48  | 0.50  | 0.80  | 0.80  |   0.0%    |   0.0%      |  50.0%                  
+  F->N sente->opera L 4              | 0.26  | 0.54  | 0.49  | 0.47  | 0.44  |   0.0%    |  50.0%      |  50.0%                  
+  F->N sente->sente L 4              | 0.20  | 0.49  | 0.50  | 0.41  | 0.48  |   0.0%    |  43.8%      |  50.0%                  
+  N->F opera->opera L 7              | 1.00  | 1.00  | 0.50  | 0.53  | 1.00  |  43.8%    |  12.5%      |  50.0%                  
+  N->F opera->first L 7              | 0.85  | 0.89  | 0.46  | 0.21  | 0.28  |  37.5%    |  18.8%      |  43.8%                  
+  N->F opera->close L 7              | 0.77  | 0.96  | 0.51  | 0.81  | 0.64  |  43.8%    |  43.8%      |  50.0%                  
+  N->F opera->sente L 7              | 0.33  | 0.57  | 0.51  | 0.48  | 0.44  |   6.2%    |  31.2%      |  50.0%                  
+  N->F sente->opera L 7              | 1.00  | 1.00  | 0.50  | 0.70  | 1.00  |  87.5%    |  37.5%      |  50.0%                  
+  N->F sente->first L 7              | 0.68  | 0.87  | 0.53  | 0.60  | 0.50  |  93.8%    |  43.8%      |  50.0%                  
+  N->F sente->close L 7              | 0.91  | 0.98  | 0.52  | 0.59  | 0.56  |  18.8%    |  18.8%      |  50.0%                  
+  N->F sente->sente L 7              | 0.44  | 0.72  | 0.50  | 0.36  | 0.32  |  18.8%    |  12.5%      |  56.2%                  
+  F->N opera->opera L 7              | 0.57  | 0.87  | 0.48  | 0.28  | 0.34  |  75.0%    |  25.0%      |  31.2%                  
+  F->N opera->sente L 7              | 0.17  | 0.60  | 0.49  | 0.45  | 0.48  |   0.0%    |   0.0%      |  43.8%                  
+  F->N first->opera L 7              | 0.71  | 0.88  | 0.55  | 0.24  | 0.28  |   0.0%    |   0.0%      |  56.2%                  
+  F->N first->sente L 7              | 0.34  | 0.66  | 0.50  | 0.16  | 0.22  |   6.2%    |   6.2%      |  62.5%                  
+  F->N close->opera L 7              | 0.28  | 0.50  | 0.50  | 0.75  | 0.76  |   0.0%    |  50.0%      |  50.0%                  
+  F->N close->sente L 7              | 0.13  | 0.47  | 0.50  | 0.57  | 0.52  |   6.2%    |  50.0%      |  50.0%                  
+  F->N sente->opera L 7              | 0.34  | 0.52  | 0.49  | 0.57  | 0.56  |   0.0%    |  43.8%      |  50.0%                  
+  F->N sente->sente L 7              | 0.31  | 0.58  | 0.49  | 0.53  | 0.60  |   6.2%    |  50.0%      |  50.0%                  
+  N->F opera->opera L10              | 0.87  | 0.93  | 0.50  | 1.00  | 1.00  | 100.0%    |  50.0%      |  50.0%                  
+  N->F opera->first L10              | 0.59  | 0.73  | 0.49  | 0.91  | 0.70  |  75.0%    |  37.5%      |  50.0%                  
+  N->F opera->close L10              | 0.51  | 0.87  | 0.50  | 1.00  | 1.00  |  56.2%    |  50.0%      |  50.0%                  
+  N->F opera->sente L10              | 0.39  | 0.73  | 0.49  | 0.27  | 0.22  |  18.8%    |  12.5%      |  43.8%                  
+  N->F sente->opera L10              | 0.87  | 1.00  | 0.50  | 1.00  | 1.00  | 100.0%    |  50.0%      |  50.0%                  
+  N->F sente->first L10              | 0.25  | 0.58  | 0.50  | 1.00  | 1.00  |  75.0%    |  37.5%      |  50.0%                  
+  N->F sente->close L10              | 0.74  | 1.00  | 0.50  | 1.00  | 1.00  |  56.2%    |  50.0%      |  50.0%                  
+  N->F sente->sente L10              | 0.50  | 0.71  | 0.45  | 0.26  | 0.28  |  37.5%    |  31.2%      |  62.5%                  
+  F->N opera->opera L10              | 0.61  | 0.83  | 0.50  | 0.94  | 0.88  | 100.0%    |  50.0%      |  50.0%                  
+  F->N opera->sente L10              | 0.17  | 0.58  | 0.49  | 0.47  | 0.48  |  25.0%    |  12.5%      |  50.0%                  
+  F->N first->opera L10              | 0.39  | 0.72  | 0.50  | 0.68  | 0.44  |   0.0%    |   0.0%      |  50.0%                  
+  F->N first->sente L10              | 0.15  | 0.58  | 0.49  | 0.76  | 0.80  |   0.0%    |   0.0%      |  50.0%                  
+  F->N close->opera L10              | 0.46  | 0.61  | 0.45  | 0.31  | 0.28  |  12.5%    |   0.0%      |  37.5%                  
+  F->N close->sente L10              | 0.28  | 0.56  | 0.48  | 0.49  | 0.44  |   0.0%    |  50.0%      |  50.0%                  
+  F->N sente->opera L10              | 0.38  | 0.73  | 0.52  | 0.23  | 0.36  |   0.0%    |   0.0%      |  62.5%                  
+  F->N sente->sente L10              | 0.37  | 0.66  | 0.51  | 0.23  | 0.34  |   0.0%    |   0.0%      |  50.0%                  
+  N->F opera->opera L16              | 0.87  | 0.93  | 0.50  | 1.00  | 1.00  |  93.8%    |  43.8%      |  50.0%                  
+  N->F opera->first L16              | 0.27  | 0.53  | 0.50  | 0.97  | 0.72  |  56.2%    |  31.2%      |  50.0%                  
+  N->F opera->close L16              | 0.52  | 0.79  | 0.50  | 1.00  | 1.00  |  50.0%    |  25.0%      |  50.0%                  
+  N->F opera->sente L16              | 0.35  | 0.74  | 0.56  | 0.33  | 0.32  |   0.0%    |   0.0%      |  56.2%                  
+  N->F sente->opera L16              | 0.80  | 1.00  | 0.50  | 1.00  | 1.00  |  93.8%    |  43.8%      |  50.0%                  
+  N->F sente->first L16              | 0.33  | 0.80  | 0.52  | 0.97  | 0.72  |  56.2%    |  31.2%      |  50.0%                  
+  N->F sente->close L16              | 0.78  | 0.94  | 0.50  | 1.00  | 1.00  |  50.0%    |  25.0%      |  50.0%                  
+  N->F sente->sente L16              | 0.47  | 0.72  | 0.51  | 0.51  | 0.54  |   0.0%    |   0.0%      |  50.0%                  
+  F->N opera->opera L16              | 0.45  | 0.76  | 0.49  | 0.38  | 0.34  |  75.0%    |  37.5%      |  50.0%                  
+  F->N opera->sente L16              | 0.15  | 0.61  | 0.52  | 0.52  | 0.60  |   0.0%    |   0.0%      |  50.0%                  
+  F->N first->opera L16              | 0.12  | 0.69  | 0.56  | 0.69  | 0.62  |   0.0%    |   0.0%      |  50.0%                  
+  F->N first->sente L16              | 0.11  | 0.66  | 0.51  | 0.81  | 0.82  |   0.0%    |   0.0%      |  50.0%                  
+  F->N close->opera L16              | 0.27  | 0.57  | 0.47  | 0.25  | 0.28  |   0.0%    |   0.0%      |  50.0%                  
+  F->N close->sente L16              | 0.20  | 0.53  | 0.48  | 0.25  | 0.32  |   0.0%    |   6.2%      |  50.0%                  
+  F->N sente->opera L16              | 0.25  | 0.56  | 0.44  | 0.25  | 0.34  |   0.0%    |   0.0%      |  37.5%                  
+  F->N sente->sente L16              | 0.21  | 0.52  | 0.47  | 0.22  | 0.26  |   0.0%    |   0.0%      |  50.0%                  
+  N->F opera->opera L24              | 0.87  | 0.93  | 0.44  | 0.88  | 1.00  |  12.5%    |   0.0%      |  43.8%                  
+  N->F opera->first L24              | 0.57  | 0.77  | 0.49  | 0.58  | 0.46  |   6.2%    |   0.0%      |  50.0%                  
+  N->F opera->close L24              | 0.63  | 0.90  | 0.49  | 0.51  | 0.46  |   0.0%    |   0.0%      |  50.0%                  
+  N->F opera->sente L24              | 0.31  | 0.67  | 0.48  | 0.83  | 0.66  |   0.0%    |   0.0%      |  50.0%                  
+  N->F sente->opera L24              | 0.80  | 0.87  | 0.50  | 0.57  | 1.00  |  12.5%    |   6.2%      |  50.0%                  
+  N->F sente->first L24              | 0.53  | 0.74  | 0.51  | 0.48  | 0.50  |   6.2%    |   0.0%      |  50.0%                  
+  N->F sente->close L24              | 0.62  | 0.81  | 0.50  | 0.41  | 0.42  |   0.0%    |   0.0%      |  50.0%                  
+  N->F sente->sente L24              | 0.70  | 0.89  | 0.50  | 0.41  | 0.44  |   0.0%    |   0.0%      |  50.0%                  
+  F->N opera->opera L24              | 0.35  | 0.72  | 0.51  | 0.39  | 0.44  |   0.0%    |   0.0%      |  50.0%                  
+  F->N opera->sente L24              | 0.17  | 0.59  | 0.49  | 0.93  | 0.94  |   0.0%    |   0.0%      |  50.0%                  
+  F->N first->opera L24              | 0.23  | 0.61  | 0.50  | 0.23  | 0.28  |   0.0%    |   0.0%      |  50.0%                  
+  F->N first->sente L24              | 0.25  | 0.66  | 0.52  | 0.33  | 0.40  |   0.0%    |   0.0%      |  50.0%                  
+  F->N close->opera L24              | 0.28  | 0.57  | 0.51  | 0.40  | 0.48  |   0.0%    |   0.0%      |  50.0%                  
+  F->N close->sente L24              | 0.25  | 0.58  | 0.50  | 0.56  | 0.64  |   0.0%    |   0.0%      |  50.0%                  
+  F->N sente->opera L24              | 0.33  | 0.56  | 0.41  | 0.20  | 0.24  |   0.0%    |  12.5%      |  37.5%                  
+  F->N sente->sente L24              | 0.42  | 0.60  | 0.45  | 0.32  | 0.40  |   0.0%    |  50.0%      |  50.0%                  
+
+  --- OLMo 2 7B per-direction aggregate (mean over 80 cells) ---
+    F->N  n= 40  agree-all= 12.5%  agree-arity= 19.5%  agree-arity-arity= 49.2%  <M4c>=0.51  <M4b>=0.49
+    N->F  n= 40  agree-all= 40.9%  agree-arity= 23.4%  agree-arity-arity= 50.2%  <M4c>=0.71  <M4b>=0.50
+
+  --- OLMo 2 7B per-layer aggregate (mean over anchor pairs x directions) ---
+    L 4    n= 16  agree-all= 32.8%  agree-arity= 33.2%  agree-arity-arity= 50.0%  <M4c>=0.79  <M4b>=0.50
+    L 7    n= 16  agree-all= 27.7%  agree-arity= 27.7%  agree-arity-arity= 49.6%  <M4c>=0.49  <M4b>=0.50
+    L10    n= 16  agree-all= 41.0%  agree-arity= 27.0%  agree-arity-arity= 50.4%  <M4c>=0.66  <M4b>=0.49
+    L16    n= 16  agree-all= 29.7%  agree-arity= 15.2%  agree-arity-arity= 49.6%  <M4c>=0.63  <M4b>=0.50
+    L24    n= 16  agree-all=  2.3%  agree-arity=  4.3%  agree-arity-arity= 48.8%  <M4c>=0.50  <M4b>=0.49
+
+  --- OLMo 2 7B concentration partition (distributed M4c<0.7 vs collapsed M4c>=0.7) ---
+    distributed n= 49  agree-all= 14.8%  agree-arity= 15.6%  agree-arity-arity= 49.6%
+    collapsed   n= 31  agree-all= 45.6%  agree-arity= 30.8%  agree-arity-arity= 49.8%
+
+  --- OLMo 2 7B per-word breakdown at the top-3 most-distributed cells (M4c < 0.7, pwmin < 0.95) ---
+
+    >> F->N first->sente L 7   M2c=0.34  M2a=0.66  M4b=0.50  M4c=0.16  pwmin=0.22
+       agree-all=  6.2%  agree-arity=  6.2%  agree-arity-arity= 62.5%
+       word     | intended     | probe top    | sim-all top  | sim-arity top  | flags
+       ------------------------------------------------------------------------------------------
+       bliq     | and          | unless       | nand         | nand           | 
+       dren     | or           | negate       | nand         | nand           | 
+       molex    | implies      | implies      | nand         | nand           | 
+       krev     | and          | negate       | nand         | nand           | 
+       sond     | or           | implies      | nand         | nand           | 
+       glin     | implies      | implies      | nand         | nand           | 
+       twiv     | and          | implies      | nand         | nand           | 
+       fump     | or           | negate       | negate       | nand           | =A
+       vusp     | not          | implies      | nand         | negate         | 
+       perph    | necessarily  | implies      | nand         | negate         | 
+       kelm     | not          | implies      | nand         | negate         | 
+       zorf     | not          | unprovably   | nand         | negate         | 
+       gleph    | necessarily  | negate       | nand         | negate         | =R
+       drelth   | necessarily  | unprovably   | nand         | negate         | 
+       vrith    | not          | unprovably   | nand         | negate         | 
+       nilph    | necessarily  | unprovably   | nand         | negate         | 
+
+    >> F->N sente->opera L24   M2c=0.33  M2a=0.56  M4b=0.41  M4c=0.20  pwmin=0.24
+       agree-all=  0.0%  agree-arity= 12.5%  agree-arity-arity= 37.5%
+       word     | intended     | probe top    | sim-all top  | sim-arity top  | flags
+       ------------------------------------------------------------------------------------------
+       bliq     | and          | not          | nand         | nand           | 
+       dren     | or           | not          | nand         | nand           | 
+       molex    | implies      | not          | nand         | nand           | 
+       krev     | and          | not          | nand         | nand           | 
+       sond     | or           | not          | nand         | nand           | 
+       glin     | implies      | or           | nand         | nand           | 
+       twiv     | and          | not          | nand         | nand           | 
+       fump     | or           | not          | negate       | nand           | 
+       vusp     | not          | or           | nand         | negate         | 
+       perph    | necessarily  | not          | nand         | negate         | 
+       kelm     | not          | not          | nand         | negate         | 
+       zorf     | not          | not          | nand         | negate         | 
+       gleph    | necessarily  | negate       | nand         | negate         | =R
+       drelth   | necessarily  | nor          | nand         | negate         | 
+       vrith    | not          | or           | nand         | negate         | 
+       nilph    | necessarily  | negate       | nand         | negate         | =R
+
+    >> N->F opera->first L 7   M2c=0.85  M2a=0.89  M4b=0.46  M4c=0.21  pwmin=0.28
+       agree-all= 37.5%  agree-arity= 18.8%  agree-arity-arity= 43.8%
+       word     | intended     | probe top    | sim-all top  | sim-arity top  | flags
+       ------------------------------------------------------------------------------------------
+       bliq     | and          | nand         | nand         | nand           | =A =R
+       dren     | or           | not          | nand         | nand           | 
+       molex    | implies      | implies      | nand         | nand           | 
+       krev     | and          | implies      | nand         | nand           | 
+       sond     | or           | and          | nand         | nand           | 
+       glin     | implies      | nand         | nand         | nand           | =A =R
+       twiv     | and          | and          | nand         | nand           | 
+       fump     | or           | negate       | nand         | nand           | 
+       vusp     | not          | implies      | nand         | always         | 
+       perph    | necessarily  | implies      | nand         | not            | 
+       kelm     | not          | and          | nand         | not            | 
+       zorf     | not          | nand         | nand         | negate         | =A
+       gleph    | necessarily  | nand         | nand         | not            | =A
+       drelth   | necessarily  | nand         | nand         | not            | =A
+       vrith    | not          | nand         | nand         | not            | =A
+       nilph    | necessarily  | negate       | nand         | negate         | =R
+
+  --- OLMo 2 7B bootstrap 95% CIs on agreement (B=50, resample invented set with replacement) ---
+    agree-all           mean =  26.2%  95% CI = [ 24.1%,  28.5%]
+    agree-arity         mean =  21.6%  95% CI = [ 19.2%,  24.4%]
+    agree-arity_arity   mean =  50.5%  95% CI = [ 43.8%,  57.4%]
+
+  OLMo 2 7B done in 18s
+
+  total wall-clock: 23s
