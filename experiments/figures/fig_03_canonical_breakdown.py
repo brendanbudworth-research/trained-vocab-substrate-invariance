@@ -123,7 +123,11 @@ def main():
         plt.Rectangle((0, 0), 1, 1, color=color_unary, label="unary canonical"),
         plt.Rectangle((0, 0), 1, 1, color=color_binary, label="binary canonical"),
     ]
-    axes[-1].legend(handles=handles, loc="upper right", fontsize=8)
+    # Place legend below the panels (out of the way of any 100% bar that
+    # may extend to the top of any axes; v6 in particular collapses to
+    # `unprovably` at 100% on the right edge of the panel).
+    fig.legend(handles=handles, loc="lower center", ncol=2,
+               bbox_to_anchor=(0.5, -0.04), fontsize=9, frameon=False)
 
     fig.suptitle(
         "Figure 3. Per-canonical breakdown of invented-word predictions at "
@@ -133,7 +137,7 @@ def main():
         "v5 and v6 collapse 100% to a single attractor (`nand` / `unprovably`).",
         fontsize=8.5, y=1.04,
     )
-    fig.tight_layout()
+    fig.tight_layout(rect=(0, 0.04, 1, 1))
     save_figure(fig, "fig_03_canonical_breakdown")
 
 

@@ -1708,6 +1708,93 @@ Probe within-condition CV at the same cells: `M1n` = 0.999 / 0.959 / 1.000; `M1f
 
 **Net §3.7.20 verdict.** Fact 1 reframes to *trained-vocabulary substrate-invariance*: cross-notation linear-probe geometry transfers at ceiling for any well-tokenized word in the model's training vocabulary, at the operator-after anchor in the early-to-mid layers (L 4 in Gemma, L 4-L 10 in OLMo and Pythia), in the N→F direction, in all three model families. The "operator-set-bound" framing is updated; the negative Fact 2 (novel-operator generalisation failure) is preserved. The paper.md title, abstract, §1 intro, §4.1, §5.1, §6, and §7 require corresponding updates.
 
+#### 3.7.21 Pre-registration criterion-drift reconciliation (script 24b)
+
+**Trigger.** External-review round 1 (2026-05-21) flagged a mismatch between the v6 pre-registration's PASS-arity criterion and the running v6 sweep code's PASS-arity criterion. The reviewer's observation: "a reader comparing the public preregistration_v6.md against paper.md §3.5 could conclude that the preregistered threshold was rewritten after analysis". The mismatch is real.
+
+**The two criteria.**
+
+- **Frozen pre-registered criterion (`experiments/preregistration_v6.md` §5, dated 2026-05-20, before any v6 extraction):**
+
+  `M2-arity ≥ 0.65 ∧ M4b ≥ 0.65 ∧ max_c p_c ≤ 0.85 ∧ M4a ∈ [0.20, 0.80] ∧ pwmin < 0.95`
+
+  where `max_c p_c` is the maximum share of invented mass on any single canonical (a max-fraction concentration statistic).
+
+- **Running-code criterion (`experiments/24_v6_canonical_expansion.py` lines 230-233, 941-943):**
+
+  `M2-arity ≥ 0.65 ∧ M4b ≥ 0.65 ∧ HHI < 0.70 ∧ M4a ∈ [0.10, 0.90] ∧ pwmin < 0.95`
+
+  where `HHI = Σ_c p_c²` is the Herfindahl-Hirschman concentration index (which equals `1/K ≈ 0.067` at uniform routing for K = 15 canonicals and 1 at single-canonical collapse, with intermediate "distributed" routing flagged at `< 0.70`).
+
+The drift between the two criteria affects two of the five PASS-arity conjuncts: the M4c statistic (max-fraction vs HHI) and the M4a balanced-arity band ([0.20, 0.80] vs [0.10, 0.90]). The drift was discovered post-extraction at external-review time, not pre-extraction; the most likely root cause is a refactor during script-24 development from the script-23 v5 codepath (which used max-fraction) to the v6 codepath (which adopted HHI as a tighter "distributed routing" concentration measure), without the running code being explicitly synced to the §3.5 prose of the manuscript.
+
+**The reconciliation experiment (script 24b).** `experiments/24b_frozen_criterion_rederivation.py` reuses script 24's `Scope`, `SweepCell`, `run_cell`, and `enumerate_cells` machinery unchanged (so probe fits, M4 breakdowns, lucky-default detection, and cell-cell ordering are byte-identical to the principal v6 sweep) and re-applies BOTH criteria to every cell. Output: `experiments/outputs/24b_20260521_120258.log`. Runtime: ~30 min total on CPU across the three models, dominated by sklearn LogisticRegression refits.
+
+**Headline result.** The v6 P_RETRACT verdict is identical under both criteria in all three model families:
+
+| Model | v6 PASS-arity cells (running) | v6 PASS-arity cells (frozen) | Disagreement |
+|---|---|---|---|
+| Gemma 2 9B | 2 (`N→F opera→close L 2` M4b=82.3%, `N→F sente→close L 2` M4b=66.2%) | 2 (same cells) | 0 |
+| OLMo 2 7B | 0 | 0 | 0 |
+| Pythia 6.9B-d | 0 | 0 | 0 |
+
+The two Gemma emergent PASS-arity cells (§3.7.16 / §4.5 Cell 1 + Cell 3) are PASS-arity under both criteria. The OLMo and Pythia v6 "zero PASS-arity cells" P_RETRACT verdict holds under both. The headline of the paper is unchanged.
+
+**The one verdict disagreement anywhere in the 4-scope × 3-model sweep.** Pythia v3 `N→F opera→close L 16` is PASS-arity under the running criterion (M4a = 0.192 is within [0.10, 0.90]) but ARITY-AXIS-ONLY under the frozen criterion (M4a = 0.192 < 0.20). M2-arity = 1.000, M4b = 0.744, max-c = 0.778, HHI = 0.64, pwmin = 0.84 — none of these differ between criteria; the verdict flip is driven entirely by the M4a band width.
+
+The disagreement is therefore **driven by the M4a balanced-arity band, not the M4c concentration definition**. Substantively: the pre-registration's [0.20, 0.80] band is the tighter "balanced-arity routing" requirement (invented mass must be at least 20% / at most 80% in either arity class for the cell to count as substantively-balanced), while the running code's [0.10, 0.90] band admits cells with up to 10% / 90% arity-class skew. Pythia v3 L 16 sits in the 10%-19% unary-mass corner of this difference: the cell routes 80.8% of invented mass to binary canonicals and only 19.2% to unary canonicals — formally "balanced enough" under running, "unary-mass-deficient" under frozen.
+
+**Cross-scope retraction-chain comparison.** All v3 PASS-arity candidates retract by v5 or v6 under both criteria:
+
+- **Gemma 2 9B**: 2 v3 PASS-arity cells (`opera→first L 4`, `sente→first L 8`) retract to M2A-ONLY by v4 under both criteria; not survivors at v5 or v6.
+
+- **OLMo 2 7B**: 3 v3 PASS-arity cells (`F→N first→opera L 7`, `N→F sente→close L 10`, `N→F opera→close L 24`). Under both criteria: `F→N first→opera L 7` retracts to M2A-ONLY at v4; `sente→close L 10` survives v4 PASS-arity then collapses to LUCKY-NEG at v5 (single-canonical `nand` collapse, the lucky-default-detector signature); `opera→close L 24` survives v4 then retracts to M2A-ONLY at v5.
+
+- **Pythia 6.9B-d**: 3 frozen v3 PASS-arity cells (`opera→close L 4`, `opera→close L 7`, `sente→close L 10`) + 1 running-only cell (`opera→close L 16`). Under both criteria, all retract by v5: `opera→close L 4` → M2A-ONLY at v5; `opera→close L 7` → M2A-ONLY at v5; `sente→close L 10` → LUCKY-NEG at v5 (M4c = HHI 1.00 = max-c 1.00 single-canonical collapse, pwmin = 0.98) then M2A-ONLY at v6 (the v5→v6 differential is because v6 adds enough canonicals that the routing distributes again, but M4b stays at chance 0.500). The `opera→close L 16` running-only cell retracts to M2A-ONLY at v4 under both criteria.
+
+**Headline retraction-chain candidate count.** Under the frozen pre-registered criterion: 2 Gemma + 3 OLMo + 3 Pythia v3 PASS-arity cells = **8 retracted PASS-arity candidates total**, all retracting by v5 or v6. Under the running-code criterion: 2 + 3 + 4 = 9 cells, with the additional cell being the Pythia v3 L 16 case. Paper.md §4.3 uses the frozen count (8 cells) as the criterion-of-record and reports the running-only L 16 cell as a §3.5 criterion-drift footnote.
+
+**Reconciliation with the pre-pre-registration Phase 1 sweep (script 22b).** The Phase 1 (script 22b) sweep on its own pre-v6 caches flagged a related but not byte-identical four-cell candidate set: OLMo `N→F sente→close L 10`, Gemma `N→F sente→first L 8`, Gemma `N→F sente→opera L 4`, OLMo `F→N first→opera L 7`. Comparing against the v6-pipeline v3 replay (24b): 3 of 4 Phase 1 cells reappear (OLMo sente→close L 10 ✓, OLMo first→opera L 7 ✓, Gemma sente→first L 8 ✓); the fourth Phase 1 cell (Gemma `sente→opera L 4`, M4b = 0.669 borderline in 22c) does not pass the v6-pipeline frozen criterion at v3. The v6-pipeline replay additionally identifies cells the Phase 1 sweep missed: Gemma `opera→first L 4`, OLMo `N→F opera→close L 24`, and all 3 Pythia v3 cells (Phase 1 was OLMo + Gemma only). The lineage discrepancy almost certainly traces to stimulus-generation seed differences between script 22b's pre-pre-registration extraction and script 24's v6 extraction. The paper adopts the v6-pipeline list as the published headline (criterion-of-record) and retains the Phase 1 narrative only in this lab-notes lineage.
+
+**Bottom-line interpretive verdict.** The paper's central empirical claims — Fact 1 (ceiling cross-notation transfer for trained vocabulary at the principal cell), Fact 2 (novel-operator generalisation failure under canonical-set expansion in all three models), the v6 P_RETRACT verdict (zero PASS-arity at v6 modulo the two Gemma L 2 emergent cells), and the Gemma 2 9B `opera→close L 2` causally-validated single-model exception — are all robust to which of the two criteria is applied. The criterion-drift, while a real provenance defect, does not change any headline result. The §3.5 amendment in paper.md acknowledges the drift explicitly, adopts the frozen criterion as the criterion-of-record going forward, and forward-points to this §3.7.21 reconciliation for full details.
+
+**Methodological lesson.** Any pre-registered analysis script should be sanity-checked against the pre-registration text immediately after every code refactor, ideally via an automated assertion that compares the threshold constants in the running code against a parsed copy of the pre-registration. The script 24 → script 24b iteration is a low-cost retrofit of this idea — a cache-only "frozen-criterion replay" that takes ~30 min total on CPU and produces a one-page comparison report — and is a directly transferable methodological device for any project that pre-registers a multi-conjunct PASS verdict on a complex sweep.
+
+#### 3.7.22 Δ_specific per-word bootstrap on Cell 2 (script 25d)
+
+**Trigger.** External-review round 1 flagged the Cell-2 WEAK PASS verdict in paper.md §4.5 (Gemma 2 9B `opera→opera L 4`, the principal cross-family Fact-1 anchor) as sitting at the soft boundary of the 1.3-2× mean-ratio band: behavioural ΔKL exceeds RANDOM_NORM by approximately 1.94× on `not` and 1.29× on `and`, with the `and` ratio just above the lower edge of the heuristic band. The §6 "Causal evidence is partial" paragraph in paper.md flagged the cleaner statistic as `Δ_specific = ΔKL_targeted − ΔKL_random`, bootstrapped per-invented-word across the 16-word set.
+
+**Script 25d.** `experiments/25d_delta_specific_bootstrap.py` parses the per-word ΔKL table from `outputs/25a_20260521_085745.log` (the reviewer-round-1 follow-up run containing Cell 2) and computes:
+
+- per-word `Δ_specific(not) = ΔKL_targeted(not) − ΔKL_random_mean(not)` for each of the 16 invented words
+- per-word `Δ_specific(and) = ΔKL_targeted(and) − ΔKL_random_mean(and)`
+- 95% bootstrap CI on the mean Δ_specific (B = 500 with-replacement resamples over the 16 invented words)
+
+The RANDOM_NORM baseline is the aggregate (16-word) mean from the 25a log's Section (D) summary block. This treats the random-norm baseline as a fixed offset; a more rigorous per-(word, stim) bootstrap would require re-running script 25a with extended per-word RANDOM_NORM logging, which is deferred. Cache-only; runtime < 5 s on CPU; log at `outputs/25d_20260521_132205.log`.
+
+**Result.** Both axes' Δ_specific 95% CIs include zero, marginally on `not` and clearly on `and`:
+
+| Axis | Targeted mean | RANDOM mean | Ratio | Δ_specific mean | Δ_specific 95% CI | Axis verdict |
+|---|---|---|---|---|---|---|
+| `not` | +0.0331 | +0.0170 | 1.95× | +0.0161 | **[−0.001, +0.031]** | borderline (CI just touches 0) |
+| `and` | +0.0274 | +0.0210 | 1.30× | +0.0064 | **[−0.005, +0.020]** | clearly includes 0 |
+
+Per-word breakdown: 13/16 invented words have positive Δ_specific(not); 11/16 have positive Δ_specific(and). Two unary-intended words (`perph`, `kelm`) are strong negative outliers on both axes (−0.056 / −0.031 on `not`, −0.028 / −0.023 on `and`). The mean ratios match the previously-reported 1.94× / 1.29× to two decimals, confirming the parse is correct.
+
+**Implication.** **Cell 2's WEAK PASS verdict does not firm up under per-word Δ_specific bootstrap.** Both axes' 95% CIs straddle zero, marginally on `not` and clearly on `and`. The mean-ratio heuristic that produced the WEAK PASS classification was partly driven by a small number of high-magnitude positive words (`molex`, `krev`, `drelth`, `vrith`); the per-word distribution as a whole does not statistically separate from the RANDOM_NORM baseline at α = 0.05. Under the cleaner statistic, **Cell 2 is AMBIG: real but borderline on `not`, clearly inert on `and`.**
+
+**Reframing the 5-cell sweep headline.** With Cell 2 reclassified from WEAK PASS to AMBIG, the cross-cell pattern becomes:
+
+- **1 CLEAN PASS**: Gemma `opera→close L 2` (v6 emergent, not a Fact-1 anchor)
+- **1 AMBIG**: Gemma `opera→opera L 4` (the principal cross-family Fact-1 anchor under the cleaner statistic; previously WEAK PASS under the mean-ratio heuristic)
+- **3 FAILs**: Gemma `sente→close L 2`, OLMo `sente→close L 10`, OLMo `opera→close L 10`
+
+This **strengthens** the §5.1 "Fact 1's geometric transfer does not uniformly imply causal load-bearingness — and is only weakly causally load-bearing even at its strongest cell" argument. Under the cleaner statistic, the principal cross-family Fact-1 cell does not even cleanly weakly pass: its causal effect on downstream computation is not statistically distinguishable from the norm-matched generic-disruption baseline. The headline becomes: *the cleanest causally-arity-respecting cell is the Gemma v6 emergent cell at L 2 close-paren, not any Fact-1 anchor — and the principal Fact-1 anchor's causal load-bearingness is not robust to a per-word bootstrap*.
+
+**Caveat on the statistic.** The aggregate RANDOM_NORM mean used as the baseline is itself a 16-word sample mean (with its own ~±0.005-0.010 sampling variability). A more rigorous statistic would be a per-(word, stim) bootstrap where the RANDOM_NORM ΔKL is paired with the targeted ΔKL for the same word, controlling for per-word variability in the residual-stream norm and the random-direction draw. We expect this to slightly tighten the CIs (because the per-word random baseline is correlated with the per-word targeted effect through the residual-stream norm) but not to flip the verdict — the `and`-axis ratio is too close to 1.0 to firm up under any reasonable per-word baseline. The per-(word, stim) re-run is a ~6 min MPS follow-up that we list as a paper.md §6 follow-up but do not block submission on.
+
+**Paper.md updates.** Table 5 verdict for Cell 2 updated from `WEAK PASS` to `AMBIG (mean ratio 1.3-2×; Δ_specific 95% CI includes 0 on both axes)`. §4.5 Cell-2 description rewrites the "approximately 1.94× on `not` and 1.29× on `and`" finding to add the Δ_specific bootstrap CI as the criterion-of-record. §5.1 and §7 update the "principal cross-family Fact-1 cell is weakly causally load-bearing" claim to "principal cross-family Fact-1 cell's causal load-bearingness is not robust under per-word Δ_specific bootstrap (95% CI [-0.001, +0.031] on `not`, [-0.005, +0.020] on `and`)". §6 "Causal evidence is partial" replaces the named follow-up with a reference to script 25d and lists the per-(word, stim) RANDOM_NORM re-run as the remaining cheap follow-up.
+
 ### 4.4 Methodological lessons
 
 Six methodological findings worth flagging. The sixth (the lucky-default detector) is the principal methodological contribution of this project and warrants particular emphasis: it is the refinement that prevented us from publishing four false-positive PASS-arity cells in §3.7.11, and it is directly transferable to any probe-based substrate-invariance study that reports per-word intended-class agreement metrics.

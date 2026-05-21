@@ -1,0 +1,169 @@
+[24b] start = 2026-05-21 12:02:58
+
+Running-code criterion (script 24):
+  M2-arity >= 0.65, M4b >= 0.65, M4c (HHI) < 0.70, 0.10 <= M4a <= 0.90, pwmin < 0.95
+Frozen pre-registered criterion (preregistration_v6.md §5):
+  M2-arity >= 0.65, M4b >= 0.65, M4c (max fraction) <= 0.85, 0.20 <= M4a <= 0.80, pwmin < 0.95
+
+
+####################################################################################################
+# Gemma 2 9B
+####################################################################################################
+    [cache hit] 24_Gemma_2_9B_NEUTRAL_npc50_v6-expanded-canonical.npz canon=(2, 750, 43, 3584), inv=(2, 800, 43, 3584)
+    [cache hit] 24_Gemma_2_9B_FUNC-PFX_npc50_v6-expanded-canonical.npz canon=(4, 750, 43, 3584), inv=(4, 800, 43, 3584)
+  scope v3: 80 cells in 68.4s -- PASS-arity (running) = 2, PASS-arity (frozen) = 2, verdict diffs = 0
+  scope v4: 80 cells in 68.9s -- PASS-arity (running) = 0, PASS-arity (frozen) = 0, verdict diffs = 0
+  scope v5: 80 cells in 200.0s -- PASS-arity (running) = 0, PASS-arity (frozen) = 0, verdict diffs = 0
+  scope v6: 80 cells in 342.3s -- PASS-arity (running) = 2, PASS-arity (frozen) = 2, verdict diffs = 0
+
+####################################################################################################
+# OLMo 2 7B
+####################################################################################################
+    [cache hit] 24_OLMo_2_7B_NEUTRAL_npc50_v6-expanded-canonical.npz canon=(2, 750, 33, 4096), inv=(2, 800, 33, 4096)
+    [cache hit] 24_OLMo_2_7B_FUNC-PFX_npc50_v6-expanded-canonical.npz canon=(4, 750, 33, 4096), inv=(4, 800, 33, 4096)
+  scope v3: 80 cells in 42.1s -- PASS-arity (running) = 3, PASS-arity (frozen) = 3, verdict diffs = 0
+  scope v4: 80 cells in 42.4s -- PASS-arity (running) = 3, PASS-arity (frozen) = 3, verdict diffs = 0
+  scope v5: 80 cells in 112.2s -- PASS-arity (running) = 0, PASS-arity (frozen) = 0, verdict diffs = 0
+  scope v6: 80 cells in 194.8s -- PASS-arity (running) = 0, PASS-arity (frozen) = 0, verdict diffs = 0
+
+####################################################################################################
+# Pythia 6.9B-deduped
+####################################################################################################
+    [cache hit] 24_Pythia_6.9B-deduped_NEUTRAL_npc50_v6-expanded-canonical.npz canon=(2, 750, 33, 4096), inv=(2, 800, 33, 4096)
+    [cache hit] 24_Pythia_6.9B-deduped_FUNC-PFX_npc50_v6-expanded-canonical.npz canon=(4, 750, 33, 4096), inv=(4, 800, 33, 4096)
+  scope v3: 80 cells in 98.4s -- PASS-arity (running) = 4, PASS-arity (frozen) = 3, verdict diffs = 1
+  scope v4: 80 cells in 98.5s -- PASS-arity (running) = 3, PASS-arity (frozen) = 3, verdict diffs = 0
+  scope v5: 80 cells in 285.7s -- PASS-arity (running) = 0, PASS-arity (frozen) = 0, verdict diffs = 0
+  scope v6: 80 cells in 460.6s -- PASS-arity (running) = 0, PASS-arity (frozen) = 0, verdict diffs = 0
+
+====================================================================================================
+  Gemma 2 9B -- per-scope PASS-arity counts under both criteria
+====================================================================================================
+  scope | cells |   running |   frozen | verdict-diff
+  --------------------------------------------------
+  v3    |    80 |         2 |        2 |            0
+  v4    |    80 |         0 |        0 |            0
+  v5    |    80 |         0 |        0 |            0
+  v6    |    80 |         2 |        2 |            0
+
+  Cells PASS-arity under EITHER criterion (any scope):
+  cell                             |   M2a |   M4b | M4c-HHI |  max-c |   M4a | pwmin | running         | frozen         
+  ----------------------------------------------------------------------------------------------------------------------------------
+  v3 N->F opera->first L 4         | 0.968 | 0.672 |   0.279 |  0.384 | 0.216 | 0.460 | PASS-arity      | PASS-arity     
+  v3 N->F sente->first L 8         | 1.000 | 0.696 |   0.510 |  0.616 | 0.360 | 0.540 | PASS-arity      | PASS-arity     
+  v6 N->F opera->close L 2         | 0.841 | 0.823 |   0.422 |  0.557 | 0.323 | 0.440 | PASS-arity      | PASS-arity     
+  v6 N->F sente->close L 2         | 0.832 | 0.662 |   0.582 |  0.703 | 0.297 | 0.600 | PASS-arity      | PASS-arity     
+
+====================================================================================================
+  OLMo 2 7B -- per-scope PASS-arity counts under both criteria
+====================================================================================================
+  scope | cells |   running |   frozen | verdict-diff
+  --------------------------------------------------
+  v3    |    80 |         3 |        3 |            0
+  v4    |    80 |         3 |        3 |            0
+  v5    |    80 |         0 |        0 |            0
+  v6    |    80 |         0 |        0 |            0
+
+  Cells PASS-arity under EITHER criterion (any scope):
+  cell                             |   M2a |   M4b | M4c-HHI |  max-c |   M4a | pwmin | running         | frozen         
+  ----------------------------------------------------------------------------------------------------------------------------------
+  v3 F->N first->opera L 7         | 0.984 | 0.696 |   0.343 |  0.408 | 0.584 | 0.520 | PASS-arity      | PASS-arity     
+  v3 N->F sente->close L10         | 1.000 | 0.880 |   0.570 |  0.704 | 0.296 | 0.560 | PASS-arity      | PASS-arity     
+  v3 N->F opera->close L24         | 0.988 | 0.768 |   0.644 |  0.768 | 0.232 | 0.840 | PASS-arity      | PASS-arity     
+  v4 N->F sente->close L 4         | 0.800 | 0.749 |   0.626 |  0.751 | 0.751 | 0.660 | PASS-arity      | PASS-arity     
+  v4 N->F sente->close L10         | 1.000 | 0.777 |   0.532 |  0.682 | 0.318 | 0.520 | PASS-arity      | PASS-arity     
+  v4 N->F opera->close L24         | 0.988 | 0.654 |   0.614 |  0.739 | 0.261 | 0.700 | PASS-arity      | PASS-arity     
+
+====================================================================================================
+  Pythia 6.9B-deduped -- per-scope PASS-arity counts under both criteria
+====================================================================================================
+  scope | cells |   running |   frozen | verdict-diff
+  --------------------------------------------------
+  v3    |    80 |         4 |        3 |            1
+  v4    |    80 |         3 |        3 |            0
+  v5    |    80 |         0 |        0 |            0
+  v6    |    80 |         0 |        0 |            0
+
+  Cells PASS-arity under EITHER criterion (any scope):
+  cell                             |   M2a |   M4b | M4c-HHI |  max-c |   M4a | pwmin | running         | frozen         
+  ----------------------------------------------------------------------------------------------------------------------------------
+  v3 N->F opera->close L 4         | 0.948 | 0.684 |   0.443 |  0.524 | 0.524 | 0.480 | PASS-arity      | PASS-arity     
+  v3 N->F opera->close L 7         | 1.000 | 0.860 |   0.546 |  0.656 | 0.340 | 0.640 | PASS-arity      | PASS-arity     
+  v3 N->F sente->close L10         | 1.000 | 0.664 |   0.371 |  0.504 | 0.672 | 0.600 | PASS-arity      | PASS-arity     
+  v3 N->F opera->close L16         | 1.000 | 0.744 |   0.640 |  0.776 | 0.192 | 0.840 | PASS-arity      | ARITY-AXIS-ONLY
+  v4 N->F opera->close L 4         | 0.948 | 0.734 |   0.445 |  0.539 | 0.539 | 0.480 | PASS-arity      | PASS-arity     
+  v4 N->F opera->close L 7         | 1.000 | 0.764 |   0.549 |  0.660 | 0.336 | 0.600 | PASS-arity      | PASS-arity     
+  v4 N->F sente->close L10         | 1.000 | 0.725 |   0.370 |  0.516 | 0.695 | 0.500 | PASS-arity      | PASS-arity     
+
+
+========================================================================================================================
+  HEADLINE: PASS-arity verdict robustness under both criteria
+========================================================================================================================
+  Model                  | v6 PASS (running)  | v6 PASS (frozen)  | verdict
+  ----------------------------------------------------------------------------------------------------
+  Gemma 2 9B             | 2                  | 2                 | consistent
+  OLMo 2 7B              | 0                  | 0                 | consistent
+  Pythia 6.9B-deduped    | 0                  | 0                 | consistent
+
+  >> No criterion-drift impact: the headline PASS-arity verdicts are robust to which M4c definition is used in all three model families.
+
+
+========================================================================================================================
+  CROSS-SCOPE RETRACTION CHAIN (per-criterion)
+========================================================================================================================
+  For each cell that is PASS-arity at v3 under EITHER criterion, show its v3-v4-v5-v6 verdict trajectory under both.
+
+  Gemma 2 9B:
+    N->F opera->first L 4:
+      v3: running=PASS-arity      frozen=PASS-arity      M2a=0.968 M4b=0.672 HHI=0.28 max-c=0.38 M4a=0.22 pwmin=0.46
+      v4: running=M2A-ONLY        frozen=M2A-ONLY        M2a=0.968 M4b=0.581 HHI=0.28 max-c=0.34 M4a=0.16 pwmin=0.36
+      v5: running=M2A-ONLY        frozen=M2A-ONLY        M2a=0.978 M4b=0.496 HHI=0.48 max-c=0.62 M4a=0.06 pwmin=0.48
+      v6: running=M2A-ONLY        frozen=M2A-ONLY        M2a=0.985 M4b=0.609 HHI=0.37 max-c=0.48 M4a=0.48 pwmin=0.52
+    N->F sente->first L 8:
+      v3: running=PASS-arity      frozen=PASS-arity      M2a=1.000 M4b=0.696 HHI=0.51 max-c=0.62 M4a=0.36 pwmin=0.54
+      v4: running=M2A-ONLY        frozen=M2A-ONLY        M2a=1.000 M4b=0.550 HHI=0.51 max-c=0.62 M4a=0.37 pwmin=0.48
+      v5: running=M2A-ONLY        frozen=M2A-ONLY        M2a=0.928 M4b=0.586 HHI=0.50 max-c=0.68 M4a=0.09 pwmin=0.32
+      v6: running=M2A-ONLY        frozen=M2A-ONLY        M2a=0.933 M4b=0.537 HHI=0.54 max-c=0.72 M4a=0.06 pwmin=0.30
+
+  OLMo 2 7B:
+    F->N first->opera L 7:
+      v3: running=PASS-arity      frozen=PASS-arity      M2a=0.984 M4b=0.696 HHI=0.34 max-c=0.41 M4a=0.58 pwmin=0.52
+      v4: running=M2A-ONLY        frozen=M2A-ONLY        M2a=0.984 M4b=0.583 HHI=0.35 max-c=0.44 M4a=0.55 pwmin=0.50
+      v5: running=M2A-ONLY        frozen=M2A-ONLY        M2a=0.888 M4b=0.574 HHI=0.27 max-c=0.37 M4a=0.57 pwmin=0.32
+      v6: running=M2A-ONLY        frozen=M2A-ONLY        M2a=0.881 M4b=0.547 HHI=0.24 max-c=0.40 M4a=0.51 pwmin=0.28
+    N->F sente->close L10:
+      v3: running=PASS-arity      frozen=PASS-arity      M2a=1.000 M4b=0.880 HHI=0.57 max-c=0.70 M4a=0.30 pwmin=0.56
+      v4: running=PASS-arity      frozen=PASS-arity      M2a=1.000 M4b=0.777 HHI=0.53 max-c=0.68 M4a=0.32 pwmin=0.52
+      v5: running=LUCKY-NEG       frozen=LUCKY-NEG       M2a=1.000 M4b=0.500 HHI=1.00 max-c=1.00 M4a=0.00 pwmin=1.00
+      v6: running=LUCKY-NEG       frozen=LUCKY-NEG       M2a=1.000 M4b=0.500 HHI=1.00 max-c=1.00 M4a=0.00 pwmin=1.00
+    N->F opera->close L24:
+      v3: running=PASS-arity      frozen=PASS-arity      M2a=0.988 M4b=0.768 HHI=0.64 max-c=0.77 M4a=0.23 pwmin=0.84
+      v4: running=PASS-arity      frozen=PASS-arity      M2a=0.988 M4b=0.654 HHI=0.61 max-c=0.74 M4a=0.26 pwmin=0.70
+      v5: running=M2A-ONLY        frozen=M2A-ONLY        M2a=0.728 M4b=0.482 HHI=0.73 max-c=0.84 M4a=0.02 pwmin=0.56
+      v6: running=M2A-ONLY        frozen=M2A-ONLY        M2a=0.900 M4b=0.486 HHI=0.51 max-c=0.63 M4a=0.01 pwmin=0.46
+
+  Pythia 6.9B-deduped:
+    N->F opera->close L 4:
+      v3: running=PASS-arity      frozen=PASS-arity      M2a=0.948 M4b=0.684 HHI=0.44 max-c=0.52 M4a=0.52 pwmin=0.48
+      v4: running=PASS-arity      frozen=PASS-arity      M2a=0.948 M4b=0.734 HHI=0.45 max-c=0.54 M4a=0.54 pwmin=0.48
+      v5: running=M2A-ONLY        frozen=M2A-ONLY        M2a=0.800 M4b=0.454 HHI=0.48 max-c=0.61 M4a=0.07 pwmin=0.52
+      v6: running=M2A-ONLY        frozen=M2A-ONLY        M2a=0.784 M4b=0.474 HHI=0.48 max-c=0.56 M4a=0.03 pwmin=0.52
+    N->F opera->close L 7:
+      v3: running=PASS-arity      frozen=PASS-arity      M2a=1.000 M4b=0.860 HHI=0.55 max-c=0.66 M4a=0.34 pwmin=0.64
+      v4: running=PASS-arity      frozen=PASS-arity      M2a=1.000 M4b=0.764 HHI=0.55 max-c=0.66 M4a=0.34 pwmin=0.60
+      v5: running=M2A-ONLY        frozen=M2A-ONLY        M2a=0.898 M4b=0.320 HHI=0.37 max-c=0.46 M4a=0.18 pwmin=0.38
+      v6: running=M2A-ONLY        frozen=M2A-ONLY        M2a=0.895 M4b=0.439 HHI=0.46 max-c=0.55 M4a=0.06 pwmin=0.48
+    N->F sente->close L10:
+      v3: running=PASS-arity      frozen=PASS-arity      M2a=1.000 M4b=0.664 HHI=0.37 max-c=0.50 M4a=0.67 pwmin=0.60
+      v4: running=PASS-arity      frozen=PASS-arity      M2a=1.000 M4b=0.725 HHI=0.37 max-c=0.52 M4a=0.69 pwmin=0.50
+      v5: running=LUCKY-NEG       frozen=LUCKY-NEG       M2a=0.926 M4b=0.500 HHI=1.00 max-c=1.00 M4a=0.00 pwmin=0.98
+      v6: running=M2A-ONLY        frozen=M2A-ONLY        M2a=0.741 M4b=0.500 HHI=0.53 max-c=0.62 M4a=0.00 pwmin=0.60
+    N->F opera->close L16:
+      v3: running=PASS-arity      frozen=ARITY-AXIS-ONLY M2a=1.000 M4b=0.744 HHI=0.64 max-c=0.78 M4a=0.19 pwmin=0.84
+      v4: running=M2A-ONLY        frozen=M2A-ONLY        M2a=1.000 M4b=0.570 HHI=0.83 max-c=0.91 M4a=0.09 pwmin=0.84
+      v5: running=M2A-ONLY        frozen=M2A-ONLY        M2a=1.000 M4b=0.500 HHI=0.88 max-c=0.94 M4a=0.00 pwmin=0.68
+      v6: running=M2A-ONLY        frozen=M2A-ONLY        M2a=0.989 M4b=0.510 HHI=0.55 max-c=0.67 M4a=0.01 pwmin=0.52
+
+
+[24b] done = 2026-05-21 12:36:49
+[24b] log saved to /Users/brendan.budworth/dev/thesis/experiments/outputs/24b_20260521_120258.log

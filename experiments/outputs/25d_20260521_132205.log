@@ -1,0 +1,74 @@
+[25d] start = 2026-05-21 13:22:05
+[25d] source log = /Users/brendan.budworth/dev/thesis/experiments/outputs/25a_20260521_085745.log
+[25d] B_BOOTSTRAP = 500, RNG_SEED = 20260522
+
+====================================================================================================
+  PARSED Cell-2 data (Gemma 2 9B)
+  cell label: extra: opera->opera L 4 (principal Fact-1 anchor causal test)
+====================================================================================================
+  16 invented words, per-axis ΔKL recovered from log
+  Aggregate means from log's (D) block:
+    targeted PATCH_not    mean = +0.0330
+    targeted PATCH_and    mean = +0.0270
+    RANDOM_NORM_not       mean = +0.0170
+    RANDOM_NORM_and       mean = +0.0210
+
+  Per-word ΔKL(not): ['+0.029', '+0.039', '+0.085', '+0.064', '+0.039', '+0.031', '-0.003', '+0.032', '+0.056', '-0.039', '-0.011', '+0.029', '+0.021', '+0.056', '+0.050', '+0.052']
+  Per-word ΔKL(and): ['+0.032', '+0.005', '+0.071', '+0.053', '+0.034', '+0.028', '-0.007', '-0.001', '+0.055', '-0.010', '-0.002', '+0.033', '+0.022', '+0.027', '+0.049', '+0.049']
+
+====================================================================================================
+  BOOTSTRAP Δ_specific = ΔKL_targeted - ΔKL_random_mean per axis
+  B = 500 resamples with replacement over the 16 invented words
+====================================================================================================
+
+  Axis: PATCH_not vs RANDOM_NORM_not
+    targeted ΔKL mean        = +0.0331
+    RANDOM_NORM ΔKL mean     = +0.0170
+    targeted / random ratio  = 1.949x
+    Δ_specific mean          = +0.0161
+    Δ_specific 95% CI        = [-0.0007, +0.0309]
+    axis verdict             = FAILS -> CI on Δ_specific includes 0 on this axis
+
+  Axis: PATCH_and vs RANDOM_NORM_and
+    targeted ΔKL mean        = +0.0274
+    RANDOM_NORM ΔKL mean     = +0.0210
+    targeted / random ratio  = 1.304x
+    Δ_specific mean          = +0.0064
+    Δ_specific 95% CI        = [-0.0054, +0.0200]
+    axis verdict             = FAILS -> CI on Δ_specific includes 0 on this axis
+
+====================================================================================================
+  JOINT VERDICT
+====================================================================================================
+  not-axis Δ_specific CI lower bound > 0?  False
+  and-axis Δ_specific CI lower bound > 0?  False
+  >> Cell-2 WEAK PASS verdict FAILS under per-word bootstrap: both axes'
+     Δ_specific 95% CI includes zero. Cell 2 should be downgraded to
+     FAIL in paper.md Table 5 / §4.5 / §6.
+
+====================================================================================================
+  PER-WORD Δ_specific BREAKDOWN
+====================================================================================================
+  word | Δ_specific(not) | Δ_specific(and)
+  ---- | --------------- | ---------------
+  bliq   B  | +0.0120        | +0.0110
+  dren   B  | +0.0220        | -0.0160
+  molex  B  | +0.0680        | +0.0500
+  krev   B  | +0.0470        | +0.0320
+  sond   B  | +0.0220        | +0.0130
+  glin   B  | +0.0140        | +0.0070
+  twiv   B  | -0.0200        | -0.0280
+  fump   B  | +0.0150        | -0.0220
+  vusp   U  | +0.0390        | +0.0340
+  perph  U  | -0.0560        | -0.0310
+  kelm   U  | -0.0280        | -0.0230
+  zorf   U  | +0.0120        | +0.0120
+  gleph  U  | +0.0040        | +0.0010
+  drelth U  | +0.0390        | +0.0060
+  vrith  U  | +0.0330        | +0.0280
+  nilph  U  | +0.0350        | +0.0280
+
+  Per-word Δ_specific > 0:  13/16 on `not`, 11/16 on `and`
+
+[25d] done = 2026-05-21 13:22:05
+[25d] log saved to /Users/brendan.budworth/dev/thesis/experiments/outputs/25d_20260521_132205.log
