@@ -97,16 +97,7 @@ def main():
     axes[0].set_ylabel("agreement (%)")
     axes[-1].legend(loc="lower left", fontsize=8, bbox_to_anchor=(0.02, 0.02))
 
-    fig.suptitle(
-        "Figure 5. Embedding-similarity vs linear-probe agreement across "
-        "L 0 + focus-layers per model. Dotted lines: chance baselines "
-        "(agree-all 6.7%, agree-arity 13%, arity-match 53%). "
-        "Solid horizontal line: pre-registered "
-        "'mechanism gap closed' threshold at 60% for agree-arity. "
-        "L 0 floor (highlighted grey) confirms the operator-region "
-        "attractor is constructed by intermediate-layer processing.",
-        fontsize=8.5, y=1.06,
-    )
+    # No fig.suptitle: LaTeX \caption{} carries the explanatory prose.
     fig.tight_layout()
     save_figure(fig, "fig_05_agreement")
 

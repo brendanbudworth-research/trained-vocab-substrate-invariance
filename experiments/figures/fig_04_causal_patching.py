@@ -6,22 +6,21 @@ Five-panel barplot, one per (source, target, layer) cell tested in script
 "RANDOM_NORM" norm-matched negative control; BASELINE is 0 by construction).
 A patch is causally arity-respecting when the targeted PATCH bar is large
 positive AND clearly exceeds the RANDOM_NORM control on the same reference
-axis. The figure visualises the one CLEAN PASS cell, the one AMBIG cell
-(Cell 2; mean-ratio reading was WEAK PASS but the per-word Δ_specific
-bootstrap reclassifies; script 25d), and the three FAIL cells in side-by-
-side comparison.
+axis. The figure visualises the one CLEAN PASS cell and the four FAIL
+cells side-by-side; Cell 2 is reclassified FAIL by the per-word Δ_specific
+bootstrap (script 25d) after the mean-ratio reading was in the WEAK-PASS
+band.
 
-For Cell 2 (AMBIG), the per-word Δ_specific 95% bootstrap CI is overlaid
-on top of the targeted-PATCH bar on each axis. Both CIs straddle zero
-(`not`: [−0.001, +0.031]; `and`: [−0.005, +0.020]; B = 500 resamples over
-the 16 invented words), which is the central reason the cell is AMBIG
-rather than WEAK PASS.
+For Cell 2, the per-word Δ_specific 95% bootstrap CI is overlaid on top
+of the targeted-PATCH bar on each axis. Both CIs straddle zero (`not`:
+[−0.001, +0.031]; `and`: [−0.005, +0.020]; B = 500 resamples over the 16
+invented words), which is the reason for the FAIL reclassification.
 
 Numbers are the canonical Table 5 values from paper.md §4.5; they are
 hard-coded here so the figure remains the single source of truth even if
 log files are pruned. Log files of record:
   - 25a_20260520_211030.log  (original 3 cells, v2 corrected probe-causality)
-  - 25a_20260521_085745.log  (the two reviewer-extra cells)
+  - 25a_20260521_085745.log  (the two post-review follow-up cells)
   - 25d_20260521_132205.log  (per-word Δ_specific bootstrap on Cell 2)
 """
 
@@ -39,7 +38,7 @@ CELLS = [
      +0.048, +0.038, +0.001, +0.003, "CLEAN PASS", None),
     ("Gemma 2 9B\nopera→opera L 4 (extra)",
      "opera-after", "opera-after", 4,
-     +0.033, +0.027, +0.017, +0.021, "AMBIG",
+     +0.033, +0.027, +0.017, +0.021, "FAIL",
      ((-0.001, +0.031), (-0.005, +0.020))),
     ("Gemma 2 9B\nsente→close L 2",
      "sentence-final", "close-paren", 2,
@@ -54,14 +53,13 @@ CELLS = [
 
 VERDICT_COLOR = {
     "CLEAN PASS": "#1b9e77",
-    "AMBIG":      "#e6ab02",
     "FAIL":       "#888888",
 }
 
 
 def main():
     plt = setup_matplotlib()
-    fig, axes = plt.subplots(1, 5, figsize=(13.5, 3.0), sharey=True)
+    fig, axes = plt.subplots(1, 5, figsize=(14.0, 4.2), sharey=True)
 
     bar_labels = [r"$\Delta\mathrm{KL}_{\,\mathrm{not}}$",
                   r"$\Delta\mathrm{KL}_{\,\mathrm{and}}$"]
@@ -83,7 +81,9 @@ def main():
                color=rnd_color, edgecolor="black", linewidth=0.5,
                hatch="///", label="RANDOM_NORM")
 
-        # Overlay Δ_specific 95% CI for Cell 2 (AMBIG) only.
+        # Overlay Δ_specific 95% CI for Cell 2 only (the one cell with a
+        # bootstrap reading; visualises why Cell 2 is FAIL despite a
+        # mean-ratio reading of 1.3-2x RANDOM_NORM).
         if delta_specific_cis is not None:
             (ci_not_lo, ci_not_hi), (ci_and_lo, ci_and_hi) = delta_specific_cis
             # The Δ_specific CI is "where ΔKL_targeted - ΔKL_random sits at the
@@ -122,17 +122,7 @@ def main():
                        r"(positive $=$ behaviour pulled toward $c$)")
     axes[-1].legend(loc="lower right", fontsize=7.5)
 
-    fig.suptitle(
-        "Figure 4. Causal patching across 5 (source, target, layer) cells. "
-        "Targeted PATCH (coloured) vs. norm-matched RANDOM_NORM control "
-        "(grey, hatched), per reference axis. A cell is causally arity-"
-        "respecting only when targeted ΔKL clearly exceeds RANDOM_NORM on "
-        "the same axis. For Cell 2 (AMBIG) the per-word Δ_specific 95% CI "
-        "is overlaid (black caps); both axes' CIs straddle zero, so the "
-        "mean-ratio WEAK PASS does not firm up under the per-word bootstrap. "
-        "(extra) = reviewer-round-1 follow-up cell.",
-        fontsize=8.5, y=1.04,
-    )
+    # No fig.suptitle: LaTeX \caption{} carries the explanatory prose.
     fig.tight_layout()
     save_figure(fig, "fig_04_causal_patching")
 

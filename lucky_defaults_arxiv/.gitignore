@@ -1,0 +1,20 @@
+# TeX intermediates
+*.aux
+*.bbl
+*.blg
+*.log
+*.out
+*.toc
+*.fdb_latexmk
+*.fls
+*.synctex.gz
+*.nav
+*.snm
+*.vrb
+
+# arXiv bundle
+arxiv_submission.tar.gz
+
+# Editor scratch
+*~
+.DS_Store

@@ -1,0 +1,220 @@
+% References for "Lucky Defaults" methods note.
+%
+% Citations group: probing methodology, calibration / OOD prototypes,
+% activation patching (light context), and the source paper whose v6
+% sweep data the case study draws from.
+
+% ---------------------------------------------------------------------------
+% Probing methodology
+% ---------------------------------------------------------------------------
+
+@inproceedings{alain2017probes,
+  title     = {Understanding intermediate layers using linear classifier probes},
+  author    = {Alain, Guillaume and Bengio, Yoshua},
+  booktitle = {International Conference on Learning Representations (ICLR)
+               Workshop Track},
+  year      = {2017},
+  eprint    = {1610.01644},
+  archivePrefix = {arXiv},
+  primaryClass  = {stat.ML},
+}
+
+@article{belinkov2022probing,
+  title   = {Probing Classifiers: Promises, Shortcomings, and Advances},
+  author  = {Belinkov, Yonatan},
+  journal = {Computational Linguistics},
+  volume  = {48},
+  number  = {1},
+  pages   = {207--219},
+  year    = {2022},
+  doi     = {10.1162/coli_a_00422},
+}
+
+@inproceedings{hewitt2019probes,
+  title     = {Designing and Interpreting Probes with Control Tasks},
+  author    = {Hewitt, John and Liang, Percy},
+  booktitle = {Proceedings of the 2019 Conference on Empirical Methods in
+               Natural Language Processing and the 9th International Joint
+               Conference on Natural Language Processing (EMNLP-IJCNLP)},
+  year      = {2019},
+  pages     = {2733--2743},
+  doi       = {10.18653/v1/D19-1275},
+}
+
+@inproceedings{ravichander2021probing,
+  title     = {Probing the Probing Paradigm: Does Probing Accuracy Entail
+               Task Relevance?},
+  author    = {Ravichander, Abhilasha and Belinkov, Yonatan and Hovy, Eduard},
+  booktitle = {Proceedings of the 16th Conference of the European Chapter of
+               the Association for Computational Linguistics (EACL): Main Volume},
+  year      = {2021},
+  pages     = {3363--3377},
+  doi       = {10.18653/v1/2021.eacl-main.295},
+}
+
+@inproceedings{pimentel2020mdl,
+  title     = {Information-Theoretic Probing for Linguistic Structure},
+  author    = {Pimentel, Tiago and Valvoda, Josef and {Hall Maudslay}, Rowan
+               and Zmigrod, Ran and Williams, Adina and Cotterell, Ryan},
+  booktitle = {Proceedings of the 58th Annual Meeting of the Association for
+               Computational Linguistics (ACL)},
+  year      = {2020},
+  pages     = {4609--4622},
+  doi       = {10.18653/v1/2020.acl-main.420},
+}
+
+
+% ---------------------------------------------------------------------------
+% Calibration and OOD detection (the closest neighbours to the lucky-default
+% phenomenon: classifiers being confidently wrong in OOD regimes)
+% ---------------------------------------------------------------------------
+
+@inproceedings{guo2017calibration,
+  title     = {On Calibration of Modern Neural Networks},
+  author    = {Guo, Chuan and Pleiss, Geoff and Sun, Yu and
+               Weinberger, Kilian Q.},
+  booktitle = {Proceedings of the 34th International Conference on Machine
+               Learning (ICML)},
+  year      = {2017},
+  pages     = {1321--1330},
+  eprint    = {1706.04599},
+  archivePrefix = {arXiv},
+  primaryClass  = {cs.LG},
+}
+
+@inproceedings{hendrycks2017baseline,
+  title     = {A Baseline for Detecting Misclassified and Out-of-Distribution
+               Examples in Neural Networks},
+  author    = {Hendrycks, Dan and Gimpel, Kevin},
+  booktitle = {International Conference on Learning Representations (ICLR)},
+  year      = {2017},
+  eprint    = {1610.02136},
+  archivePrefix = {arXiv},
+  primaryClass  = {cs.NE},
+}
+
+@inproceedings{liang2018odin,
+  title     = {Enhancing The Reliability of Out-of-distribution Image
+               Detection in Neural Networks},
+  author    = {Liang, Shiyu and Li, Yixuan and Srikant, R.},
+  booktitle = {International Conference on Learning Representations (ICLR)},
+  year      = {2018},
+  eprint    = {1706.02690},
+  archivePrefix = {arXiv},
+  primaryClass  = {cs.LG},
+}
+
+@inproceedings{lee2018mahalanobis,
+  title     = {A Simple Unified Framework for Detecting Out-of-Distribution
+               Samples and Adversarial Attacks},
+  author    = {Lee, Kimin and Lee, Kibok and Lee, Honglak and Shin, Jinwoo},
+  booktitle = {Advances in Neural Information Processing Systems (NeurIPS)},
+  volume    = {31},
+  year      = {2018},
+  eprint    = {1807.03888},
+  archivePrefix = {arXiv},
+  primaryClass  = {stat.ML},
+}
+
+
+% ---------------------------------------------------------------------------
+% Prototype / nearest-class-mean classifiers (the mechanism behind
+% lucky-default collapse: each OOD item gets routed to the nearest familiar
+% prototype, and "coarse property of nearest prototype" tracks coarse truth
+% by chance)
+% ---------------------------------------------------------------------------
+
+@inproceedings{snell2017protonets,
+  title     = {Prototypical Networks for Few-shot Learning},
+  author    = {Snell, Jake and Swersky, Kevin and Zemel, Richard},
+  booktitle = {Advances in Neural Information Processing Systems (NeurIPS)},
+  volume    = {30},
+  year      = {2017},
+  eprint    = {1703.05175},
+  archivePrefix = {arXiv},
+  primaryClass  = {cs.LG},
+}
+
+@article{mensink2013ncm,
+  title     = {Distance-Based Image Classification: Generalizing to New
+               Classes at Near-Zero Cost},
+  author    = {Mensink, Thomas and Verbeek, Jakob and Perronnin, Florent
+               and Csurka, Gabriela},
+  journal   = {IEEE Transactions on Pattern Analysis and Machine Intelligence},
+  volume    = {35},
+  number    = {11},
+  pages     = {2624--2637},
+  year      = {2013},
+  doi       = {10.1109/TPAMI.2013.83},
+}
+
+
+% ---------------------------------------------------------------------------
+% Concentration measures (Herfindahl, max-fraction)
+% ---------------------------------------------------------------------------
+
+@article{hirschman1964hhi,
+  title   = {The Paternity of an Index},
+  author  = {Hirschman, Albert O.},
+  journal = {American Economic Review},
+  volume  = {54},
+  number  = {5},
+  pages   = {761--762},
+  year    = {1964},
+}
+
+
+% ---------------------------------------------------------------------------
+% Activation patching / interpretability (light contextual citations)
+% ---------------------------------------------------------------------------
+
+@misc{heimersheim2024patching,
+  title         = {How to use and interpret activation patching},
+  author        = {Heimersheim, Stefan and Nanda, Neel},
+  year          = {2024},
+  eprint        = {2404.15255},
+  archivePrefix = {arXiv},
+  primaryClass  = {cs.LG},
+}
+
+@inproceedings{zhang2024patchingbest,
+  title         = {Towards Best Practices of Activation Patching in Language Models: Metrics and Methods},
+  author        = {Zhang, Fred and Nanda, Neel},
+  booktitle     = {International Conference on Learning Representations (ICLR)},
+  year          = {2024},
+  eprint        = {2309.16042},
+  archivePrefix = {arXiv},
+  primaryClass  = {cs.LG},
+}
+
+
+% ---------------------------------------------------------------------------
+% Cross-lingual concept transfer (cited in section 5)
+% ---------------------------------------------------------------------------
+
+@inproceedings{dumas2025tongue,
+  title         = {Separating Tongue from Thought: Activation Patching Reveals Language-Agnostic Concept Representations in Transformers},
+  author        = {Dumas, Cl{\'e}ment and Wendler, Chris and Veselovsky, Veniamin and Monea, Giovanni and West, Robert},
+  booktitle     = {Proceedings of the 63rd Annual Meeting of the Association for Computational Linguistics (ACL), Volume 1: Long Papers},
+  year          = {2025},
+  pages         = {31822--31841},
+  address       = {Vienna, Austria},
+  eprint        = {2411.08745},
+  archivePrefix = {arXiv},
+  primaryClass  = {cs.CL},
+  url           = {https://aclanthology.org/2025.acl-long.1536/},
+}
+
+
+% ---------------------------------------------------------------------------
+% Companion paper (case study)
+% ---------------------------------------------------------------------------
+
+@misc{budworth2026substrate,
+  title         = {Trained-vocabulary substrate-invariance in mid-scale language models},
+  author        = {Budworth, Brendan},
+  year          = {2026},
+  howpublished  = {arXiv preprint},
+  note          = {Source repository:
+                   \url{https://github.com/brendanbudworth-research/trained-vocab-substrate-invariance}},
+}

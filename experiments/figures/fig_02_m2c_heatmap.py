@@ -144,13 +144,7 @@ def main():
                    fontsize=9)
     cbar.ax.axhline(0.65, color="red", linewidth=1.0)
 
-    fig.suptitle(
-        "Figure 2. Per-model M2-canonical heatmap across the v6 80-cell sweep. "
-        "Rows = (direction, source→target anchor pair); columns = focus layers. "
-        "The red line in the colourbar marks the M2 PASS gate at 0.65. "
-        "Numbers from outputs/24_20260520_185537.log.",
-        fontsize=8.5, y=0.98,
-    )
+    # No fig.suptitle: LaTeX \caption{} carries the explanatory prose.
     save_figure(fig, "fig_02_m2c_heatmap")
 
 

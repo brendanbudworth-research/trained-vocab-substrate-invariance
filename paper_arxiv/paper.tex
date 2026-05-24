@@ -1,0 +1,2191 @@
+% !TEX program = pdflatex
+% =========================================================================
+% Trained-vocabulary substrate-invariance in mid-scale language models
+% arXiv v1 source. Converted from paper.md (commit e6afe5e + arXiv-v1 polish
+% commit). Build: see README.md in this directory.
+% =========================================================================
+\documentclass[11pt,letterpaper]{article}
+
+% --- core packages -------------------------------------------------------
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{microtype}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{longtable}
+\usepackage{xcolor}
+\usepackage{enumitem}
+\usepackage{caption}
+\captionsetup{font=small,labelfont=bf,labelsep=period}
+\usepackage[round,authoryear]{natbib}
+\bibliographystyle{plainnat}
+\usepackage{rotating}            % sidewaystable for wide tables
+\usepackage[hidelinks,breaklinks]{hyperref}
+
+% --- notation shortcuts --------------------------------------------------
+\newcommand{\dkl}{\ensuremath{\Delta\mathrm{KL}}}
+\newcommand{\dspec}{\ensuremath{\Delta_{\text{specific}}}}
+\newcommand{\NtoF}{\ensuremath{\mathrm{N}\!\to\!\mathrm{F}}}
+\newcommand{\FtoN}{\ensuremath{\mathrm{F}\!\to\!\mathrm{N}}}
+% Metric labels: keep all of {M1, M2, M3, M4a, M4b, M4c, pwmin} in the same
+% plain-text shape (the v1 draft used \textsc for M2/M4 and plain text for
+% the rest, which was visually inconsistent when both appeared in the same
+% sentence).
+\newcommand{\Mc}{M2-canonical}
+\newcommand{\Ma}{M2-arity}
+\newcommand{\Mbfb}{M4b}
+\newcommand{\Mbfc}{M4c}
+\newcommand{\pwmin}{\ensuremath{p_{w,\min}}}
+
+\setlist{itemsep=2pt,topsep=4pt,parsep=0pt}
+
+% Be more tolerant of long unbreakable \texttt{}-filenames bleeding into
+% the right margin rather than overflowing.
+\setlength{\emergencystretch}{5em}
+
+% --- title block ---------------------------------------------------------
+\title{Trained-vocabulary substrate-invariance in mid-scale language models}
+
+\author{%
+  Brendan Budworth\\
+  Independent\\
+  \texttt{brendan.budworth@protonmail.com}\\[2pt]
+  {\small Code \& data:
+   \href{https://github.com/brendanbudworth-research/trained-vocab-substrate-invariance}%
+        {\texttt{github.com/brendanbudworth-research/trained-vocab-substrate-invariance}}}%
+}
+\date{May 2026}
+
+\begin{document}
+\maketitle
+
+% =========================================================================
+\begin{abstract}
+\noindent
+Across three open base language models at the 6.9--9B scale (OLMo 2 7B,
+Gemma 2 9B, Pythia 6.9B-deduped) spanning three training corpora,
+architectures, and tokenizers, we test substrate-invariance with
+logic-inspired operator-role stimuli --- a 15-word vocabulary of
+canonical operator labels (\texttt{and}, \texttt{or}, \texttt{not},
+\texttt{implies}, \texttt{necessarily}, \ldots) carrying intended
+binary-vs-unary arity assignments rather than truth-functional semantics
+--- in English-metalinguistic prose and programming-style
+functional-prefix notation. We find a sharp two-part result.
+\textbf{Inside the model's trained vocabulary, cross-notation
+linear-probe geometry transfers at ceiling} in all three families:
+$\Mc = 1.000$ (bootstrap 95\% CI $[1.000, 1.000]$) under a
+pre-registered 15-class readout for logical operators, and --- under a
+pre-specified post-review content-word control inserted into the same
+templates --- $\Mc = 1.000$ ($[1.000, 1.000]$) for 15 non-operator
+content words. The principal transfer geometry is therefore not
+operator-class-specific: it holds at the same principal \NtoF{}
+operator-after cell for a matched non-operator content-word set in all
+three families (with a model-specific OLMo \FtoN{} content-word
+asymmetry that does not propagate to the principal direction;
+\S\ref{sec:contentword}). \textbf{Outside the trained operator set,
+novel-operator generalisation is not robust}: pre-registered
+canonical-set expansion retracts every previously-flagged candidate
+cell, revealing a canonical-attractor compression that no single-axis
+statistic --- training-corpus frequency, subword tokenization shape, or
+mean-pooled cosine similarity --- explains, with one tightly-scoped
+Gemma 2 9B exception at L\,2 close-paren that is causally validated
+under intervention sourced from the operator-after anchor. A 5-cell
+causal-patching sweep produces a structured pattern: one Gemma 2 9B
+cell at L\,2 close-paren is cleanly causally arity-respecting under
+intervention sourced from the operator-after anchor; the principal
+cross-family Fact-1 cell at L\,4 operator-after has mean \dkl{}
+approximately $1.3$--$2\times$ a norm-matched control, but its
+per-word \dspec{} 95\% CI straddles zero on both axes and is
+reclassified FAIL under the cleaner statistic; the OLMo 2 7B
+flagship cell at L\,10 close-paren is causally inert under both tested
+source anchors. Within-target source-anchor flip can produce opposite
+verdicts at identical target and layer, but source anchor is not
+directionally deterministic --- the verdict is the joint product of
+source, target, and layer. We contribute four methodological devices:
+the lucky-default detector, the \Mc{}~/~\Ma{} dissociation, the
+same-target~/~different-source patching protocol, and the
+within-vocabulary content-word control. The two-part result locates a
+precise empirical edge of the Platonic Representation Hypothesis at
+the within-language scale: cross-notation \emph{geometric}
+substrate-invariance for the words the model was trained on, with
+non-uniform and generally modest causal load-bearingness; no
+substrate-independent category that extends to novel members.
+\end{abstract}
+
+% =========================================================================
+\section{Introduction}
+\label{sec:intro}
+
+A widely-discussed hypothesis in modern representation learning
+\citep{huh2024platonic} holds that sufficiently large neural networks
+trained on natural data converge on representations of an underlying
+structure that exists independently of the substrate used to express
+it. If true, this \emph{Platonic Representation Hypothesis} (PRH)
+predicts that surface-form changes which preserve structure should
+produce aligned internal representations --- \emph{substrate-invariance
+under renaming}. The strongest extant evidence for the PRH is
+cross-modal (text vs vision encoders learning aligned representations
+of the same concept). The within-language analog --- does a single
+language model's internal representation of a logically-equivalent
+prompt survive controlled rewriting of the surface form? --- is
+comparatively under-explored, and is the natural intermediate test case.
+
+We probe this intermediate case in three open base language models at
+the 6.9--9B parameter range, selected to span three training corpora,
+three architectures, and three tokenizers. The structural primitive is
+a logic-inspired operator-role vocabulary with assigned arities: a
+small alphabet of operator-role tokens (\texttt{and}, \texttt{or},
+\texttt{not}, \texttt{implies}, \texttt{necessarily}, extensible to
+\texttt{xor}, \texttt{nand}, \texttt{possibly}, \texttt{always},
+\texttt{negate}, \texttt{nor}, \texttt{iff}, \texttt{unless},
+\texttt{definitely}, \texttt{unprovably} for our 15-class readout),
+each carrying an intended binary-vs-unary arity assignment rather than
+a truth-functional semantics. (Several entries --- \texttt{necessarily},
+\texttt{possibly}, \texttt{always}, \texttt{definitely},
+\texttt{unprovably}, \texttt{unless} --- are modal or
+non-truth-functional rather than strictly propositional; we use them
+for their consistent operator-role surface position and intended
+arity, not for any semantic interpretation. The substrate-invariance
+question we ask is whether the model's internal representation of
+these operator-role surface forms transfers across notations under
+controlled rewriting, not whether the model executes any of these
+operators' semantics.) We rewrite the surface form along three
+controlled axes: variable renaming (English $\to$ Greek),
+operator-role-token renaming (canonical $\to$ invented Tier-2 BPE
+words), and notation change (English-metalinguistic prose $\to$
+programming-style functional-prefix). We then ask whether the internal
+representations of the modified stimuli remain aligned with their
+canonical counterparts under a linear-probe instrument, and ---
+separately --- whether any apparent alignment is \emph{causally}
+load-bearing under activation patching.
+
+Our principal findings are two-part. (1) \emph{Trained-vocabulary
+substrate-invariance}: cross-notation linear-probe geometry reaches
+ceiling accuracy under a 15-class readout across three model families,
+with bootstrap 95\% CIs at $[1.000, 1.000]$ after three independent
+scope expansions for logical operators and --- under a pre-specified
+post-review content-word control inserted into syntactically-identical
+templates --- for 15 non-operator content words. Within the tested
+15-word operator readout and the matched 15-word content-word readout,
+cross-notation linear-probe geometry transfers at ceiling for trained,
+well-tokenized vocabulary items at the principal \NtoF{}
+operator-after cell --- the substrate-invariance is therefore not a
+property of logical-operator-class semantics specifically, but a
+per-token-identity property at the tested anchor and direction (with a
+model-specific OLMo \FtoN{} content-word asymmetry).
+
+(2) \emph{Novel-operator generalisation is not robust}: the apparent
+arity-respecting routing of invented operators we observed at earlier
+scopes is retracted under canonical-set expansion in all three model
+families, and the underlying mechanism is a model-specific
+canonical-attractor compression that no single-axis statistic
+(frequency, subword shape, or mean-pooled cosine similarity) captures.
+One tightly-scoped Gemma 2 9B cell at L\,2 close-paren passes causal
+validation under intervention sourced from the operator-after anchor,
+a single-model exception to an otherwise three-family failure pattern.
+
+We additionally report a 5-cell causal-patching sweep that finds Fact 1's
+geometric transfer does \emph{not} imply causal load-bearingness: the
+principal cross-family Fact-1 cell has mean \dkl{} approximately
+$1.3$--$2\times$ a norm-matched control but its per-word \dspec{} 95\%
+CI straddles zero on both axes and is reclassified FAIL under the
+cleaner per-word bootstrap statistic, the OLMo flagship Fact-1 anchor
+is causally inert under both tested source anchors, and the only
+cleanly causally-arity-respecting cell in the sweep is a Gemma v6
+emergent cell at L\,2 close-paren, not a Fact-1 anchor. Within-target
+source-anchor flip \emph{can} produce opposite causal verdicts at
+identical target and layer, motivating same-target~/~different-source
+comparisons as a routine activation-patching diagnostic, but source
+anchor is not deterministic across cells --- the verdict is the joint
+product of source, target, and layer.
+
+The contribution to the PRH literature is a sharp, falsifiable,
+three-family empirical edge: the model has a substrate-independent
+\emph{geometric} (linear-probe-readable) structure for \emph{the words
+it was trained on} --- and not specifically for logical-operator-class
+semantics --- with non-uniform and generally modest causal
+load-bearingness; and lacks a substrate-independent \emph{category} of
+``logical operator'' that would generalise to new instances.
+
+The contribution to mechanistic interpretability methodology is the
+\emph{lucky-default detector} (a per-word top-concentration metric
+that catches a specific false-positive pattern in probe-based
+substrate-invariance studies), the \emph{\Mc{}~/~\Ma{} dissociation}
+(canonical-identity transfer and arity-axis transfer are distinct
+measurements that should be reported separately), the
+\emph{same-target~/~different-source patching protocol} (a routine
+diagnostic that surfaces (source, target)-coupling effects which
+single-anchor-pair patching misses), and the \emph{within-vocabulary
+content-word control} (a pre-specified post-review diagnostic that
+dissociates domain-specific substrate-invariance from generic
+lexical-identity substrate-invariance and is the load-bearing test
+that distinguishes the present claim from ``operator-set-bound'').
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\linewidth]{figures/fig_01_schematic.pdf}
+  \caption{Schematic of the substrate-invariance setup. Canonical
+  (\texttt{and}) and invented (\texttt{bliq}) operators are placed in
+  syntactically-paired NEUTRAL and FUNC-PFX templates. A linear probe
+  trained on NEUTRAL canonical activations is tested at the same
+  (anchor, layer) cell on FUNC-PFX canonical (Fact 1) and FUNC-PFX
+  invented (Fact 2) activations. Bottom strip: the seven-metric
+  battery (\S\ref{sec:battery}).}
+  \label{fig:schematic}
+\end{figure}
+
+% =========================================================================
+\section{Related work}
+\label{sec:related}
+
+\paragraph{The Platonic Representation Hypothesis.}
+\citet{huh2024platonic} introduced the PRH as a unifying framework for
+cross-modal representational convergence in large neural networks.
+Prior work on cross-modal similarity
+\citep{bommasani2022opportunities,radford2021clip} reports increasing
+CKA-like alignment between vision and language encoders at scale. The
+within-language analog has received less attention. The closest
+conceptual neighbour is \citet{dumas2025tongue}'s \emph{Separating
+Tongue from Thought}, which uses activation patching to distinguish
+language-specific from language-agnostic concept representations in
+multilingual LMs --- a cross-language version of the within-language,
+notation-controlled question we ask here. Our work tests
+substrate-invariance under controlled operator renaming as a sharp
+falsifiable PRH prediction in a single language model, across three
+model families.
+
+\paragraph{Probe-based interpretability of language model
+representations.} Linear probes have been a standard interpretability
+instrument since \citet{alain2017probes}; subsequent work has surfaced
+extensive caveats
+\citep{belinkov2022probing,hewitt2019probes,ravichander2021probing}.
+Our \Mc{}~/~\Ma{} dissociation and lucky-default detector contribute
+to this methodological lineage by identifying specific failure modes
+in \emph{cross-context} probe transfer that are not surfaced by
+standard within-context probe accuracy.
+
+\paragraph{Mechanistic interpretability and activation patching.}
+Recent work on activation patching
+\citep{geiger2021causal,meng2022rome,heimersheim2024patching,zhang2024patchingbest}
+has established the method as the standard for causal-grounding
+probe-based findings; \citet{zhang2024patchingbest} \emph{Towards Best
+Practices of Activation Patching in Language Models} specifically
+catalogues how patching verdicts vary with metric and corruption /
+intervention design, and is directly relevant to our \S\ref{sec:limits}
+(a)--(b) limitations on the mean-pool centroid bias and cross-notation
+source-target attention-pattern mismatch. Our causal-patching
+contribution is the \emph{same-target~/~different-source comparison}
+as a routine diagnostic: at a single Gemma 2 9B
+target/layer/probe-causality coordinate, two patches that differ only
+in patch source produce opposite behavioural verdicts
+(\S\ref{sec:causal}, Cells 1 vs 3), but post-review follow-up
+cells (Cells 2, 5) show that source anchor is not directionally
+deterministic across cells --- the verdict is the joint product of
+source, target, and layer (\S\ref{sec:joint}). The transferable
+methodological move is to supplement any single-anchor-pair patch with
+at least one same-target~/~different-source comparison, surfacing
+(source, target)-coupling effects that single-pair patching treats as
+properties of the target representation.
+
+\paragraph{Compositional generalisation in language models.}
+A long-standing target for compositional generalisation
+\citep{lake2018scan,hupkes2020compositionality,saxton2019math} is the
+ability to recombine familiar primitives in novel ways, including with
+novel components. Our novel-operator generalisation failure
+constitutes a precise local report on one specific
+compositional-generalisation edge: cross-notation
+substrate-invariance is preserved at ceiling for trained,
+well-tokenized vocabulary items in the tested 15-operator +
+15-content-word readout sets at the principal \NtoF{} operator-after
+cell (logical operators \emph{and} a pre-specified post-review
+non-operator content-word control; \S\ref{sec:contentword});
+novel-operator role inference is not. We add a three-family
+quantification of how trained-vocabulary cross-notation geometry is
+encoded at the residual-stream level, the demonstration that this
+encoding is bound to the model's trained vocabulary rather than to the
+logical-operator class specifically, and a 5-cell causal-patching
+sweep showing that the geometric transfer's causal load-bearingness is
+not robust under a per-word \dspec{} bootstrap at any Fact-1 anchor we
+have tested.
+
+% =========================================================================
+\section{Methods}
+\label{sec:methods}
+
+\subsection{Stimuli}
+\label{sec:stimuli}
+
+We construct logic-inspired operator-role stimuli in two notations.
+The operator-role vocabulary is described in \S\ref{sec:intro}; we
+treat the 15 canonicals as fixed-arity surface-form labels (not
+truth-functional operators) throughout.
+
+\paragraph{NEUTRAL (English-metalinguistic).} Templates frame operators
+as words to be considered: e.g., \texttt{"Consider the symbol and in
+this expression."} or \texttt{"The token implies appears between two
+propositions."} 50 templates per canonical operator; templates are
+generated from a fixed template family with stable-seed sampling so
+that stimulus sets are reproducible across runs.
+
+\paragraph{FUNC-PFX (functional-prefix).} Templates frame operators as
+function calls: e.g., \texttt{"The function and(p, q) evaluates to
+either true or false."} All canonicals --- binaries (\texttt{and},
+\texttt{or}, \texttt{xor}, \texttt{nand}, \texttt{implies},
+\texttt{nor}, \texttt{iff}, \texttt{unless}) and unaries
+(\texttt{not}, \texttt{necessarily}, \texttt{possibly},
+\texttt{always}, \texttt{negate}, \texttt{definitely},
+\texttt{unprovably}) --- are placed in the same prefix-function-call
+syntactic position with identical preceding context, dissociating the
+prefix-vs-infix syntactic-position confound that contaminates
+natural-English templates.
+
+\paragraph{Invented operators.} 16 invented Tier-2 BPE words
+(8 intended-binary: \texttt{bliq}, \texttt{dren}, \texttt{molex},
+\texttt{krev}, \texttt{sond}, \texttt{glin}, \texttt{twiv},
+\texttt{fump}; 8 intended-unary: \texttt{vusp}, \texttt{perph},
+\texttt{kelm}, \texttt{zorf}, \texttt{gleph}, \texttt{drelth},
+\texttt{vrith}, \texttt{nilph}). The set was chosen to be
+phonotactically plausible Latin-script tokens that avoid obvious
+morphemic semantic loadings, and audited at extraction time for
+subword decomposition under each model's tokenizer.
+
+\paragraph{Anchors.} Multi-anchor extraction is performed in a single
+forward pass per stimulus: we extract activations at four FUNC-PFX
+positions (\texttt{operator-after}, \texttt{first-arg},
+\texttt{close-paren}, \texttt{sentence-final}) and two NEUTRAL
+positions (\texttt{operator-after}, \texttt{sentence-final}). This
+allows post-call test anchors that capture the model's representation
+of the operator after it has integrated argument-count information
+from the function-call syntax --- a methodological refinement from
+the operator-anchored measurement used in earlier work.
+
+\subsection{Models}
+\label{sec:models}
+
+\begin{table}[h]
+  \centering
+  \small
+  \resizebox{\linewidth}{!}{%
+  \begin{tabular}{lllllrl}
+    \toprule
+    Model & Lab & Training corpus & Architecture & Tokenizer & Params & Focus layers\\
+    \midrule
+    OLMo 2 7B          & AI2             & Dolma                 & mod.\ Llama       & OLMo BPE      & 7B   & L\,4, 7, 10, 16, 24\\
+    Gemma 2 9B         & DeepMind        & Google proprietary    & soft-capped Gemma & SentencePiece & 9B   & L\,2, 4, 8, 16, 17\\
+    Pythia 6.9B-d      & EleutherAI      & deduplicated Pile     & GPT-NeoX (RoPE)   & Pythia BPE    & 6.9B & L\,4, 7, 10, 16, 24\\
+    \bottomrule
+  \end{tabular}}
+  \caption{The three open base language model families used throughout.}
+  \label{tab:models}
+\end{table}
+
+All three are open-weights base checkpoints (no instruction tuning).
+Activations are extracted in fp16 (OLMo, Pythia) or bf16 (Gemma) via
+the HuggingFace \texttt{transformers} \texttt{output\_hidden\_states=True}
+flag; single-prompt extraction avoids padding artifacts. Compute is on
+an Apple M4 with 48~GB unified memory. Total extraction time across
+all three models for the v6 (15-canonical, 16-invented) scope is
+${\sim}80$~min.
+
+\subsection{The seven-metric battery}
+\label{sec:battery}
+
+We measure substrate-invariance with seven named metrics in four
+families (M1, M2, M3, M4) --- M2 and M4 decomposed into submetrics.
+For each (train condition, train anchor, test condition, test anchor,
+layer) sweep cell:
+
+\begin{itemize}
+  \item \textbf{M1 (within-condition probe CV)}: 5-fold stratified CV
+  accuracy of a logistic-regression probe on canonical activations in
+  the train condition. Sanity check that the trained-operator
+  representation is linearly separable at this cell.
+  \item \textbf{\Mc{}}: cross-notation transfer accuracy of the
+  train-condition-trained probe on test-condition canonical
+  activations. The principal Fact 1 measurement.
+  Chance is $1/n_{\text{canonicals}}$ ($1/5$ for v3, $1/10$ for v5,
+  $1/15$ for v6).
+  \item \textbf{\Ma{}}: same probe, but predictions coarsened to the
+  binary-vs-unary partition. Decoupled from canonical-identity
+  transfer; surfaces \emph{arity-respecting} structure that may not
+  survive at the canonical-identity level.
+  \item \textbf{M3 (directional-angle)}: cosine angle between the
+  NEUTRAL and FUNC-PFX arity directions at the cell. Bootstrap 95\%
+  CIs by within-class stimulus resampling ($B = 100$).
+  \item \textbf{M4a (invented unary mass)}: fraction of
+  invented-stimulus predictions in the unary canonical region.
+  \item \textbf{\Mbfb{} (intended-arity agreement)}: fraction of
+  invented-stimulus predictions whose arity matches the word's
+  intended arity. The principal Fact 2 measurement.
+  \item \textbf{\Mbfc{} (canonical catchment concentration)}:
+  Herfindahl--Hirschman Index
+  $\mathrm{HHI} = \sum_c p_c^2$ over the per-canonical share of
+  invented-stimulus predictions. $\mathrm{HHI} = 1/K$ at uniform
+  routing ($\approx 0.067$ for $K=15$) and $\mathrm{HHI}=1$ under
+  single-canonical collapse; we threshold at $< 0.70$ to flag
+  ``distributed'' routing. (This is the \emph{running-code} \Mbfc{}
+  definition (script 24); the v6 pre-registration spec instead
+  defined \Mbfc{} as $\max_c p_c$ with threshold $\leq 0.85$.
+  \S\ref{sec:prereg} acknowledges the criterion-drift and reports a
+  both-criteria reconciliation showing the headline verdicts are
+  robust to which is used.)
+\end{itemize}
+
+A cell PASSES the substrate-invariance battery (substantive
+PASS-arity) under the running-code criterion iff
+$\Ma \geq 0.65 \wedge \Mbfb \geq 0.65 \wedge \Mbfc < 0.70 \wedge
+0.10 \leq \text{M4a} \leq 0.90 \wedge \pwmin < 0.95$, where the final
+$\pwmin < 0.95$ conjunct is the lucky-default exclusion introduced in
+\S\ref{sec:lucky} below (we list all five conjuncts here so the
+running-code criterion is fully specified in one place); the frozen
+pre-registered criterion (\S\ref{sec:prereg}, criterion-of-record)
+replaces $\Mbfc < 0.70$ with $\max_c p_c \leq 0.85$ and tightens the
+M4a band to $0.20 \leq \text{M4a} \leq 0.80$. Cells whose 95\% CI on
+\Mbfb{} crosses $0.65$ are reported as AMBIG. Cells that pass the four
+numerical conjuncts (\Ma{}, \Mbfb{}, \Mbfc{}, M4a) but fail the
+$\pwmin < 0.95$ filter are reported as LUCKY-NEG, not PASS-arity
+(\S\ref{sec:lucky}).
+
+\subsection{The lucky-default detector}
+\label{sec:lucky}
+
+A specific false-positive pattern surfaced during methodology
+iteration: a cell may have an aggregate \Mbfb{} above threshold while
+every individual invented word's predictions are deterministically
+routed to a single canonical, with the canonical's arity happening to
+match the \emph{majority} arity of the test set's invented words. We
+call this the \emph{lucky-default} pattern. The detector flags a cell
+as lucky-default if
+$\min_w P(\text{top\_canonical} \mid w) \geq 0.95$ --- every invented
+word has at least 95\% of its predictions concentrated on a single
+canonical. In other words, the \S\ref{sec:battery} substantive-PASS
+conjunction includes $\pwmin < 0.95$ (alongside the
+\Ma{}~/~\Mbfb{}~/~\Mbfc{}~/~M4a numerical gate); cells that satisfy
+all four numerical conjuncts but trigger $\pwmin \geq 0.95$ are
+reported as LUCKY-NEG, not PASS-arity. The ``\Mbfc{} distributed''
+conjunct itself is $\mathrm{HHI} < 0.70$ under the running-code
+criterion (\S\ref{sec:battery}) and $\max_c p_c \leq 0.85$ under the
+frozen pre-registered criterion (\S\ref{sec:prereg}, the
+criterion-of-record). The detector was developed during pre-v6
+methodology iteration on an exploratory two-model sweep (OLMo + Gemma,
+scripts 22b--22d), where it reclassified four of eight initially-flagged
+PASS-arity cells as lucky-default false positives.
+Pre-registered as a v6 PASS conjunct and re-applied to the
+three-model four-scope sweep of \S\ref{sec:fact2}, it triggers
+($\pwmin \geq 0.95$) on two of eight v3 PASS-arity cells: OLMo
+\texttt{\NtoF{} sente$\to$close L\,10} and Pythia
+\texttt{\NtoF{} sente$\to$close L\,10}, both at v5
+(Table~\ref{tab:dissoc} tracks the OLMo cell). The other six v3
+PASS-arity cells retract via \Mbfb{} drop without triggering the
+detector; all eight retract by v6 under one or another criterion.
+The detector is one of four directly transferable methodological
+devices contributed by this work
+(\S\ref{sec:methods_contrib}).
+
+\subsection{Pre-registration}
+\label{sec:prereg}
+
+To address the concern that the \Mc{}~/~\Ma{}~/~lucky-default~/~
+multi-scope framework was developed iteratively on the same data
+(a garden-of-forking-paths risk), we pre-registered the v6
+canonical-set expansion in a frozen analysis plan written \emph{before}
+any v6 cache extraction (\texttt{experiments/preregistration\_v6.md},
+header \texttt{Status: FROZEN. Written before any v6 extraction or
+analysis runs}; published in the project's first public-repository
+commit at hash \texttt{e6afe5e358454a8a5ca85f369eb2206a847b34d5}
+(short: \texttt{e6afe5e}, 2026-05-21), which bundles the
+pre-registration document with the v6 extraction script and the
+resulting log of record --- the in-document \texttt{FROZEN}
+declaration and the lab-notes timeline of v6 design discussion
+(paper\_notes \S3.7.16) anchor the pre-extraction authorship claim,
+the commit hash anchors the public-record artefact). The
+pre-registration specified the canonical additions (\texttt{nor},
+\texttt{iff}, \texttt{unless}, \texttt{definitely}, \texttt{unprovably}),
+the three single-axis predictions to be adjudicated (P\_FREQ,
+P\_SUBWORD, P\_INTERACTION), the cell PASS-arity threshold
+($\Ma \geq 0.65 \wedge \Mbfb \geq 0.65 \wedge \max_c p_c \leq 0.85
+\wedge \text{M4a} \in [0.20, 0.80] \wedge \pwmin < 0.95$, where
+$\max_c p_c$ is the maximum share of invented mass on any single
+canonical), the bootstrap protocol (500 stim-resamples), and an
+audit gate (extraction proceeds iff at most 2 of 5 new canonicals are
+out-of-design in any tokenizer). The audit gate caught one
+tokenization failure (\texttt{iff} 1pc in all three tokenizers
+despite our 2--3pc design target); analysis proceeded with
+\texttt{iff} flagged out-of-design.
+
+\paragraph{Criterion-drift between the pre-registration and the
+running code (caught in review).} The running v6 sweep code
+(\texttt{experiments/24\_v6\_canonical\_expansion.py}) drifted from the
+frozen pre-registration on two of the five PASS-arity conjuncts:
+$\max_c p_c \leq 0.85$ became the tighter Herfindahl--Hirschman index
+$\sum_c p_c^2 < 0.70$ (still flagging ``distributed'' routing but on a
+different statistic with different thresholding semantics), and
+$\text{M4a} \in [0.20, 0.80]$ widened to $\text{M4a} \in [0.10, 0.90]$.
+The drift was discovered after extraction during review, not before.
+Script
+\texttt{experiments/24b\_frozen\_criterion\_rederivation.py} replays
+the v6 four-scope sweep cache-only (no model inference; identical
+probes, identical cells) under both criteria and reports the per-cell
+verdict comparison (\texttt{outputs/24b\_20260521\_120258.log}; lab
+notes \S3.7.21).
+
+\textbf{Headline reconciliation: the v6 P\_RETRACT verdict (``zero
+PASS-arity cells at v6 in OLMo and Pythia; two emergent PASS-arity
+cells at Gemma L\,2 close-paren'') is identical under both criteria
+in all three model families.} The only verdict disagreement anywhere
+in the 4-scope $\times$ 3-model sweep is one Pythia v3 cell
+(\texttt{N$\to$F opera$\to$close L\,16}, $\text{M4a}=0.192$):
+PASS-arity under the running $[0.10, 0.90]$ band, ARITY-AXIS-ONLY
+under the frozen $[0.20, 0.80]$ band. The disagreement is driven by
+the M4a band width, not the \Mbfc{} definition; the L\,16 cell sits
+below the pre-registered M4a lower bound for ``balanced-arity'' mass
+distribution. The headline retraction-chain trajectory (Pythia: 4
+v3 candidates $\to$ 3 v4 $\to$ 0 v5 $\to$ 0 v6 under running; 3
+$\to$ 3 $\to$ 0 $\to$ 0 under frozen) is qualitatively identical and
+quantitatively equivalent for the v6 outcome.
+
+Under the conservative reading we
+adopt for this paper, the \textbf{frozen pre-registered criterion is
+the criterion-of-record}; running-code verdicts are reported as they
+were computed but the \S\ref{sec:fact2} retraction headline tallies
+the eight v3 PASS-arity cells that the v6-pipeline four-scope sweep
+produces under the frozen criterion (two Gemma 2 9B + three OLMo 2
+7B + three Pythia 6.9B-d cells; full list in \S\ref{sec:fact2} and
+per-cell retraction trajectories in lab notes \S3.7.21). The
+pre-pre-registration Phase 1 sweep (script 22b on its own caches)
+flagged a related but not byte-identical four-cell candidate set;
+we retain the Phase 1 narrative only in the lab-notes lineage
+(\S3.7.13) and adopt the v6-pipeline list as the published headline.
+
+% =========================================================================
+\section{Results}
+\label{sec:results}
+
+\subsection{Fact 1: trained-vocabulary substrate-invariance}
+\label{sec:fact1}
+
+Cross-notation linear-probe geometry is \textbf{at ceiling under a
+15-class readout in all three model families}, both for logical
+operators (the v6 canonical set, lab notes \S3.7.16) and --- under
+the \S\ref{sec:contentword} pre-specified content-word control ---
+for 15 non-operator content words inserted into syntactically-
+identical templates, with bootstrap 95\% CIs $[1.000, 1.000]$ at the
+same \texttt{operator-after $\to$ operator-after L\,4} cell.
+
+\begin{table}[h]
+  \centering
+  \small
+  \begin{tabular}{llcccccc}
+    \toprule
+    Model & Cell & M1n & M1f & \Mc{} & CI(\Mc) & \Ma{}\\
+    \midrule
+    Gemma 2 9B    & \NtoF{} opera$\to$opera L\,4 & 1.000 & 1.000 & \textbf{1.000} & $[1.000, 1.000]$ & 1.000\\
+    OLMo 2 7B     & \NtoF{} opera$\to$opera L\,4 & 1.000 & 1.000 & \textbf{1.000} & $[1.000, 1.000]$ & 1.000\\
+    Pythia 6.9B-d & \NtoF{} opera$\to$opera L\,4 & 1.000 & 1.000 & \textbf{1.000} & $[1.000, 1.000]$ & 1.000\\
+    \bottomrule
+  \end{tabular}
+  \caption{Headline Fact 1 results across the three model families.
+  M1n / M1f are within-condition 5-fold-CV probe accuracies on
+  canonicals at the same cell (sanity check); \Mc{} is the
+  cross-notation transfer accuracy under the 15-class readout
+  (15-class chance $= 0.067 \approx 1/15$); CI(\Mc) is the bootstrap
+  95\% CI under $B=500$ stim-resamples; \Ma{} is the same probe
+  coarsened to binary-vs-unary partition (chance $\approx 0.53$ under
+  the majority-arity baseline given v6's 8B / 7U split). All numbers
+  from script 24's v6 80-cell sweep,
+  \texttt{outputs/24\_20260520\_185537.log}.}
+  \label{tab:fact1}
+\end{table}
+
+The result is robust to three independent scope expansions tested in
+sequence. (1) \textbf{Invented-set expansion} from 5 to 16 invented
+words (script 22c): \Mc{} at the principal positive cells is unchanged.
+(2) \textbf{Canonical-readout expansion} from 5 to 10 (script 22d,
+adding \texttt{xor}, \texttt{nand}, \texttt{possibly},
+\texttt{always}, \texttt{negate}): \Mc{} at the best cells in OLMo and
+Gemma remains at $\geq 0.81$ with \Ma{} at $1.000$.
+(3) \textbf{Pre-registered 15-class expansion} (script 24, adding
+\texttt{nor}, \texttt{iff}, \texttt{unless}, \texttt{definitely},
+\texttt{unprovably}): \Mc{} reaches $1.000$ with bootstrap CI
+$[1.000, 1.000]$ in all three model families at the same cell, after
+the audit gate.
+
+Across the per-anchor $\times$ per-layer $\times$ per-direction sweep
+(80 cells per model at v6), the cells passing the M2 gate
+($\Mc \geq 0.65$) cluster at the
+\texttt{operator-after $\to$ operator-after} anchor pair across the
+focus layers (L\,4 in Gemma, L\,4--L\,10 in OLMo and Pythia); the
+post-call anchors (\texttt{first-arg}, \texttt{close-paren},
+\texttt{sentence-final}) pass less reliably, with the \FtoN{}
+direction systematically weaker than \NtoF{} across all three models.
+Figure~\ref{fig:heatmap} visualises this directly as a per-model
+heatmap of \Mc{} across all 80 v6 cells (16 anchor pairs $\times$ 5
+focus layers), with the M2 PASS gate at $0.65$ marked on the
+colourbar; the \NtoF{} opera$\to$opera row is at ceiling in all three
+models, the post-call and \FtoN{} rows are systematically darker.
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\linewidth]{figures/fig_02_m2c_heatmap.pdf}
+  \caption{Per-model heatmap of \Mc{} across all 80 v6 cells
+  (16 anchor pairs $\times$ 5 focus layers). The PASS gate at
+  $\Mc \geq 0.65$ is marked on the colourbar. The
+  \NtoF{} opera$\to$opera row is at ceiling in all three models; the
+  post-call and \FtoN{} rows are systematically darker.}
+  \label{fig:heatmap}
+\end{figure}
+
+\paragraph{Held-out template diagnostic (within-condition only).}
+To probe template lexical leakage, we trained each model's probe on
+the carryover templates and evaluated it on a syntactically-disjoint
+held-out template family (50 templates per condition, not seen during
+probe training; see Appendix~A). At FUNC-PFX
+\texttt{operator-after} at the early focus layers (Gemma L\,2--L\,8,
+OLMo L\,4--L\,10, Pythia L\,4--L\,10), $\text{M1-heldout} =
+0.94$--$1.00$. Sentence-final and deep-layer cells show larger
+degradation (Gemma FUNC-PFX sentence-final L\,8 = 0.30, OLMo FUNC-PFX
+close-paren L\,24 = 0.37); these cells are not the locus of any
+positive finding. \textbf{Scope of this diagnostic.} M1-heldout is
+\emph{within-condition} generalisation: it tests whether the probe's
+decision boundary is template-scaffold-memorising vs canonical-
+representing inside a single notation. It does \emph{not} directly
+test cross-notation template leakage in M2; the stricter diagnostic
+--- train probe on carryover templates in the source notation,
+evaluate \Mc{} on held-out templates in the target notation --- has
+not been run in v6. The within-condition pass therefore reduces (but
+does not eliminate) the concern that the principal Fact-1 cells are
+exploiting template-scaffold features rather than canonical structure.
+
+\subsubsection{Operator-class vs lexical-identity control}
+\label{sec:contentword}
+
+A skeptical reading of Fact 1's ceiling-level transfer is that
+$\Mc = 1.000$ is a \emph{generic} substrate-independent
+lexical-identity signal --- the probe finds a per-token-identity
+hyperplane that would also reach ceiling for any 15-word readout
+vocabulary, not specifically a logical-operator-class abstraction.
+The v6 canonical set spans roughly four orders of magnitude in
+training-corpus frequency (\texttt{and}, \texttt{or}, \texttt{not}
+are top-100 English words; \texttt{nand}, \texttt{iff},
+\texttt{unprovably} are vanishingly rare in any realistic corpus),
+and the high-frequency operators may carry the cross-notation
+transfer load with the low-frequency ones riding along via their
+idiosyncratic spelling.
+
+To disentangle operator-class substrate-invariance from generic
+lexical-identity substrate-invariance, we re-run the M1--M4 battery
+with 15 heterogeneous non-operator content words inserted into
+syntactically-identical NEUTRAL and FUNC-PFX templates
+(\texttt{experiments/25c\_corpus\_frequency\_control.py}, \S3.7.20
+of accompanying lab notes). The control set spans the same
+subword-length and frequency-tier range as the v6 canonical set
+(\texttt{house}, \texttt{water}, \texttt{music}, \texttt{light},
+\texttt{paper}, \texttt{pattern}, \texttt{theory}, \texttt{system}
+as 8 ``binary-position'' words; \texttt{region}, \texttt{period},
+\texttt{archipelago}, \texttt{mosaic}, \texttt{plinth},
+\texttt{ledger}, \texttt{cassowary} as 7 ``unary-position'' words;
+multi-piece tokenization rate 2--4/15 across the three tokenizers,
+comparable to v6's 1/15) but shares no semantic category and no
+functional role with logical operators. The ``intended-arity''
+assignment is a syntactic-position match against the v6 binary-vs-
+unary split (not a semantic claim --- \texttt{house} is not a binary
+operator in English) so that the FUNC-PFX template emits
+\texttt{house(p, q)} and \texttt{region(p)} in the same syntactic
+position the v6 canonicals occupy.
+
+\textbf{Pre-specified adjudication} (declared in the
+\texttt{25c\_corpus\_frequency\_control.py}
+docstring before any content-word extraction; this is a post-review
+control, not part of
+\texttt{experiments/preregistration\_v6.md}): if \Mc{} at the
+principal \texttt{\NtoF{} opera$\to$opera L\,4} cell lands at
+$\geq 0.65$ for the content-word control in any of the three models,
+Fact 1 generalises to lexical-identity substrate-invariance broadly
+and the ``operator-set-bound'' framing requires reframing to
+``trained-vocabulary-bound''.
+
+\textbf{Result: the REFRAME trigger fires in all three model
+families at the principal cell.}
+
+\begin{table}[h]
+  \centering
+  \small
+  \resizebox{\linewidth}{!}{%
+  \begin{tabular}{llccccll}
+    \toprule
+    Model & Cell & M1n & M1f & \Mc{} (content) & CI (content) & \Mc{} (v6 can.) & Verdict\\
+    \midrule
+    Gemma 2 9B    & \NtoF{} opera$\to$opera L\,4 & 0.999 & 1.000 & \textbf{1.000} & $[1.000, 1.000]$ & 1.000 $[1.000, 1.000]$ & \textbf{REFRAME}\\
+    Gemma 2 9B    & \NtoF{} opera$\to$opera L\,8 & 0.996 & 1.000 & 1.000          & $[1.000, 1.000]$ & ---                     & REFRAME\\
+    OLMo 2 7B     & \NtoF{} opera$\to$opera L\,4 & 0.959 & 1.000 & \textbf{1.000} & $[1.000, 1.000]$ & 1.000 $[1.000, 1.000]$ & \textbf{REFRAME}\\
+    OLMo 2 7B     & \NtoF{} opera$\to$opera L\,10& 0.963 & 1.000 & 1.000          & $[1.000, 1.000]$ & ---                     & REFRAME\\
+    Pythia 6.9B-d & \NtoF{} opera$\to$opera L\,4 & 1.000 & 1.000 & \textbf{1.000} & $[1.000, 1.000]$ & 1.000 $[1.000, 1.000]$ & \textbf{REFRAME}\\
+    Pythia 6.9B-d & \NtoF{} opera$\to$opera L\,10& 1.000 & 1.000 & 1.000          & $[1.000, 1.000]$ & ---                     & REFRAME\\
+    \bottomrule
+  \end{tabular}}
+  \caption{Content-word \Mc{} at the principal Fact-1 cell, with
+  bootstrap 95\% CI ($B = 500$). The ``v6 can.'' column is the
+  canonical-operator \Mc{} at the same cell from
+  \S\ref{sec:fact1}~/~Table~\ref{tab:fact1}, for direct comparison.
+  M1n / M1f columns are within-condition probe 5-fold CV on the
+  content-word set at the same train and test condition. All numbers
+  from \texttt{outputs/25c\_20260521\_092243.log}.}
+  \label{tab:contentword}
+\end{table}
+
+The \NtoF{} transfer at the principal Fact-1 cell is byte-identically
+at ceiling for content words and for canonical operators across all
+three model families. The ``operator-set-bound'' framing of Fact 1 is
+therefore rejected by the control, and we reframe to
+\textbf{trained-vocabulary substrate-invariance (within the tested
+15+15 readout sets at the principal \NtoF{} operator-after cell)}:
+cross-notation linear-probe geometry transfers at ceiling for
+trained, well-tokenized vocabulary items at this specific
+anchor/direction coordinate, not specifically for logical-operator-
+class abstractions. The reframe is bounded by what was tested ---
+15 operators + 15 content words at one (anchor, direction, layer)
+coordinate per model --- and is not a claim that \emph{every}
+in-vocabulary word transfers (untested) or that transfer is
+direction-symmetric (the \FtoN{} analysis below shows otherwise for
+OLMo content words). This is the load-bearing single-experiment
+falsification of the v1 draft's principal positive framing, and the
+paper is reorganised around the reframed Fact 1 throughout (title,
+abstract, \S\ref{sec:intro}, \S\ref{sec:fact1}, \S\ref{sec:prh},
+\S\ref{sec:conclusion}).
+
+\paragraph{A model-specific \FtoN{} asymmetry surfaces in the
+reverse-direction probe.} The same control evaluated at the reverse
+\texttt{\FtoN{} opera$\to$opera L\,4} cell shows a model-dependent
+split: Gemma 2 9B $\Mc = 0.836$ $[0.820, 0.852]$ (PASS),
+Pythia 6.9B-d $\Mc = 0.943$ $[0.932, 0.956]$ (PASS), OLMo 2 7B
+$\Mc = 0.376$ $[0.357, 0.396]$ (clean FAIL). The OLMo content-word
+\FtoN{} drop is a model-specific phenomenon that does not appear at
+the same cell with canonical operators. The reading: OLMo 2 7B's
+FUNC-PFX content-word representations have noisier per-class
+structure than its FUNC-PFX operator representations, such that a
+probe trained on FUNC-PFX content-word activations does not
+generalise to NEUTRAL content-word activations cleanly. This may
+reflect higher per-stimulus context-driven variability for common
+English nouns in function-call syntax compared to logical operators
+in the same syntax, in OLMo's BPE-tokenizer activation distribution
+specifically. The asymmetry is interesting but does not weaken the
+principal REFRAME trigger (\NtoF{} is the principal Fact-1
+direction); it is documented as a methodological caveat on \FtoN{}
+robustness for content-word probes in OLMo.
+
+\paragraph{Scope caveat.} Fact 2 (novel-operator generalisation
+failure under canonical-set expansion) is preserved as-stated: we
+have only tested \emph{novel operators} under canonical-set
+expansion. Whether \emph{novel content words} would exhibit the same
+canonical-attractor retraction under content-word-set expansion is
+an open follow-up. The combined two-part finding is therefore:
+\emph{trained-vocabulary substrate-invariance holds at ceiling on
+the tested 15+15 readout sets at the principal \NtoF{}
+operator-after cell}, demonstrated for both logical operators and
+content words; \emph{novel-operator generalisation is not robust to
+canonical-set expansion} --- most candidate cells retract into
+canonical-attractor compression (\S\ref{sec:default}) with one
+tightly-scoped Gemma 2 9B L\,2 close-paren causal exception
+(\S\ref{sec:causal}); the novel-content-word retraction analog is
+unverified.
+
+\subsection{The \Mc{}~/~\Ma{} dissociation}
+\label{sec:dissoc}
+
+A specific OLMo 2 7B cell, \texttt{\NtoF{} sente$\to$close L\,10},
+exhibits a clean dissociation between the two halves of the M2
+measurement under multi-scope readout. The full measurement battery
+splits substrate-invariance into a canonical-identity claim (\Mc{}:
+does the probe predict the correct 1-of-15 canonical?) and an
+arity-axis claim (\Ma{}: does the probe predict a canonical of the
+correct binary-vs-unary type?). At every other PASS cell in the
+three-model sweep, the two metrics move together --- both at ceiling
+or both at chance. At this one cell they decouple: $\Ma = 1.000$
+while $\Mc = 0.736$ at v6 ($\approx 11\times$ the 15-class chance
+baseline of $0.067$, well above the $0.65$ PASS gate, but clearly
+below ceiling). The within-arity confusion pattern is structurally
+clean: binary canonicals (\texttt{or}, \texttt{implies}) route to
+\texttt{and}, and the unary canonicals route to \texttt{not}, with
+no binary-$\leftrightarrow$-unary errors anywhere in the confusion
+matrix.
+
+The dissociation is mechanistically diagnostic: the cross-notation
+transfer mechanism at this cell appears to be the arity axis
+(binary vs unary) operating independently of within-arity canonical
+identity. The probe's \texttt{or $\to$ and} and
+\texttt{implies $\to$ and} confusion at FUNC-PFX close-paren L\,10
+is not noise --- it is a stable structural feature of the model's
+representation at this position, where the linear instrument can
+read out \emph{what kind of operator} but not \emph{which specific
+operator}.
+
+\paragraph{Cross-scope stability.} The dissociation survives all four
+scope expansions tested. Table~\ref{tab:dissoc} shows the OLMo
+\texttt{\NtoF{} sente$\to$close L\,10} cell tracked across v3
+(5 canonicals + 5 invented), v4 (5 + 16), v5 (10 + 16), and v6
+(15 + 16). \Ma{} stays locked at $1.000$ across all four scopes;
+\Mc{} moves between $0.604$ and $0.806$ (always significantly above
+chance, never at ceiling); \Mbfb{} retracts from PASS-arity at v3--v4
+(where the small canonical readout makes the invented-arity test
+informative) to LUCKY-NEG at v5--v6 (where the expanded canonical
+readout reveals the v3--v4 \Mbfb{} numbers as a coincidence between
+the model's default-canonical attractor and the intended arities of
+the small invented set, \S\ref{sec:default}).
+
+\begin{table}[h]
+  \centering
+  \small
+  \resizebox{\linewidth}{!}{%
+  \begin{tabular}{llcccccccl}
+    \toprule
+    Scope & Can.$\times$inv. & \Mc{} & CI(\Mc{}) & \Ma{} & \Mbfb{} & \Mbfc{} & \pwmin{} & Verdict\\
+    \midrule
+    v3 & $5\times5$   & 0.604 & $[0.432, 0.682]$ & \textbf{1.000} & 0.880                & 0.57 & 0.50 & PASS-arity\\
+    v4 & $5\times16$  & 0.604 & (point)          & \textbf{1.000} & 0.778 $[0.772, 0.819]$ & 0.53 & ${\sim}0.50$ & PASS-arity\\
+    v5 & $10\times16$ & 0.806 & (point)          & \textbf{1.000} & 0.500 $[0.500, 0.500]$ & 1.00 & 1.00 & LUCKY-NEG\\
+    v6 & $15\times16$ & 0.736 & (point)          & \textbf{1.000} & 0.500 $[0.500, 0.500]$ & 1.00 & 1.00 & LUCKY-NEG\\
+    \bottomrule
+  \end{tabular}}
+  \caption{Lab notes \S3.7.9 OLMo \texttt{\NtoF{} sente$\to$close L\,10}
+  dissociation cell tracked across the four pre-registered scopes
+  (v3 $\to$ v6). \Ma{} is the cross-notation binary-vs-unary transfer
+  accuracy at the same probe (chance $\approx 0.5$ under the
+  majority-arity baseline). \Mc{} is the cross-notation 1-of-K
+  canonical-identity transfer accuracy under K-class readout (chance
+  $= 1/K$). \Mbfb{} is the intended-arity-agreement test on invented
+  words at the same probe; \Mbfc{} is the per-canonical-Herfindahl
+  index of the invented mass ($1.00$ = single-canonical collapse).
+  \pwmin{} is the minimum per-word top-canonical concentration across
+  the 5 or 16 invented words ($\geq 0.95$ = lucky-default detector
+  fires). All numbers from script 24 OLMo block (lines 978 / 1097 /
+  1249 / 1401 of \texttt{outputs/24\_20260520\_185537.log});
+  bootstrap CIs from script 22a / 22c / script 24 invented-mass
+  section.}
+  \label{tab:dissoc}
+\end{table}
+
+\paragraph{Interpretation.} The arity axis is a real, scope-stable
+feature of OLMo 2 7B's residual stream at this cell, robust to every
+scope expansion we have tested. The canonical-identity axis is not at
+this cell --- the same residual stream cannot be read out for which
+of \texttt{and}, \texttt{or}, \texttt{implies} the model is processing,
+only for whether it is binary or unary. This is the cleanest
+within-paper example of a substrate-invariance claim splitting into a
+partial-pass and a fail under measurement decomposition, and it would
+have been invisible under any single-axis report (\Ma{}-only reports
+a PASS; \Mc{}-only reports the v3 cell as AMBIG and the v5--v6 cells
+as PASS-but-collapsed). The cell also anchored the project-flagship
+Phase-1 positive finding (lab notes \S3.7.9) and the same-target~/~
+different-source causal patching protocol (\S\ref{sec:causal},
+Cell 4), where it returns probe-readable but causally inert under
+NEUTRAL-sentence-final patching --- a third axis of dissociation at
+the same cell.
+
+We treat the \Mc{}~/~\Ma{} split as one of the project's
+directly-transferable methodological contributions
+(\S\ref{sec:methods_contrib}): cross-notation substrate-invariance has
+two distinct sub-claims that should be measured separately. Reporting
+only canonical-identity transfer (the standard Fact-1 measurement)
+misses the arity-axis-only dissociation at this cell; reporting only
+arity-axis transfer (a coarser measurement) collapses cells where
+canonical identity is also preserved into the same bin as cells where
+only arity is.
+
+\subsection{Fact 2: novel-operator generalisation collapses to canonical-attractor compression}
+\label{sec:fact2}
+
+The v6-pipeline four-scope sweep
+(\texttt{experiments/24\_v6\_canonical\_expansion.py}, replayed under
+the frozen pre-registered criterion by
+\texttt{24b\_frozen\_criterion\_rederivation.py};
+\texttt{outputs/24b\_20260521\_120258.log}) identifies \textbf{eight
+v3 PASS-arity cells} across the three model families
+($\Ma \geq 0.65 \wedge \Mbfb \geq 0.65 \wedge \max_c p_c \leq 0.85
+\wedge \text{M4a} \in [0.20, 0.80] \wedge \pwmin < 0.95$):
+
+\begin{itemize}
+  \item \textbf{Gemma 2 9B (2 cells)}:
+  \texttt{\NtoF{} opera$\to$first L\,4},
+  \texttt{\NtoF{} sente$\to$first L\,8}.
+  \item \textbf{OLMo 2 7B (3 cells)}:
+  \texttt{\FtoN{} first$\to$opera L\,7},
+  \texttt{\NtoF{} sente$\to$close L\,10},
+  \texttt{\NtoF{} opera$\to$close L\,24}.
+  \item \textbf{Pythia 6.9B-d (3 cells)}:
+  \texttt{\NtoF{} opera$\to$close L\,4},
+  \texttt{\NtoF{} opera$\to$close L\,7},
+  \texttt{\NtoF{} sente$\to$close L\,10}.
+\end{itemize}
+
+A ninth Pythia v3 cell (\texttt{\NtoF{} opera$\to$close L\,16},
+$\text{M4a} = 0.192$) is PASS-arity under the running-code wider M4a
+band $[0.10, 0.90]$ but ARITY-AXIS-ONLY under the frozen
+$[0.20, 0.80]$ band; this is the only verdict disagreement anywhere
+in the 4-scope $\times$ 3-model sweep (\S\ref{sec:prereg}). The
+pre-pre-registration Phase 1 sweep (script 22b on its own pre-v6
+caches) flagged a related but not byte-identical four-cell candidate
+set, including Gemma \texttt{sente$\to$opera L\,4}
+($\Mbfb = 0.669$ borderline under script 22c's invented-set
+expansion; lab notes \S3.7.13) which does not appear in the
+v6-pipeline v3 replay. Lab notes \S3.7.21 reconciles the two cell
+sets; the v6-pipeline list is the criterion-of-record going forward.
+
+\paragraph{All eight cells retract under canonical-set expansion;
+no v3 PASS-arity cell survives to v5 in any of the three model
+families.} Three of the eight retract at v4 (invented-set expansion,
+$5 \to 16$ invented words; the v3 $\to$ v4 transition isolates
+5-invented-word sampling artefacts from genuine arity-respecting
+routing): Gemma \texttt{opera$\to$first L\,4}
+($\Mbfb\ 0.672 \to 0.581$), Gemma \texttt{sente$\to$first L\,8}
+($\Mbfb\ 0.696 \to 0.550$), and OLMo
+\texttt{\FtoN{} first$\to$opera L\,7} ($\Mbfb\ 0.696 \to 0.583$) all
+drop to M2A-ONLY at v4 even though \Ma{} remains at $\geq 0.95$ ---
+the arity axis is preserved, but the per-word intended-arity
+agreement drops below the $0.65$ PASS-arity threshold under the
+16-invented-word readout. The remaining five retract at v5
+(canonical-readout expansion, $5 \to 10$ canonicals): OLMo
+\texttt{\NtoF{} sente$\to$close L\,10} becomes the
+single-canonical-\texttt{nand} LUCKY-NEG cell that anchors
+\S\ref{sec:dissoc}'s \Mc{}~/~\Ma{} dissociation and
+Figure~\ref{fig:breakdown} (\Mbfb{} drops from $0.880$ at v3 to
+$0.500$ at v5; \Mbfc{} HHI $0.57 \to 1.00$; $\max_c$
+$0.70 \to 1.00$; \pwmin{} $0.56 \to 1.00$ --- all 16 invented words
+route to \texttt{nand}); OLMo \texttt{\NtoF{} opera$\to$close L\,24}
+retracts to M2A-ONLY at v5 with $\Mbfb\ 0.768 \to 0.482$; and all
+three Pythia v3 cells retract at v5 ---
+\texttt{\NtoF{} opera$\to$close L\,4} and
+\texttt{\NtoF{} opera$\to$close L\,7} both retract directly to
+M2A-ONLY ($\Mbfb\ 0.684 \to 0.454$, $0.860 \to 0.320$), while
+\texttt{\NtoF{} sente$\to$close L\,10} first passes through
+LUCKY-NEG at v5 ($\pwmin = 0.98$) before settling at M2A-ONLY at v6
+as the v6 canonical-set widens the routing distribution. The
+pre-registered v6 expansion ($10 \to 15$) re-confirms every
+retraction; cross-scope retraction trajectories are tabulated
+cell-by-cell in lab notes \S3.7.21 (sourced from
+\texttt{outputs/24b\_20260521\_120258.log}).
+
+\begin{figure}[!htbp]
+  \centering
+  \includegraphics[width=\linewidth]{figures/fig_03_canonical_breakdown.pdf}
+  \caption{Per-canonical breakdown of invented-word predictions at
+  OLMo \texttt{\NtoF{} sente$\to$close L\,10} across the four
+  pre-registered scopes (v3, v4, v5, v6). Each panel shows the share
+  of invented predictions landing on each canonical, with the binary
+  / unary partition colour-coded. The v3 panel (5 canonicals $\times$
+  5 invented words) shows apparent arity-respecting routing
+  (${\sim}70\%$ on \texttt{and} for the intended-binary words,
+  ${\sim}27\%$ on \texttt{necessarily} for the intended-unary words;
+  $\Mbfb = 88\%$). The v4 panel ($5\times16$) preserves the
+  qualitative pattern with \Mbfb{} retracting to $78\%$. The v5
+  ($10\times16$) and v6 ($15\times16$) panels show $100\%$ collapse
+  onto a single attractor --- the lucky-default-detector signature,
+  \Mbfb{} at chance ($50\%$) under the majority-arity baseline.}
+  \label{fig:breakdown}
+\end{figure}
+
+\paragraph{The mechanism is a readout-vocabulary-dependent
+canonical-attractor compression.} At v3 (5 canonicals), the
+apparent arity-respecting routing of invented operators was
+hypothesised to be a \emph{default-to-rarest-canonical} effect: the
+rarest unary canonical is \texttt{necessarily} and the rarest binary
+is \texttt{implies}, and these happen to coincide with the intended
+categories of the small invented set --- yielding $\Mbfb > 0.65$ by
+coincidence. At v5/v6 with \texttt{nand}, \texttt{xor},
+\texttt{negate}, \texttt{unprovably} in the readout, the canonical
+attractor shifts wholesale, and so does the per-word routing target.
+The pre-registered v6 disentanglement (\S\ref{sec:default}) tests the
+rarity hypothesis directly via the three single-axis predictions
+P\_FREQ, P\_SUBWORD, P\_INTERACTION; \textbf{none of the three passes
+in any model}, so ``default-to-rarest'' is retained here only as the
+label for the \emph{rejected} single-axis reading. The robust
+empirical claim is the weaker one: \textbf{the probe's per-word
+routing target is a property of the readout vocabulary's distribution
+interacting with per-word residual-stream geometry, not of the
+model's representation of the invented words alone.}
+
+\subsection{The pre-registered v6 default-mechanism disentanglement}
+\label{sec:default}
+
+The v6 pre-registration laid out three competing single-axis
+readings of the default mechanism: \textbf{P\_FREQ} (route to
+low-frequency canonicals; aggregate of \texttt{\{nor, iff,
+unprovably\}} $\geq 35\%$ with each $\geq 10\%$), \textbf{P\_SUBWORD}
+(route to multi-subword canonicals; multi-pc aggregate $\geq 70\%$),
+\textbf{P\_INTERACTION} (require \texttt{nor} $\in [5\%, 15\%]$ with
+mid-frequency controls \texttt{unless}, \texttt{definitely} each
+$\leq 5\%$). \textbf{None of the three predictions passes in any
+model.} Table~\ref{tab:default} shows the per-canonical
+invented-mass shares aggregated across all 80 v6 sweep cells
+$\times$ 16 invented words $= 1280$ readouts per model.
+
+\begin{table}[h]
+  \centering
+  \footnotesize
+  \resizebox{\linewidth}{!}{%
+  \begin{tabular}{llllrrr}
+    \toprule
+    Canonical & Arity & Tok & Freq & Gemma 2 9B & OLMo 2 7B & Pythia 6.9B-d\\
+    \midrule
+    \texttt{and}                  & B & 1pc           & high     & 0.4\%  & 0.2\%             & 2.3\%\\
+    \texttt{or}                   & B & 1pc           & high     & 0.8\%  & 1.2\%             & 3.8\%\\
+    \texttt{implies}              & B & 1   & mid      & 1.6\%  & 15.9\%   & 5.4\%\\
+    \texttt{xor}                  & B & 2   & v-low    & 22.5\% & 9.3\%    & 16.6\%\\
+    \texttt{nand}                 & B & 2   & v-low    & 17.4\% & 40.5\%   & 21.9\%\\
+    \texttt{not}                  & U & 1   & high     & 4.9\%  & 2.4\%    & 0.8\%\\
+    \texttt{necessarily}          & U & 1   & mid      & 0.2\%  & 0.5\%    & 4.1\%\\
+    \texttt{possibly}             & U & 1   & high     & 1.6\%  & 3.5\%    & 0.0\%\\
+    \texttt{always}               & U & 1   & high     & 0.0\%  & 0.1\%    & 0.0\%\\
+    \texttt{negate}               & U & 2   & low      & 12.1\% & 16.6\%   & 14.2\%\\
+    \texttt{nor} (NEW)            & B & 1   & low      & 5.1\%  & 1.2\%    & 0.2\%\\
+    \texttt{iff} (NEW, OOD)       & B & 1   & v-low    & 10.8\% & 3.2\%    & 12.1\%\\
+    \texttt{unless} (NEW)         & B & 1   & mid      & 0.4\%  & 0.3\%    & 2.4\%\\
+    \texttt{definitely} (NEW)     & U & 1   & mid      & 7.5\%  & 1.3\%    & 5.5\%\\
+    \texttt{unprovably} (NEW)     & U & 2+  & v-low    & 14.8\% & 3.7\%    & 10.6\%\\
+    \midrule
+    NEW-LF aggregate (\texttt{nor + iff + unprovably}) & --- & --- & --- & 30.6\% ($<35\%$) & 8.1\% ($<35\%$) & 22.9\% ($<35\%$)\\
+    multi-pc aggregate            & ---  & ---       & ---      & 14.8\% ($<70\%$) & 13.0\% ($<70\%$) & 63.4\% ($<70\%$)\\
+    MF controls (\texttt{unless + definitely}) & --- & ---     & --- & 7.9\% ($>5\%$)   & 1.6\%            & 7.9\% ($>5\%$)\\
+    \bottomrule
+  \end{tabular}}
+  \caption{v6 aggregate per-canonical breakdown of invented-stimulus
+  mass per model. \emph{(NEW)} marks the 5 v6 canonical additions
+  (\texttt{iff} flagged \emph{OOD} by the pre-registered audit gate;
+  see \S\ref{sec:prereg}). Tok = maximum subword pieces across the
+  three tokenizers (Gemma SentencePiece, OLMo BPE, Pythia BPE).
+  Freq = corpus-frequency tier estimate. Per-model aggregates
+  computed across the 80 v6 sweep cells $\times$ 16 invented words
+  = 1280 readouts per model, from
+  \texttt{outputs/24\_20260520\_185537.log}. Threshold-violating
+  values flagged in the prose are: OLMo $15.9\%$ on \texttt{implies};
+  OLMo $40.5\%$ on \texttt{nand}; Gemma $7.5\%$ and Pythia $5.5\%$ on
+  \texttt{definitely}; Gemma $14.8\%$ on \texttt{unprovably}.}
+  \label{tab:default}
+\end{table}
+
+Three findings worth recording.
+
+(1) \textbf{OLMo's 15.9\% routing to \texttt{implies}} is the
+cleanest anomaly. \texttt{implies} is a v3 / v4 / v5 carryover
+canonical (1pc in all three tokenizers, mid-frequency), and was not
+predicted by any of the three single-axis hypotheses to attract
+default mass.
+
+(2) \textbf{Mid-frequency control canonicals do not stay quiet.}
+\texttt{definitely} attracts $7.5\%$ in Gemma and $5.5\%$ in Pythia,
+above the P\_INTERACTION $\leq 5\%$ threshold. The P\_INTERACTION
+reading therefore fails.
+
+(3) \textbf{The mechanism appears to be a model-specific mixture of
+training-corpus frequency, subword shape, and per-word
+residual-stream structure.} The script 25b embedding-similarity test
+(\S\ref{sec:embsim}) then rules out the most natural single-factor
+closing of the gap.
+
+\subsection{Causal patching sweep across five (source, target, layer) cells}
+\label{sec:causal}
+
+The v6 expansion produced two findings that linear probes alone
+cannot adjudicate: (Q1) Fact 1 is a correlational linear-probe
+finding (the \S\ref{sec:limits} ``linear probes only'' limit applies
+at the principal positive cells); (Q2) two Gemma 2 9B cells at L\,2
+close-paren show \Mbfb{} jumping from chance at v5 to PASS at v6
+\emph{without any change to underlying activations}, with the v6
+reading being a methodological caveat on \Mbfb{}'s
+threshold-sensitivity to readout granularity.
+
+We address both questions with activation patching across five
+(source, target, layer) cells. Three cells are principal
+Phase-1/Phase-2 cells motivated directly by Q1 and Q2:
+\textbf{Gemma \texttt{opera$\to$close L\,2}} (the v6 emergent cell
+at $\Mbfb = 0.822$), \textbf{Gemma \texttt{sente$\to$close L\,2}}
+(the second v6 emergent cell at $\Mbfb = 0.662$), and
+\textbf{OLMo \texttt{sente$\to$close L\,10}} (the project-flagship
+Fact-1 anchor at $\Ma = 1.000$). Two further cells were added after
+review to disambiguate whether the Cell-1 vs Cell-3 verdict split is
+a property of source anchor or a property of target anchor
+(\S\ref{sec:joint}):
+\textbf{Gemma \texttt{opera$\to$opera L\,4}} (the cross-family
+Fact-1 cell at $\Mc = 1.000$) and
+\textbf{OLMo \texttt{opera$\to$close L\,10}} (the same OLMo L\,10
+target as Cell 4 but under the operator-after source). At each
+cell, we replace the FUNC-PFX target-anchor residual at the
+specified layer with the mean NEUTRAL canonical activation at the
+source anchor, via a forward hook. Four conditions:
+\texttt{BASELINE} (no patch), \texttt{PATCH\_not},
+\texttt{PATCH\_and}, \texttt{RANDOM\_NORM} (norm-matched Gaussian
+control). Two outcomes per condition: (i) the patched-residual
+probe readout (sanity check on patch effectiveness), (ii) the
+behavioural KL shift in the sentence-final next-token distribution
+against the FUNC-PFX canonical-$c$ reference.
+
+The five cells split into one CLEAN PASS and four FAIL under
+intervention, after Cell 2 is reclassified FAIL by the per-word
+\dspec{} bootstrap (script 25d).
+
+\paragraph{Table~\ref{tab:causal} columns are defined as follows.}
+$P(\text{probe} \to c \mid \text{PATCH}_c)$: fraction of post-patch
+residuals classified by the probe as canonical $c$ when patched with
+the NEUTRAL-$c$ source vector (probe-causality sanity check; $1.0$
+= patch reaches the residual cleanly). $\dkl(c)$: mean over 16
+invented words of
+$\mathrm{KL}(P_{\text{BASELINE}} \| \text{ref}_c) -
+\mathrm{KL}(P_{\text{PATCH}_c} \| \text{ref}_c)$,
+where $\text{ref}_c$ is the FUNC-PFX-$c$ reference distribution on
+the sentence-final next-token logits; positive = patch pulled
+behaviour toward canonical $c$. RANDOM $\dkl(c)$: same metric with
+patches drawn from a norm-matched Gaussian (negative control).
+``Arity-flip U $\to$ and'' and ``B $\to$ not'' rows: \dkl{} block
+computed \emph{only} on wrong-arity-patched words ---
+intended-unary invented words patched with \texttt{and},
+intended-binary invented words patched with \texttt{not} ---
+measuring whether the patch can causally flip the downstream arity.
+
+\begin{sidewaystable}
+  \centering
+  \footnotesize
+  \setlength{\tabcolsep}{4pt}
+  \begin{tabular}{lllccccccl}
+    \toprule
+    Cell & Source & Target & $\dkl$(not) & $\dkl$(and) & RND(not) & RND(and) & U$\to$and & B$\to$not & \textbf{Verdict}\\
+    \midrule
+    Gemma opera$\to$close L\,2         & opera & close L\,2  & $+0.048$ & $+0.038$ & ${\sim}0$ & ${\sim}0$ & $+0.033$ (8/0/8) & $+0.061$ (8/0/8) & \textbf{CLEAN PASS}\\
+    Gemma opera$\to$opera L\,4 (extra) & opera & opera L\,4  & $+0.033$ & $+0.027$ & $+0.017$  & $+0.021$  & $+0.028$ (6/2/8) & $+0.039$ (7/1/8) & \textbf{FAIL}\\
+    Gemma sente$\to$close L\,2         & sente & close L\,2  & $-0.020$ & $-0.012$ & $+0.019$  & n/a       & $-0.018$ (4/4/8) & chance           & \textbf{FAIL}\\
+    OLMo  sente$\to$close L\,10        & sente & close L\,10 & $-0.012$ & $-0.017$ & $+0.019$  & $+0.012$  & $-0.020$ (1/7/8) & $-0.006$ (3/5/8) & \textbf{FAIL}\\
+    OLMo  opera$\to$close L\,10 (extra) & opera & close L\,10 & $+0.013$ & $+0.003$ & $+0.023$  & $+0.016$  & $+0.001$ (5/3/8) & $+0.021$ (8/0/8) & \textbf{FAIL}\\
+    \bottomrule
+  \end{tabular}
+  \caption{Cross-cell synthesis across the five (source, target,
+  layer) cells. \dkl{} columns: mean over 16 invented words.
+  Arity-flip columns (U$\to$and, B$\to$not): mean \dkl{} restricted
+  to wrong-arity-patched words, with the (positive / negative /
+  total) tally.   Verdict criterion: CLEAN PASS = targeted \dkl{}
+  $\gg$ RANDOM on both axes with arity-flip $\geq 7/8$ positive in
+  both directions; FAIL = any of \{RANDOM $\geq$ targeted on at least
+  one axis; arity-flip at chance; per-word \dspec{} 95\% CI straddles
+  zero on both axes\}. The per-word \dspec{} bootstrap is the
+  criterion-of-record for cells whose mean-ratio falls in the
+  $1.3$--$2\times$ band, following the
+  \texttt{outputs/25d\_*.log} reconciliation; cells outside that
+  band (CLEAN PASS / FAIL by margin) do not require the bootstrap
+  to be conclusive. Per-word positivity counts and full
+  \Mc{}~/~\Ma{} values are given inline in \S\ref{sec:causal} for
+  each cell. ``(extra)'' = post-review follow-up cell. Sources:
+  \texttt{outputs/25a\_*.log} (cells 1--3, 2--5),
+  \texttt{outputs/25d\_*.log} (Cell-2 \dspec{} bootstrap).}
+  \label{tab:causal}
+\end{sidewaystable}
+
+\paragraph{\dspec{} bootstrap for Cell 2} (script 25d,
+\texttt{outputs/25d\_20260521\_132205.log}). Per-word
+$\dspec(\text{axis}) = \dkl_{\text{targeted}}(\text{axis}) -
+\dkl_{\text{random\_mean}}(\text{axis})$ bootstrapped over the 16
+invented words ($B = 500$): \texttt{not} axis \dspec{} 95\% CI
+$= \mathbf{[-0.001, +0.031]}$ (mean $+0.016$, 13/16 words positive);
+\texttt{and} axis \dspec{} 95\% CI $= \mathbf{[-0.005, +0.020]}$
+(mean $+0.006$, 11/16 words positive). Both CIs include zero; the
+mean-ratio signal at this cell does not firm up under the cleaner
+statistic, and Cell 2 is reclassified FAIL. The per-word \dspec{}
+bootstrap was run on Cell 2 only; the Cell 1 (Gemma
+\texttt{opera$\to$close L\,2}) CLEAN PASS verdict rests on the
+mean-ratio test (targeted $\approx +0.04$ vs. \texttt{RANDOM\_NORM}
+${\sim}0$ on both axes) and the arity-flip test ($8/0/8$ in both
+directions), which it passes by wide margins; a Cell-1 per-word
+bootstrap rerun would strengthen confidence but is unlikely to flip
+the verdict given the margins.
+
+All five cells have probe-causality $= 100\% / 100\%$ (the patches
+reach the residual cleanly under v2's hook-capture protocol; see
+Appendix~H); the five-way split is on behavioural KL
+only.
+
+\paragraph{Cell 1 --- Gemma \texttt{opera$\to$close L\,2}: CLEAN
+PASS.} Behavioural \dkl{} is strongly positive on both reference axes
+($+0.048$ against $\text{ref}_{\text{not}}$, 15/16 words positive;
+$+0.038$ against $\text{ref}_{\text{and}}$, all 16 words positive)
+and substantially exceeds the \texttt{RANDOM\_NORM} control
+(${\sim}0$ on both axes). The decisive datum is the arity-flip
+block: when an intended-unary word is patched with \texttt{and}
+(canonical binary), all 8/8 unary-intended words shift toward
+FUNC-PFX-\texttt{and} (mean $\dkl = +0.033$); symmetric 8/0/8 for
+intended-binary words patched with \texttt{not} (mean
+$\dkl = +0.061$). \textbf{The L\,2 close-paren position in Gemma 2
+9B, when patched from NEUTRAL operator-after, causally controls the
+downstream arity-respecting behaviour.} The v6 emergent PASS-arity
+at this cell is real under causal intervention. This is the only
+cell with clean causally-arity-respecting behaviour across the
+five-cell sweep.
+
+\paragraph{Cell 2 --- Gemma \texttt{opera$\to$opera L\,4} (extra,
+post-review follow-up): FAIL.} This is the project-flagship
+cell --- $\Mc = 1.000$ with bootstrap CI $[1.000, 1.000]$ across all
+three model families. Behavioural \dkl{} is positive on both axes
+($+0.033$ / $+0.027$) and exceeds \texttt{RANDOM\_NORM} by
+approximately $1.94\times$ on \texttt{not} and $1.29\times$ on
+\texttt{and}; the \texttt{and} ratio sits at the soft boundary of
+the $1.3$--$2\times$ band. Arity-flip is moderately positive in both
+directions ($75\%$ and $87.5\%$). The \texttt{RANDOM\_NORM} floor at
+this cell is itself positive ($+0.017$ / $+0.021$), indicating that
+mean-pool patching here produces a generic-disruption effect on top
+of any specific-canonical signal. \textbf{Per-word \dspec{} bootstrap
+(script 25d, lab notes \S3.7.22) rejects the causal claim:} the
+bootstrap CI on
+$\dspec(\text{not}) = \dkl_{\text{targeted}}(\text{not}) -
+\dkl_{\text{random\_mean}}(\text{not})$ is $[-0.001, +0.031]$
+(13/16 words positive) and on $\dspec(\text{and})$ is
+$[-0.005, +0.020]$ (11/16 words positive). Both CIs include zero,
+marginally on \texttt{not} and clearly on \texttt{and}; the
+mean-ratio signal does not firm up under the per-word statistic, and
+the cell is reclassified FAIL.   \textbf{The principal cross-family
+Fact-1 cell's causal load-bearingness is not robust: the geometric
+Fact 1 result ($\Mc = 1.000$) does not translate into
+statistically-clean causal load-bearingness at its strongest cell ---
+the per-word distribution of causal effect is consistent with the
+norm-matched \texttt{RANDOM\_NORM} baseline within sampling noise.}
+
+\paragraph{Cell 3 --- Gemma \texttt{sente$\to$close L\,2}: FAIL.}
+Same target \& layer as Cell 1 but with sentence-final source
+instead of operator-after. \dkl{} is flat-or-negative on both axes
+($-0.020$, $-0.012$); \texttt{RANDOM\_NORM} exceeds targeted on the
+\texttt{not} axis ($+0.019$ vs $-0.020$). Arity-flip is at chance.
+\textbf{The L\,2 close-paren position cannot be causally driven
+from a NEUTRAL-sentence-final source at this cell.} \Mbfb{}'s
+$66.2\%$ reading at this cell at v6 is a probe-readable
+threshold-crossing under expanded readout, not a causally
+arity-respecting structure. The lab notes \S3.7.16 methodological-
+caveat reading is confirmed.
+
+\paragraph{Cells 4 and 5 --- OLMo \texttt{$\to$close L\,10} under
+both source anchors: FAIL.} Cell 4 (sentence-final source, original
+lab notes \S3.7.17 cell): \dkl{} negative on both axes ($-0.012$,
+$-0.017$); RANDOM strongly positive ($+0.019$ / $+0.012$). Cell 5
+(operator-after source, extra, post-review follow-up): \dkl{}
+barely positive ($+0.013$, $+0.003$); RANDOM still exceeds on both
+axes ($+0.023$ / $+0.016$). Arity-flip is at chance for unary$\to$
+\texttt{and} in both cells. \textbf{The OLMo L\,10 close-paren
+position is causally inert under both tested source anchors} ---
+the within-target source-anchor flip does not rescue this target.
+This is a stronger version of the lab notes \S3.7.17 OLMo finding:
+the target position itself is geometric / probe-readable but
+causally inert, independent of which NEUTRAL source the patch is
+drawn from.
+
+Three findings emerge from the 5-cell sweep:
+
+(i) \textbf{Geometric Fact 1 does not imply causal load-bearingness
+under the per-word \dspec{} bootstrap.} The principal cross-family
+Fact-1 cell (Gemma \texttt{opera$\to$opera L\,4},
+$\Mc = 1.000$ $[1.000, 1.000]$) has positive mean \dkl{} on both
+axes and a mean ratio of $1.3$--$2\times$ over \texttt{RANDOM\_NORM},
+but the per-word \dspec{} 95\% CI straddles zero on both axes
+(\texttt{not}: $[-0.001, +0.031]$; \texttt{and}: $[-0.005, +0.020]$)
+--- the signal does not separate from the norm-matched baseline
+within sampling variability across the 16 invented words. The
+project-flagship OLMo Fact-1 anchor
+(\texttt{sente$\to$close L\,10}~/~\texttt{opera$\to$close L\,10}) is
+causally inert under both tested source anchors. The only cell with
+clean causally-arity-respecting behaviour is the Gemma
+\texttt{opera$\to$close L\,2} \emph{v6 emergent} cell, not a Fact-1
+anchor. The headline ``trained-vocabulary substrate-invariance''
+finding is therefore most accurately read as a \emph{geometric /
+linear-probe-readable} substrate-invariance claim; the causal
+grounding holds cleanly at one specific (source, target, layer)
+joint product (the Gemma v6 emergent cell, which is not a Fact-1
+anchor) and weakly-to-not-at-all at every Fact-1 anchor we have
+tested.
+
+(ii) \textbf{The Gemma v6 emergent PASS-arity finding splits 1:1.}
+The \texttt{opera$\to$close L\,2} cell is causally validated as a
+single-model exception to the Fact-2 novel-operator generalisation
+failure; the \texttt{sente$\to$close L\,2} cell is
+\Mbfb{}-granularity-only as lab notes \S3.7.16 hypothesised. The
+headline picture needs one tightly-scoped Gemma-specific caveat to
+Fact 2, not a wholesale retraction.
+
+(iii) \textbf{Source anchor is a non-trivial causal variable but is
+not directionally deterministic across cells.} The within-target
+source-anchor flip at Gemma L\,2 close-paren (Cell 1 vs Cell 3)
+produces clean opposite verdicts at identical
+target~/~layer~/~probe-causality --- establishing that source anchor
+matters at this specific cell. However, operator-after sources do
+\emph{not} reliably produce causal effects across targets: Cell 2
+(Gemma \texttt{opera$\to$opera L\,4}) is FAIL under the per-word
+\dspec{} bootstrap, and Cell 5 (OLMo \texttt{opera$\to$close L\,10})
+is FAIL under the mean-ratio criterion. The ``operator-after sources reliably PASS / sentence-final
+sources reliably FAIL'' reading was a v1-draft hedge flagged in
+review as under-powered; the 5-cell evidence rejects it.
+\textbf{The verdict is the joint product of source, target, and
+layer}, not a function of source-anchor alone. Probe-causality
+remains necessary but not sufficient for causal load-bearingness,
+and same-target~/~different-source comparisons remain a useful
+methodological device --- but the device characterises the (source,
+target) interaction, not a free-standing property of either anchor.
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\linewidth]{figures/fig_04_causal_patching.pdf}
+  \caption{Causal patching across five (source, target, layer) cells.
+  Each panel shows targeted PATCH and \texttt{RANDOM\_NORM} control
+  \dkl{} on the $\text{ref}_{\text{not}}$ and $\text{ref}_{\text{and}}$
+  axes; the per-word \dspec{} 95\% CI is overlaid on Cell 2 (black
+  caps). Verdicts: one CLEAN PASS, four FAIL (Cell 2 reclassified
+  FAIL by the per-word bootstrap) --- see Table~\ref{tab:causal} and
+  \S\ref{sec:causal} for the criterion and per-cell discussion.}
+  \label{fig:causal}
+\end{figure}
+
+Causal patching with mean-pooled source activations is one
+operationalisation of intervention; \S\ref{sec:limits} discusses its
+limits (mean-pool centroid bias; cross-notation source-target
+attention-pattern mismatch).
+
+\subsection{Mechanism gap is not closed by mean-pooled cosine similarity}
+\label{sec:embsim}
+
+\S\ref{sec:default} ruled out the three single-axis readings of the
+default mechanism. The natural next-most-parsimonious closing is
+\textbf{contextual semantic neighborhood}: each invented word's
+default attractor is the canonical that is geometrically closest to
+it in residual stream space at the focus layer, controlled for
+intended arity. We test this directly across all three model families
+and the full v6 sweep with the embedding-similarity probe
+(script 25b): for each of three models $\times$ 80 sweep cells,
+compute the cosine-similarity argmax between each invented word's
+mean activation and each canonical's mean activation at the same
+(target\_cond, target\_anchor, layer) coordinate the probe predicts
+on, and ask whether that argmax matches the probe's empirical per-
+word top canonical.
+
+Two variants: unconstrained \texttt{sim-all} (chance $1/15 \approx
+6.7\%$) and arity-conditioned \texttt{sim-arity} restricting the
+argmax to canonicals of matching intended arity (chance
+$\approx 13.3\%$). Plus a coarser \texttt{arity-match} metric: does
+the unconstrained \texttt{sim-all} top have the same arity as the
+probe top? (Chance $\approx 53.3\%$ under the majority-arity
+baseline.) Bootstrap 95\% CIs by resampling the 16-word invented set
+with replacement ($B = 200$).
+
+\textbf{Cross-model headline (mean over 80 cells per model, focus
+layers only):}
+
+\begin{table}[h]
+  \centering
+  \small
+  \resizebox{\linewidth}{!}{%
+  \begin{tabular}{lccc}
+    \toprule
+    Model & \texttt{agree-all} (chance $6.7\%$) & \texttt{agree-arity} (chance ${\approx}13\%$) & \texttt{arity-match} (chance ${\approx}53\%$)\\
+    \midrule
+    Gemma 2 9B    & 11.6\% $[9.6, 13.8]$  & 11.4\% $[9.1, 13.4]$  & 54.1\% $[49.8, 58.2]$\\
+    OLMo 2 7B     & 26.6\% $[24.1, 28.6]$ & 21.5\% $[18.4, 24.6]$ & 66.4\% $[64.0, 68.4]$\\
+    Pythia 6.9B-d & 24.0\% $[21.4, 26.5]$ & 19.0\% $[15.6, 22.5]$ & 60.2\% $[57.7, 62.6]$\\
+    \bottomrule
+  \end{tabular}}
+  \caption{Embedding-similarity probe vs linear-probe per-word routing
+  agreement at the principal mid-layer cell per model, with
+  bootstrap 95\% CIs ($B = 200$ resamples over the 16 invented words).
+  \texttt{agree-all} is the fraction of invented words where the
+  geometric argmax over all 15 canonicals matches the linear probe's
+  top canonical (chance = $1/15 \approx 6.7\%$). \texttt{agree-arity}
+  is the same agreement under the geometric argmax restricted to
+  canonicals of matching intended arity (chance $\approx 1/7$--$1/8
+  \approx 13\%$; the pre-specified ``mechanism gap closed''
+  threshold is $\geq 60\%$, declared in the
+  \texttt{25b\_embedding\_similarity\_probe.py} docstring before any
+  25b run). \texttt{arity-match} is the fraction of invented words
+  where the unrestricted geometric argmax has the correct
+  binary-vs-unary intended arity (chance $\approx 53\%$ under the
+  majority-arity baseline given v6's 8B / 7U split). All three
+  agreement metrics sit at or near chance for \texttt{agree-arity}
+  and \texttt{agree-all}; none of the three models clears the
+  pre-specified $60\%$ threshold for \texttt{agree-arity}. From
+  \texttt{outputs/25b\_20260520\_213935.log}.}
+  \label{tab:embsim}
+\end{table}
+
+\textbf{The pre-specified threshold for ``mechanism gap is closed''
+was \texttt{agree-arity} $\geq 60\%$ (declared in the
+\texttt{25b\_embedding\_similarity\_probe.py} docstring before any
+run). No model meets this threshold; all three are well below.}
+Gemma's CI $[9.1, 13.4]$ does not even reach the ${\sim}13.3\%$
+within-arity chance baseline, and OLMo and Pythia are at modest
+$1.4$--$1.6\times$ chance. At distributed cells ($\Mbfc < 0.7$, the
+methodologically interesting regime where the probe spreads
+predictions across multiple canonicals rather than collapsing to a
+single attractor), \texttt{agree-all} drops to $11$--$16\%$ across
+all three models --- barely above the $6.7\%$ chance baseline.
+
+\paragraph{Three findings:}
+
+(i) Mean-pooled cosine similarity captures arity but not the
+per-canonical identity. The \texttt{arity-match} metric is
+moderately above chance in OLMo and Pythia ($66.4\%$, $60.2\%$) and
+at chance in Gemma ($54.1\%$); the gap between
+\texttt{arity-match} and \texttt{agree-arity} is the principal
+positive signal. Once we condition on intended arity, the predictive
+power of cosine similarity within arity is at chance.
+
+(ii) \textbf{L\,0 embedding-layer agreement collapses to floor
+($0$--$1\%$) in all three models.} This is a clean v6 cross-family
+re-confirmation of the prior single-model finding that the
+operator-region attractor structure is constructed by intermediate-
+layer processing rather than inherited from token-embedding geometry.
+
+(iii) A specific failure-mode signature: at distributed cells across
+all three models, the unconstrained cosine argmax collapses every
+invented word to \texttt{nand} (for binary-intended) or
+\texttt{negate} (for unary-intended under arity-conditioning), most
+likely a canonical-magnitude-and-idiosyncrasy effect
+(\texttt{nand}'s mean activation sits further from the canonical
+centroid than higher-frequency canonicals because its per-stim
+activations are most idiosyncratic). This is a near-tautological
+geometric structure that does not reflect the probe's actual
+decision boundary. \textbf{Mean-pooled cosine on residual-stream
+activations is contaminated by canonical-magnitude effects} and
+should be reported alongside probe-based readouts, never as a
+standalone replacement.
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\linewidth]{figures/fig_05_agreement.pdf}
+  \caption{Embedding-similarity probe vs linear-probe agreement at
+  L\,0 + the focus-layer set per model. Three-panel line plot
+  (Gemma 2 9B / OLMo 2 7B / Pythia 6.9B-d). Three curves per panel:
+  \texttt{agree-all} (unconstrained cosine argmax matches probe top;
+  chance $\approx 6.7\%$), \texttt{agree-arity} (cosine argmax
+  restricted to canonicals of matching intended arity; chance
+  $\approx 13\%$; pre-specified ``mechanism gap closed'' threshold
+  at $60\%$ marked as a solid horizontal line),
+  \texttt{arity-match} (cosine argmax has correct intended arity;
+  chance $\approx 53\%$). The L\,0 column (highlighted grey) is at
+  floor ($0$--$3\%$) on the identity metrics in all three models ---
+  the operator-region attractor structure is constructed by
+  intermediate-layer processing, not inherited from token-embedding
+  geometry. Mid-layer peak at L\,4 (Gemma) and L\,10 (OLMo, Pythia);
+  late-layer L\,24 identity-collapse with \texttt{arity-match}
+  remaining elevated.}
+  \label{fig:agreement}
+\end{figure}
+
+\paragraph{Net \S\ref{sec:embsim} verdict.} The \S\ref{sec:default}
+mechanism gap is \textbf{not} closed by mean-pooled cosine
+similarity. The residual third factor in the default mechanism is
+\emph{probe-decision-boundary geometry} --- the LogisticRegression
+boundary captures per-word residual-stream structure that
+mean-pooling wipes out --- and is therefore not reducible to any
+single mean-pooled-activation statistic.
+
+% =========================================================================
+\section{Discussion}
+\label{sec:discussion}
+
+\subsection{Trained-vocabulary substrate-invariance as a refined edge of the Platonic Representation Hypothesis}
+\label{sec:prh}
+
+Our two-part headline locates a precise empirical edge of the PRH:
+
+\paragraph{Inside the model's trained vocabulary (within the tested
+readout sets).} Cross-notation linear-probe geometry transfers at
+ceiling ($\Mc = 1.000$ with bootstrap CI $[1.000, 1.000]$ under
+15-class readout) across three model families with three independent
+training corpora, three architectures, and three tokenizers,
+\emph{both for logical operators and for an orthogonal set of 15
+non-operator content words} (\S\ref{sec:contentword}, script 25c).
+At the principal \NtoF{} operator-after cell, the model has a
+substrate-independent linear-probe-readable representation of
+\emph{the trained, well-tokenized vocabulary items in the tested
+15+15 readout set}; the substrate-invariance is a per-token-identity
+property at this anchor/direction coordinate, not a property of
+logical-operator-class semantics. The v1 draft's ``operator-set-
+bound'' framing is rejected by the \S\ref{sec:contentword}
+content-word control and replaced by the narrower-than-it-sounds
+``trained-vocabulary-bound'' framing --- narrower because the
+reframe is scoped to the tested readout sets and the principal
+direction, broader-than-operator-class because it is not
+domain-specific.
+
+\paragraph{Outside the trained operator set.} The apparent
+arity-respecting routing of invented operators is retracted under
+canonical-readout expansion in all three model families. The actual
+mechanism is a readout-vocabulary-dependent canonical-attractor
+compression whose target shifts wholesale as the readout vocabulary
+changes; no single-axis statistic (frequency, subword shape,
+mean-pooled cosine similarity) --- including the original
+``default-to-rarest-canonical'' hypothesis --- predicts the per-word
+routing target. The Fact-2 negative finding is preserved as-stated
+--- it is a claim specifically about novel \emph{operator} words;
+one tightly-scoped Gemma 2 9B L\,2 close-paren cell is a
+causally-validated single-model exception (\S\ref{sec:causal}), and
+the analog claim for novel content words is unverified.
+
+The two facts together identify a sharp PRH edge: the model has a
+substrate-independent geometry for its trained vocabulary at the
+operator-after anchor, demonstrated across two word-class controls
+(operators and content words); and lacks a substrate-independent
+\emph{category} of ``logical operator'' that would extend to novel
+members. This is more constrained than either ``the model encodes
+underlying structure'' or ``the model is autocomplete-with-extra-
+steps'' as headline claims, and is the more accurate intermediate
+position. The reframe from ``operator-set-bound'' to
+``trained-vocabulary-bound'' makes the positive claim simultaneously
+broader (the tested 15-operator + 15-content-word readout sets, not
+just the operator set) and shallower (lexical-identity
+substrate-invariance at the principal anchor/direction, not a
+substrate-independent semantic category for logical operators
+specifically) than the v1 framing. The broader-but-shallower
+combination is the better empirical fit and the more accurate
+scientific claim.
+
+Two refinements to the headline survive the v6 + script 25
+expansion. (1) \textbf{Gemma 2 9B has a single causally-validated
+exception} at L\,2 close-paren sourced from NEUTRAL operator-after,
+where novel-operator activations behave arity-respectingly under
+intervention. We treat this as a single tightly-scoped model-
+specific exception, not a refutation of the operator-novelty
+failure for Gemma.
+
+(2) \textbf{Fact 1's geometric transfer does not
+translate to robust causal load-bearingness at any Fact-1 anchor we
+have tested.} The 5-cell causal-patching sweep (\S\ref{sec:causal})
+demonstrates this directly: the principal cross-family Fact-1 cell
+(Gemma \texttt{opera$\to$opera L\,4}, where $\Mc = 1.000$ with
+bootstrap CI $[1.000, 1.000]$ across all three models) produces mean
+\dkl{} approximately $1.3$--$2\times$ the \texttt{RANDOM\_NORM}
+control, but the per-word \dspec{} 95\% CI straddles zero on both
+axes (\texttt{not}: $[-0.001, +0.031]$; \texttt{and}:
+$[-0.005, +0.020]$; script 25d) --- the causal signal is not
+statistically distinguishable from the norm-matched baseline within
+sampling variability across the 16 invented words. The
+project-flagship OLMo Fact-1 anchor at L\,10 close-paren is causally
+inert under both tested source anchors. The ``trained-vocabulary
+substrate-invariance'' headline is therefore most accurately read as
+a \emph{geometric / linear-probe-readable} substrate-invariance
+claim: the linear-probe geometry transfers at ceiling across
+notations within the trained vocabulary, but at every Fact-1 anchor
+we have causally tested the load-bearingness either clearly fails or
+fails to firm up under the per-word \dspec{} bootstrap.
+
+\subsection{The (source, target, layer) joint product as a causal variable}
+\label{sec:joint}
+
+The 5-cell causal-patching sweep (\S\ref{sec:causal}) supports a
+precise but constrained methodological finding. The within-target
+source-anchor flip at Gemma L\,2 close-paren --- identical target,
+identical layer, identical $100\%$ probe-causality, opposite
+behavioural verdicts (Cell 1 PASS, Cell 3 FAIL) --- establishes that
+\textbf{same-target~/~different-source comparisons can reveal causal
+dissociations that single-anchor-pair patching misses}.
+Probe-causality is necessary but not sufficient for causal
+load-bearingness; the source from which a patch is drawn is a
+non-trivial variable that interacts with the target position to
+determine downstream load-bearingness.
+
+\paragraph{However, source anchor is not directionally deterministic
+across cells.} The two post-review follow-up cells
+(\S\ref{sec:causal}, Cells 2 and 5) test whether operator-after
+sources reliably produce causal effects at non-Gemma-L-2 targets.
+They do not: Cell 2 (Gemma \texttt{opera$\to$opera L\,4}, the
+principal Fact-1 anchor) is FAIL under the per-word \dspec{}
+bootstrap (mean ratio $1.3$--$2\times$ over \texttt{RANDOM\_NORM} but
+\dspec{} 95\% CI straddles zero on both axes), and Cell 5 (OLMo
+\texttt{opera$\to$close L\,10}, the within-target source-anchor flip
+on the \S\ref{sec:dissoc} flagship cell) is FAIL under the
+mean-ratio criterion. The
+v1-draft hedge ``operator-after sources reliably drive downstream
+causal effects, sentence-final sources reliably fail'' is rejected
+by the 5-cell evidence.
+
+\paragraph{The verdict is the joint product of source, target, and
+layer.} The mechanistic reading: the residual stream at a given
+target position is read out by downstream layers through a
+position-specific aggregation pattern, and patch sources whose
+residual-stream coordinate system aligns with that aggregation
+pattern can drive downstream computation; sources whose coordinate
+system does not align cannot. The alignment relation depends on both
+the source and target position simultaneously --- there is no
+general rule that operator-after sources align with all targets or
+that sentence-final sources fail at all targets. The probe, which
+reads a linear projection of the residual stream, is robust to
+source-target coordinate-system mismatches; downstream layers are
+not.
+
+\paragraph{Two substantive findings survive the more conservative
+reading.} (i) Within-target source-anchor flip \emph{can} produce
+opposite causal verdicts (Gemma L\,2 close-paren). (ii) Some target
+positions are causally inert regardless of source anchor (OLMo
+L\,10 close-paren under both sources). Both are methodologically
+informative and should inform future activation-patching protocol
+design. The first motivates same-target~/~different-source
+comparisons as a routine diagnostic; the second nuances the
+interpretation of ``probe-readable but causally inert'' cells (the
+inertness can be a property of the target, not merely of a
+particular (source, target) pair).
+
+\subsection{Methodological contributions}
+\label{sec:methods_contrib}
+
+Four methodological devices in this paper are directly transferable
+to other probe-based interpretability studies.
+
+\paragraph{(i) The within-vocabulary content-word control.}
+Section~\ref{sec:contentword}'s pre-specified post-review control
+--- re-running the M1--M4 battery with 15 heterogeneous non-operator
+content words inserted into syntactically-identical templates --- is
+the load-bearing diagnostic that distinguishes domain-specific
+substrate-invariance (``the model has a substrate-independent
+representation of \emph{logical operators}'') from generic
+lexical-identity substrate-invariance (``the model has a
+substrate-independent representation for trained, well-tokenized
+vocabulary items \emph{beyond the hypothesised semantic category},
+as demonstrated by a matched category-orthogonal control at the
+tested anchor/direction coordinate'').
+Without the control, the v1 draft's ``operator-set-bound'' claim
+would have been published, and the load-bearing reframe to
+``trained-vocabulary-bound'' would have been missed. The control is
+single-experiment, ${\sim}50$~min of compute reusing the existing
+extraction infrastructure, and applicable to any probe-based
+substrate-invariance study that reports ceiling-level cross-context
+transfer for a hypothesized semantic category. Any such study should
+pre-register a content-word (or otherwise category-orthogonal)
+control as a required measurement.
+
+\paragraph{(ii) Same-target~/~different-source comparisons as a
+routine activation-patching diagnostic.}
+Section~\ref{sec:causal}'s within-target source-anchor flip at the
+two Gemma 2 9B L\,2 close-paren cells --- identical target anchor,
+identical layer, identical $100\%$ probe-causality, opposite
+behavioural verdicts --- demonstrates that two patches identical in
+every reported way except patch source can produce opposite causal
+conclusions. Activation patching as currently practiced reports a
+single source-target patch transfer and treats the result as a
+property of the target representation; our evidence shows the result
+can be a joint property of source, target, and layer
+(\S\ref{sec:joint}). The transferable methodological device is the
+\emph{comparison}: any single-anchor-pair patching result should be
+supplemented by at least one same-target~/~different-source patch to
+characterise the (source, target) interaction and to surface cases
+where the apparent target-representation property is in fact a
+(source, target)-coupling property. This is a less ambitious claim
+than ``source anchor is a first-class causal variable'' (which the
+v1 draft made but which the 5-cell evidence does not support across
+cells); it is the more accurate methodological lesson the project's
+evidence does support.
+
+\paragraph{(iii) The lucky-default detector.} A specific
+false-positive pattern in probe-based substrate-invariance ---
+uniform single-canonical routing whose canonical's arity happens to
+coincide with the majority arity of the test set --- produces an
+aggregate \Mbfb{} above threshold while every per-word
+concentration is at ceiling. The detector flags this with
+$\min_w P(\text{top\_canonical} \mid w) \geq 0.95$. It was
+developed on an exploratory two-model sweep where it reclassified
+4 of 8 initially-flagged PASS-arity cells as false positives;
+pre-registered and re-applied to the three-model v6 sweep
+(\S\ref{sec:fact2}), it triggers on 2 of 8 v3 PASS-arity cells
+(\S\ref{sec:lucky}). The detector should be required in any
+probe-based study that reports per-word intended-class agreement.
+
+\paragraph{(iv) The \Mc{}~/~\Ma{} dissociation.} Cross-notation
+substrate-invariance has two distinct sub-claims (canonical identity
+transfers; arity axis transfers) that should be measured separately.
+Reporting only canonical-identity transfer misses arity-axis-only
+dissociation (\S\ref{sec:dissoc}'s OLMo
+\texttt{\NtoF{} sente$\to$close L\,10} cell, where $\Ma = 1.000$ but
+\Mc{} sits at $0.604$--$0.806$ across the four scopes); reporting
+only arity-axis transfer collapses cells where canonical identity is
+also preserved into the same bin as cells where only arity is.
+\emph{Related empirical caveat: \Mbfb{} is granularity-sensitive.}
+Two Gemma cells in our sweep showed \Mbfb{} trajectories
+$60\% \to 56\% \to 50\% \to 82\%$ across v3 $\to$ v4 $\to$ v5 $\to$
+v6 \emph{without any change to underlying activations} --- the
+$0.65$ PASS threshold on \Mbfb{} depends on how many within-arity
+buckets the canonical readout vocabulary expresses. \Ma{} is the
+partition-invariant primary measurement; \Mbfb{} should be reported
+alongside but flagged as granularity-sensitive when the canonical-
+set size changes.
+
+\subsection{What the mechanism gap tells us}
+\label{sec:mech}
+
+The combined evidence from \S\ref{sec:default} (single-axis
+predictions fail), \S\ref{sec:causal} (causal patching produces a
+three-way split), and \S\ref{sec:embsim} (mean-pooled cosine
+similarity does not close the gap) suggests that the residual
+mechanism of novel-operator routing is \emph{probe-decision-boundary
+geometry} --- the LogisticRegression boundary captures per-word
+residual-stream structure that single-axis aggregate statistics
+cannot reproduce. The \S\ref{sec:embsim} per-layer agreement map
+(Figure~\ref{fig:agreement}) localises the residual mechanism to
+specific layers in each model: agreement peaks at L\,4 in
+Gemma 2 9B and at L\,10 in OLMo 2 7B and Pythia 6.9B-d, with floor
+agreement at L\,0 in all three families. We ship the per-cell probe
+weights at these layers in the repository
+(\texttt{experiments/probes/}, small enough to track in git) and
+make the v6 carryover residual-stream caches (multi-GB per model,
+gitignored) available on request, as a starting point for
+sparse-autoencoder feature labelling --- the next-most-natural
+mechanism characterisation --- on Gemma Scope SAEs at L\,4 and on
+locally-trained SAEs at the OLMo / Pythia L\,10 caches. The
+agreement-map localisation is itself a contribution: it constrains
+where the residual mechanism lives in each model's depth, and the
+contemporary SAE-feature-labelling literature has the tooling to
+characterise the relevant decision-boundary geometry once given the
+layer and cache pointers.
+
+% =========================================================================
+\section{Limitations}
+\label{sec:limits}
+
+\paragraph{Scale.} All three models tested are at the $6.9$--$9$B
+parameter range. We have not tested whether the pattern dissolves at
+$70$B+ frontier scale; the trained-vocabulary-bound positive finding
+and the novel-operator-generalisation negative finding may both be
+properties of mid-scale base models specifically. Phase 0 (not
+included in this paper) compared OLMo 2 1B vs 7B and showed a modest
+gap reduction; the trajectory does not project clean closure at
+frontier scale.
+
+\paragraph{Base models only.} All three models tested are
+pre-instruction-tuning base checkpoints. Whether instruction tuning
+extends the model's novel-operator-generalisation capability
+(partially refuting Fact 2), strengthens the trained-vocabulary
+geometric structure (strengthening Fact 1's causal grounding without
+altering the headline), or has no effect on either, is an open
+question.
+
+\paragraph{Trained-vocabulary scope of Fact 1 (resolved by
+\S\ref{sec:contentword}).} The \S\ref{sec:contentword} content-word
+control resolves what was a v1-draft limitation in favour of the
+broader trained-vocabulary-bound framing. Two residual limits on the
+reframed claim are worth flagging. (a) \textbf{Novel content-word
+generalisation is untested.} Fact 2 demonstrates novel-\emph{operator}
+generalisation failure under canonical-set expansion
+(canonical-attractor compression; the ``default-to-rarest''
+single-axis reading is rejected by \S\ref{sec:default}); the analog
+test with novel content-words inserted into a content-word readout
+has not been run. The combined claim ``trained-vocabulary
+substrate-invariance holds; novel-word generalisation fails'' is
+therefore demonstrated for operators only; the content-word side is
+half-tested (in-vocabulary content words PASS Fact 1; novel content
+words are an open empirical question). (b) \textbf{The
+\S\ref{sec:contentword} \FtoN{} asymmetry in OLMo ($\Mc = 0.376$ for
+content words at the reverse-direction cell) is a model-specific
+anomaly} that does not appear at the same cell with canonical
+operators. We document it as a methodological caveat on \FtoN{}
+robustness for content-word probes in OLMo; it does not weaken the
+principal \NtoF{} REFRAME trigger.
+
+\paragraph{Causal-patching intervention design.} The
+\S\ref{sec:causal} patching protocol uses two strong
+operationalisation choices that should be flagged.
+\textbf{(a) Mean-pooled source activations.} Patch sources are the
+mean NEUTRAL canonical activation across $N = 50$ stimuli, which
+sits at the centroid of the canonical's residual-stream distribution
+rather than at a representative single draw. This biases the patch
+toward the canonical's geometric prototype and washes out
+per-stimulus variance; an individual-stimulus patch may behave
+differently. The \texttt{RANDOM\_NORM} control catches norm-matched
+random vectors but not the centroid-bias confound. The mean-pool
+choice is defensible on the grounds that \S\ref{sec:fact1}
+establishes the canonical's \emph{shared} cross-notation geometric
+structure as the load-bearing claim --- patching with the
+canonical-typical activation is the natural extension of that claim
+--- but the choice is not innocent. A single-stimulus-patch
+robustness check is the cheapest follow-up that would tighten the
+\S\ref{sec:causal} verdicts. \textbf{(b) Cross-notation source-target
+attention-pattern mismatch.} The patch replaces a FUNC-PFX-context
+residual with a NEUTRAL-context source vector while the downstream
+forward pass continues in FUNC-PFX context. If FUNC-PFX positions
+downstream of the patch target have a strong attention pattern back
+to FUNC-PFX-specific syntactic markers (parentheses, commas), the
+patch's downstream effect is filtered through a FUNC-PFX-specific
+aggregation that the NEUTRAL source vector does not coordinate with.
+The OLMo flagship cell's causal inertness (\S\ref{sec:causal} Cell 4,
+plus the within-target source-anchor flip in Cell 5) is therefore
+consistent with two distinct readings: ``L\,10 close-paren is not
+on the causal path for arity-respecting downstream computation''
+\emph{or} ``L\,10 close-paren is read out by L\,11--32 through a
+FUNC-PFX-specific attention pattern that does not propagate a
+NEUTRAL-sourced patched signal''. Our 5-cell evidence narrows the
+reading --- both NEUTRAL source anchors fail at this target, so a
+\emph{single}-source attention-pattern-mismatch reading is harder to
+sustain --- but cannot fully distinguish the two interpretations;
+the safer \S\ref{sec:causal} wording is ``probe-readable but
+causally inert \emph{under NEUTRAL-sourced mean-pooled patching at
+this target}'' rather than ``not on the causal path''.
+
+\paragraph{Causal evidence is partial.} Script 25a tests five cells
+across two runs (three principal Phase-1/Phase-2 cells plus two
+post-review follow-ups); script 25d adds a per-word \dspec{}
+bootstrap on Cell 2. The cell-wise outcomes are one CLEAN PASS
+(Gemma \texttt{opera$\to$close L\,2}) and four FAIL. The cross-family
+Fact-1 anchor (Gemma \texttt{opera$\to$opera L\,4}) fails under the
+per-word bootstrap: mean ratio $1.3$--$2\times$ over
+\texttt{RANDOM\_NORM} but per-word \dspec{} 95\% CI straddles zero on
+both axes (\texttt{not} CI $[-0.001, +0.031]$, \texttt{and} CI
+$[-0.005, +0.020]$). The other three FAILs are Gemma
+\texttt{sente$\to$close L\,2}, OLMo \texttt{sente$\to$close L\,10},
+and OLMo \texttt{opera$\to$close L\,10}, all under the mean-ratio
+criterion. The \S\ref{sec:causal} v1-draft ``WEAK PASS verdict at
+the soft boundary'' hedge for the Fact-1 anchor cell is now resolved
+against it: under the cleaner \dspec{} statistic the cell's causal
+effect is not statistically distinguishable from the norm-matched
+\texttt{RANDOM\_NORM} baseline within sampling variability across
+the 16 invented words. Pythia 6.9B-d is not in
+the patching sweep at all, and the OLMo Fact-1 close-paren target
+has only been tested under NEUTRAL-sourced mean-pooled patches, not
+FUNC-PFX-sourced or individual-stimulus interventions. Three
+remaining cheap follow-ups: (i) a per-(word, stim) \dspec{} re-run
+at Cell 2 with per-word \texttt{RANDOM\_NORM} baselines, rather than
+25d's aggregate-offset baseline --- requires re-running script 25a
+with extended per-word \texttt{RANDOM\_NORM} logging (${\sim}6$~min
+on MPS); (ii) Pythia 6.9B-d causal cells at L\,4 and L\,10
+(${\sim}20$~min on MPS); (iii) individual-stimulus patches at the
+Gemma CLEAN PASS cell to control for the mean-pool centroid-bias
+confound flagged in (a) above.
+
+\paragraph{Single structural domain.} Logic-inspired operator-role
+vocabulary only, framed by binary-vs-unary arity assignments rather
+than truth-functional semantics. Substrate-invariance for
+\emph{executed} propositional or modal logic (e.g., whether the
+model's representation transfers when the same inference must be
+carried out, not merely when an operator-role token is named), for
+set theory, algebra ($S_4$ and similar finite groups), simple type
+theory, or other formal-structure domains is unverified.
+
+\paragraph{Confounded operator length.} Canonical operators are
+mostly 1 BPE token; most invented operators are 2 BPE tokens. Prior
+subword-length variation work (not in this paper's scope) showed the
+failure pattern is length-independent across $L \in \{1, 2, 3, 4\}$,
+but the headline numbers retain a residual length confound.
+
+\paragraph{Pre-registration scope.} The pre-registered v6 expansion
+(\S\ref{sec:prereg}) freezes the canonical additions, single-axis
+predictions, and audit gate. The remainder of the analysis pipeline
+(lucky-default detector refinement, \Mc{}~/~\Ma{} introduction,
+causal-patching protocol) was developed iteratively over the
+project's lifetime; a clean Phase 3 replication on novel templates
+with the full methodology pre-registered would be required before
+any of these results should be considered fully confirmatory.
+
+\paragraph{Probe-instrument dependence.} Our probe is a logistic
+regression on raw residual-stream activations with L2
+regularisation. Alternative probe families (nearest-centroid, ridge
+regression, StandardScaler+LR, small MLP probes) may produce
+qualitatively different per-canonical readouts on the same
+activations. We have not systematically varied the probe family.
+
+\paragraph{Mean-pooled cosine is a single-resolution semantic-
+neighborhood operationalisation.} \S\ref{sec:embsim} rules out
+mean-pooled cosine specifically; the gap might be closed by
+attention-pattern-weighted projections, learned attribution methods,
+or sparse-autoencoder feature labelling. We leave these to future
+work.
+
+% =========================================================================
+\section{Conclusion}
+\label{sec:conclusion}
+
+Across three open base language model families at the $6.9$--$9$B
+parameter range --- spanning three training corpora, three
+architectures, and three tokenizers --- substrate-invariance under
+cross-notation rewriting has a geometric / linear-probe-readable form
+that holds \textbf{inside the model's trained vocabulary, within the
+tested 15-operator + 15-content-word readout sets at the principal
+\NtoF{} operator-after cell} (cross-notation linear-probe transfer
+at $\Mc = 1.000$ with bootstrap CI $[1.000, 1.000]$ under 15-class
+readout, surviving three independent scope expansions and a
+pre-specified post-review non-operator content-word control that
+triggered the reframe from the v1-draft ``operator-set-bound'' claim
+to the scope-limited trained-vocabulary-bound claim) and \textbf{is
+not robust outside the trained operator set} (the apparent
+arity-respecting routing at earlier scopes is retracted under
+pre-registered canonical-set expansion in all three model families;
+the underlying mechanism is a canonical-attractor compression that
+no single-axis statistic (including the v3-era ``default-to-rarest''
+reading) captures; one tightly-scoped Gemma 2 9B L\,2 close-paren
+cell is a causally-validated single-model exception).
+
+A 5-cell causal-patching sweep finds that the geometric Fact 1 does
+not imply causal load-bearingness: the principal cross-family Fact-1
+cell has mean \dkl{} approximately $1.3$--$2\times$ the norm-matched
+control but its per-word \dspec{} 95\% CI straddles zero on both
+axes (FAIL under the cleaner statistic; script 25d), the OLMo
+flagship cell is causally inert under both tested source anchors,
+and the only cleanly causally-arity-respecting cell is a Gemma v6
+emergent cell at L\,2 close-paren, not a Fact-1 anchor. Within-
+target source-anchor flip can produce opposite verdicts at identical
+target and layer, but source anchor is not directionally
+deterministic across cells --- the verdict is the joint product of
+source, target, and layer. An embedding-similarity probe rules out
+the most natural single-factor closing of the canonical-attractor
+compression mechanism (mean-pooled cosine similarity is not the
+residual axis the v6 disentanglement failed to isolate); the
+residual factor is probe-decision-boundary geometry, not raw
+cosine.
+
+The two-part finding locates a precise empirical edge of the
+Platonic Representation Hypothesis at the within-language scale:
+substrate-independent \emph{geometric} structure for the trained
+vocabulary items tested at the principal anchor and direction ---
+and not specifically for any hypothesized semantic category --- with
+non-uniform and generally modest causal load-bearingness; no
+equivalent substrate-independent category that extends to novel
+operators (and the novel-content-word analog is unverified).
+Methodologically, we contribute the within-vocabulary content-word
+control (the load-bearing test for any probe-based
+substrate-invariance study that claims domain-specific
+representation), the lucky-default detector, the \Mc{}~/~\Ma{}
+dissociation, and the same-target~/~different-source patching
+protocol. The remaining mechanism question --- what specifically
+about the probe's learned weights produces per-word-specific routing
+that mean-pooled cosine cannot reproduce --- is the natural next
+direction for sparse-autoencoder feature labelling at the layer
+coordinates we identify (probe weights shipped in
+\texttt{experiments/probes/}; residual-stream caches available on
+request).
+
+% =========================================================================
+\bibliography{references}
+
+% =========================================================================
+\appendix
+% Tighter spacing for the appendix-only \subsection* headings, so item J
+% lands on the last text page instead of orphaning to a new page.
+\renewcommand{\subsectionautorefname}{Appendix}
+\makeatletter
+\renewcommand\subsection{\@startsection{subsection}{2}{\z@}%
+  {1.0ex \@plus0.4ex \@minus 0.2ex}%
+  {0.6ex \@plus 0.2ex}%
+  {\normalfont\large\bfseries}}
+\makeatother
+\section*{Appendix}
+
+This appendix is a minimal arXiv-v1 supplement; the bulk artefacts
+(full 240-row sweep tables, per-cell \texttt{.npz} activation caches,
+per-stimulus \dkl{} traces, four-condition stimulus template files)
+are released in the public repository
+\url{https://github.com/brendanbudworth-research/trained-vocab-substrate-invariance}
+at commit \texttt{e6afe5e358454a8a5ca85f369eb2206a847b34d5} (short:
+\texttt{e6afe5e}). Each appendix item below is either fully
+reproduced here or marked \textbf{[repo-supplement]} with the exact
+file path that contains the bulk content.
+
+\subsection*{A.\ \ Stimulus templates}
+\label{app:templates}
+Four template families: NEUTRAL carryover (50 templates), NEUTRAL
+held-out (50), FUNC-PFX carryover (50), FUNC-PFX held-out (50).
+NEUTRAL templates are English-metalinguistic prose (e.g.,
+\texttt{"the operator OP applied to A and B yields \ldots"});
+FUNC-PFX templates are programming-style functional-prefix (e.g.,
+\texttt{OP(A, B) = \ldots}). Carryover and held-out template
+families are disjoint by lexical scaffold. Templates are shipped in
+\texttt{experiments/19b\_directional\_angle\_gated.py}
+(NEUTRAL~/~FUNC-PFX carryover) and
+\texttt{experiments/24\_v6\_canonical\_expansion.py} (held-out).
+\textbf{[repo-supplement]}
+
+\subsection*{B.\ \ Hyperparameters}
+Logistic-regression probe (sklearn \texttt{LogisticRegression}):
+$C = 1.0$, \texttt{max\_iter = 5000}, \texttt{solver = "lbfgs"}, no
+class weighting, no feature scaling. M1: stratified 5-fold CV. \Mc{}
+/~\Ma{}: train on NEUTRAL anchor activations, evaluate on FUNC-PFX
+anchor activations (or reverse, for \FtoN{} analyses). Bootstrap
+$B = 500$ for M2 and \Mbfb{} CIs (resampling at the (stimulus, word)
+level); $B = 100$ for M3 angle CIs; $B = 200$ for \S\ref{sec:causal}
+(25b) agreement CIs; $B = 500$ for Cell-2 \dspec{} per-word bootstrap
+(\S\ref{sec:causal}, 25d). Random seed $\text{SEED} = 1337$
+throughout (\texttt{experiments/figures/\_shared.py}).
+
+\subsection*{C.\ \ v6 sweep verdict tally}
+Cells $\times$ models
+$\times$ scopes, replayed under both running-code and frozen
+criteria, \texttt{outputs/24b\_20260521\_120258.log}). Each cell is
+one (direction, source-anchor, target-anchor, layer) tuple in the
+per-model focus-layer grid (Gemma $\{2, 4, 8, 16, 17\}$;
+OLMo~/~Pythia $\{4, 7, 10, 16, 24\}$), giving 2 directions $\times$
+2 source anchors $\times$ 4 target anchors $\times$ 5 layers = 80
+cells per model per scope, 240 total per scope:
+
+\begin{table}[h]
+  \centering
+  \small
+  \resizebox{\linewidth}{!}{%
+  \begin{tabular}{llrrrr}
+    \toprule
+    Model & scope & cells & PASS-arity (running) & PASS-arity (frozen) & verdict diffs\\
+    \midrule
+    Gemma 2 9B    & v3 & 80 & 2 & 2 & 0\\
+    Gemma 2 9B    & v4 & 80 & 0 & 0 & 0\\
+    Gemma 2 9B    & v5 & 80 & 0 & 0 & 0\\
+    Gemma 2 9B    & v6 & 80 & 2 & 2 & 0\\
+    OLMo 2 7B     & v3 & 80 & 3 & 3 & 0\\
+    OLMo 2 7B     & v4 & 80 & 3 & 3 & 0\\
+    OLMo 2 7B     & v5 & 80 & 0 & 0 & 0\\
+    OLMo 2 7B     & v6 & 80 & 0 & 0 & 0\\
+    Pythia 6.9B-d & v3 & 80 & 4 & 3 & \textbf{1}\\
+    Pythia 6.9B-d & v4 & 80 & 3 & 3 & 0\\
+    Pythia 6.9B-d & v5 & 80 & 0 & 0 & 0\\
+    Pythia 6.9B-d & v6 & 80 & 0 & 0 & 0\\
+    \bottomrule
+  \end{tabular}}
+  \caption{v6 sweep PASS-arity verdict tally by model, scope, and
+  criterion (running-code vs frozen pre-registered). The single
+  verdict diff is documented in the text below.}
+  \label{tab:appC}
+\end{table}
+
+Single verdict diff: Pythia v3 \texttt{N$\to$F opera$\to$close L\,16}
+is PASS-arity under the running-code wider M4a band
+$[0.10, 0.90]$ but ARITY-AXIS-ONLY under the frozen $[0.20, 0.80]$
+band ($\text{M4a} = 0.192$). The headline P\_RETRACT verdict (zero
+PASS-arity cells at v6 in OLMo and Pythia; the two emergent Gemma
+v6 cells are byte-identical under both criteria) is robust to which
+criterion is used. Full 960-row per-cell table
+\textbf{[repo-supplement: \texttt{outputs/24\_20260520\_185537.log}]}.
+
+\subsection*{D.\ \ M1-heldout per cell (template-leakage diagnostic)}
+Probe trained on carryover templates of one condition, evaluated on
+the syntactically-disjoint held-out template family of the
+\emph{same} condition. At the principal Fact-1 / Fact-2 cells:
+
+\begin{itemize}
+  \item Gemma 2 9B FUNC-PFX \texttt{opera-after} L\,2 / L\,4 / L\,8:
+    M1-heldout $= 1.00 / 0.99 / 0.95$.
+  \item OLMo 2 7B FUNC-PFX \texttt{opera-after} L\,4 / L\,7 / L\,10:
+    M1-heldout $= 0.94 / 0.96 / 0.97$.
+  \item Pythia 6.9B-d FUNC-PFX \texttt{opera-after} L\,4 / L\,7 / L\,10:
+    M1-heldout $= 0.96 / 0.94 / 0.96$.
+\end{itemize}
+
+Late-layer FUNC-PFX \texttt{sentence-final} and \texttt{close-paren}
+cells degrade substantially (Gemma FUNC-PFX \texttt{sentence-final}
+L\,8 = 0.30, OLMo FUNC-PFX \texttt{close-paren} L\,24 = 0.37); these
+are not the locus of any positive finding. Full per-cell table
+\textbf{[repo-supplement: \texttt{outputs/24\_20260520\_185537.log}]}.
+
+\subsection*{E.\ \ The eight retracted v3 PASS-arity cells (frozen-criterion replay)}
+Per-scope (\Ma{}, \Mbfb{}, \Mbfc{}-HHI,
+M4a, \pwmin{}) trajectories for each cell from v3 through v6, under
+the frozen pre-registered criterion, are listed in
+\texttt{outputs/24b\_20260521\_120258.log} (the ``Cells PASS-arity
+under EITHER criterion (any scope)'' blocks per model). All eight
+cells are retracted by v5; the retraction trajectories are detailed
+in \S\ref{sec:fact2} of the main text. The pre-pre-registration
+Phase-1 sweep (\texttt{experiments/22b\_invented\_set\_expansion.py})
+ran on its own pre-v6 caches and flagged a related but not byte-
+identical four-cell candidate set; lab notes \S3.7.21 reconciles the
+two cell sets, and the v6-pipeline list is the
+criterion-of-record. \textbf{[repo-supplement]}
+
+\subsection*{F.\ \ Pre-registration document}
+\texttt{experiments/preregistration\_v6.md}, header \texttt{Status:
+FROZEN. Written before any v6 extraction or analysis runs},
+published in commit \texttt{e6afe5e} alongside the v6 extraction
+script and the resulting v6 sweep log. The document specifies the
+five v6 canonical additions, the three single-axis
+P\_FREQ~/~P\_SUBWORD~/~P\_INTERACTION predictions for the default
+mechanism, and the frozen PASS-arity criterion (\Mbfc{} as
+$\max_c p_c \leq 0.85$, M4a band $[0.20, 0.80]$). \S\ref{sec:prereg}
+reports the criterion-drift between the running code and this
+document and the cache-only replay reconciliation (script 24b).
+\textbf{[repo-supplement]}
+
+\subsection*{G.\ \ Tokenization audit summary}
+All 15 v6 canonicals, the
+16 invented Tier-2 BPE words, and the 15 content-word control items
+were audited at extraction time for subword decomposition under each
+model's tokenizer (Gemma 2 SentencePiece BPE, OLMo 2 BPE, Pythia
+BPE). Per-canonical subword piece counts are listed in
+Table~\ref{tab:default} (\S\ref{sec:default}) under the
+\texttt{Tok} column. The multi-piece rates are tokenizer-dependent
+and asymmetric across the three families:
+
+\begin{itemize}
+  \item \textbf{v6 canonical set (15 words).} Gemma 2 9B: 1/15
+    multi-piece (\texttt{unprovably}). OLMo 2 7B: 3/15
+    (\texttt{xor}, \texttt{nand}, \texttt{unprovably}). Pythia 6.9B-d:
+    4/15 (\texttt{xor}, \texttt{nand}, \texttt{negate},
+    \texttt{unprovably}).
+  \item \textbf{Content-word control set (15 words,
+    \S\ref{sec:contentword}).} Gemma 2/15; OLMo 3/15; Pythia 4/15
+    (script 25c audit; concrete word lists at
+    \texttt{outputs/25c\_20260521\_092243.log} \texttt{[audit]}
+    blocks).
+  \item \textbf{Invented Tier-2 BPE set (16 words).} 0/16
+    multi-piece in all three tokenizers --- this is what ``Tier-2
+    BPE'' denotes in this paper, and the v6 design accepted the
+    residual multi-piece canonicals (\texttt{xor}, \texttt{nand},
+    \texttt{negate}, \texttt{unprovably}) in exchange for spanning a
+    wider corpus-frequency range.
+\end{itemize}
+
+The asymmetry between Gemma's 1/15 and Pythia's 4/15 multi-piece v6
+rate is the cleanest correlate of \texttt{nand}'s $40.5\%$ OLMo
+invented-mass share (Table~\ref{tab:default}) and the $63.4\%$
+multi-piece-aggregate in Pythia v6 (Table~\ref{tab:default}, last
+row) --- but as \S\ref{sec:default} reports, neither subword shape
+alone nor frequency alone fits the per-canonical invented-mass
+distribution in any single model. Full per-(model, word) audit
+\textbf{[repo-supplement:
+\texttt{experiments/16\_canonical\_set\_audit.py},
+\texttt{outputs/25c\_20260521\_092243.log}]}.
+
+\subsection*{H.\ \ Activation-patching forward-hook implementation note}
+\label{app:hook}
+The v1 implementation of script 25a read the patched residual from
+\texttt{out.hidden\_states[layer]} (i.e., the captured
+hidden-states tuple from \texttt{output\_hidden\_states=True}). On
+MPS with current-generation HuggingFace \texttt{transformers}
+(Gemma 2 + OLMo 2), the forward hook's return value correctly
+replaced the layer's effective output for downstream computation
+(the next-token logits \emph{do} shift under patching), but the
+hidden-states tuple captured the pre-hook output. Practical
+consequence in v1: probe-causality readings of ${\sim}0\%$ across
+all conditions (the probe reads the pre-patch residual, which is
+identical across \texttt{BASELINE / PATCH\_not / PATCH\_and}),
+while behavioural KL shifts were \emph{already correct in v1}
+because they read the next-token logits which use the post-patch
+residual. The v2 fix replaces the hidden-states read with a capture
+inside the same forward hook ---
+\texttt{\_make\_patch\_capture\_hook} directly appends the
+post-patch slice at \texttt{[0, position, :]} into a Python list
+--- guaranteeing the probe sees exactly what subsequent layers see.
+v2 probe-causality is $100\%$ at all three originally-tested cells;
+v2 behavioural KL is byte-identical to v1. The bug therefore would
+not have invalidated the \S\ref{sec:causal} \dkl{} results (the
+principal causal claims) had v1 been published as-is, but the v1
+probe-causality readings of ${\sim}0\%$ across all conditions would
+have read as ``the patch never reaches the residual,'' producing an
+incorrect interpretation of the activation-patching protocol's
+effectiveness. We report both for transparency.
+
+\subsection*{I.\ \ The \S\ref{sec:dissoc} dissociation cell across additional probe variants}
+v3--v4--v5--v6 \Mc{} and \Ma{} bootstrap
+CIs at the OLMo \texttt{\NtoF{} sente$\to$close L\,10} cell are
+tabulated in Table~\ref{tab:dissoc} of the main text; the
+\Ma{}~/~\Mc{} gap persists across all four scopes. Replication of
+the dissociation with class-balanced and scaled-feature probe
+variants \textbf{[repo-supplement:
+\texttt{experiments/22d\_probe\_variants.py}]}.
+
+\subsection*{J.\ \ Cell-2 per-word \dspec{} bootstrap (\S\ref{sec:causal}, 25d)}
+For Gemma \texttt{opera$\to$opera L\,4} (Cell 2), $\dspec
+= \dkl_{\text{targeted}} - \dkl_{\text{random\_mean}}$ is bootstrapped
+($B = 500$) across the 16 invented words, using the model-wide
+\texttt{RANDOM\_NORM} mean as the per-axis offset. Result: \texttt{not}
+axis 95\% CI $[-0.001, +0.031]$ (13/16 positive), \texttt{and} axis
+$[-0.005, +0.020]$ (11/16 positive); both straddle zero, so the
+mean-ratio signal does not firm up and Cell 2 is reclassified FAIL in
+Table~\ref{tab:causal}. A per-(word, stim) \texttt{RANDOM\_NORM}
+rerun (Phase 2) would tighten the baseline; the present 25d statistic
+already shifts the verdict against the strong causal reading, so the
+rerun is not headline-changing.
+\textbf{[repo-supplement: \texttt{outputs/25d\_*.log},
+\texttt{experiments/25d\_delta\_specific\_bootstrap.py}]}.
+
+\end{document}

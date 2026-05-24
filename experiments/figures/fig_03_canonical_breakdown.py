@@ -83,61 +83,62 @@ def compute_breakdown(scope: str):
 
 def main():
     plt = setup_matplotlib()
-    fig, axes = plt.subplots(1, 4, figsize=(13.5, 3.4))
+    # 2x2 grid so each panel gets ~2x the linear scale of the previous 1x4
+    # strip. v6 in particular has 15 canonicals on its x-axis, which were
+    # illegible at fontsize=7 in the strip layout.  Kept wider than tall so
+    # \includegraphics[width=\linewidth] doesn't overflow a page slot.
+    fig, axes = plt.subplots(2, 2, figsize=(11.5, 7.0), sharey=True)
+    axes_flat = axes.flatten()
 
     color_unary = "#1f77b4"
     color_binary = "#d62728"
 
-    for ax, scope in zip(axes, SCOPE_LIST):
+    for ax, scope in zip(axes_flat, SCOPE_LIST):
         canonicals, breakdown, m4b = compute_breakdown(scope)
         ys = [breakdown[c] * 100 for c in canonicals]
         colors = [color_unary if c in UNARY_V6 else color_binary
                   for c in canonicals]
         bars = ax.bar(range(len(canonicals)), ys, color=colors,
-                      edgecolor="black", linewidth=0.4)
+                      edgecolor="black", linewidth=0.5)
+
+        # Bar-label font shrinks with canonical-set size so v5/v6's narrow
+        # bars don't get text wider than the bar.
+        n = len(canonicals)
+        label_fs = 10 if n <= 5 else (9 if n <= 10 else 8)
 
         for bar, c, v in zip(bars, canonicals, ys):
-            if v >= 12:
-                ax.text(bar.get_x() + bar.get_width() / 2, v - 4,
-                        f"{c}\n{v:.0f}%", ha="center", va="top",
-                        fontsize=7.5, color="white", fontweight="bold")
-            elif v >= 1:
+            if v >= 1:
+                # Uniform placement: percentage always sits just above the
+                # bar in plain black text; canonical name is on the x-axis.
                 ax.text(bar.get_x() + bar.get_width() / 2, v + 2,
-                        f"{c}\n{v:.0f}%", ha="center", va="bottom",
-                        fontsize=7)
+                        f"{v:.0f}%", ha="center", va="bottom",
+                        fontsize=label_fs, color="black",
+                        fontweight="bold")
 
         ax.set_xticks(range(len(canonicals)))
-        ax.set_xticklabels(canonicals, rotation=45, ha="right", fontsize=7)
-        ax.set_ylim(0, 108)
+        ax.set_xticklabels(canonicals, rotation=45, ha="right", fontsize=10)
+        ax.set_ylim(0, 122)
         ax.set_yticks([0, 25, 50, 75, 100])
-        ax.set_yticklabels(["0%", "25%", "50%", "75%", "100%"], fontsize=8)
+        ax.set_yticklabels(["0%", "25%", "50%", "75%", "100%"], fontsize=10)
         n_words = len(SCOPE_INVENTED[scope])
         n_canon = len(canonicals)
-        ax.set_title(f"{scope}  ({n_canon} canonicals × {n_words} invented)\n"
+        ax.set_title(f"{scope}  ({n_canon} canonicals × {n_words} invented)   "
                      f"M4b = {m4b * 100:.0f}%",
-                     fontsize=9.5)
+                     fontsize=12, pad=6)
 
-    axes[0].set_ylabel("share of invented predictions")
+    # Shared y-label on the leftmost panels of each row only.
+    axes[0, 0].set_ylabel("share of invented predictions", fontsize=11)
+    axes[1, 0].set_ylabel("share of invented predictions", fontsize=11)
 
     handles = [
         plt.Rectangle((0, 0), 1, 1, color=color_unary, label="unary canonical"),
         plt.Rectangle((0, 0), 1, 1, color=color_binary, label="binary canonical"),
     ]
-    # Place legend below the panels (out of the way of any 100% bar that
-    # may extend to the top of any axes; v6 in particular collapses to
-    # `unprovably` at 100% on the right edge of the panel).
     fig.legend(handles=handles, loc="lower center", ncol=2,
-               bbox_to_anchor=(0.5, -0.04), fontsize=9, frameon=False)
+               bbox_to_anchor=(0.5, -0.01), fontsize=11, frameon=False)
 
-    fig.suptitle(
-        "Figure 3. Per-canonical breakdown of invented-word predictions at "
-        "OLMo 2 7B `N→F sente→close L 10` across the four pre-registered "
-        "scopes (v3 → v6). M4b is the intended-arity agreement (chance ≈ 50% "
-        "under the majority-arity baseline). v3 appears arity-respecting; "
-        "v5 and v6 collapse 100% to a single attractor (`nand` / `unprovably`).",
-        fontsize=8.5, y=1.04,
-    )
-    fig.tight_layout(rect=(0, 0.04, 1, 1))
+    # No fig.suptitle: LaTeX \caption{} carries the explanatory prose.
+    fig.tight_layout(rect=(0, 0.03, 1, 1))
     save_figure(fig, "fig_03_canonical_breakdown")
 
 

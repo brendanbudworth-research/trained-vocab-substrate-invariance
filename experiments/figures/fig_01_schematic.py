@@ -169,19 +169,10 @@ def main():
         draw_box(ax, x, 0.16, bw, bh, name, sublabel=sub,
                  facecolor="#fafafa", fontsize=9, fontweight="bold")
 
-    # ---- BOTTOM annotation ---------------------------------------------
-    ax.text(0.5, 0.07,
-            "All three model families return Fact 1 = ceiling and Fact 2 = chance "
-            "at the principal operator-after L 4 cell under the v6 scope (15 "
-            "canonicals × 16 invented). The §4.1.1 content-word control extends "
-            "Fact 1 to in-vocabulary content words (trained-vocabulary "
-            "substrate-invariance, not specifically operator-class).",
-            ha="center", va="center", fontsize=8.5, style="italic", color="#333")
-
-    ax.text(0.5, 0.02,
-            "Figure 1. Schematic of the substrate-invariance setup. "
-            "Notations / probes / measurements at a glance.",
-            ha="center", va="center", fontsize=9, color="#222")
+    # No in-figure caption: LaTeX \caption{} on the paper side carries the
+    # explanatory prose. (Removed bottom-of-figure ax.text(...) calls that
+    # used to bake "Figure 1. ..." into the PDF, duplicating the LaTeX
+    # caption.)
 
     save_figure(fig, "fig_01_schematic")
 

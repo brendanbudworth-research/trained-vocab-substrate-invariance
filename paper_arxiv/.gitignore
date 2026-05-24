@@ -1,0 +1,21 @@
+# TeX intermediates produced by pdflatex / bibtex
+*.aux
+*.bbl
+*.blg
+*.log
+*.out
+*.toc
+*.fdb_latexmk
+*.fls
+*.synctex.gz
+*.nav
+*.snm
+*.vrb
+
+# Build artifacts
+arxiv_submission.tar.gz
+
+# Editor / OS junk
+.DS_Store
+*.swp
+*~
